@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "173217512139",
+    "project_id": "sitnserve-fbaed",
+    "storage_bucket": "sitnserve-fbaed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173217512139:android:8ae68d6b47c8e15989b94e",
+        "android_client_info": {
+          "package_name": "com.awesomeprojects"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgFPudbPztCPdJeIfP_P84CSmRMUHeApY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

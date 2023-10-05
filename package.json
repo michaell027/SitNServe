@@ -14,6 +14,8 @@
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-native-fontawesome": "^0.3.0",
+    "@react-native-firebase/app": "^18.5.0",
+    "@react-native-firebase/firestore": "^18.5.0",
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",

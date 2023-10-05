@@ -11,13 +11,16 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 // FontAwesome Imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faBars, faHouse, faInfo, faPaintBrush } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faHouse, faInfo, faPaintBrush, faUtensils } from '@fortawesome/free-solid-svg-icons';
 
 // Screen Imports
 import HomeScreen from './src/views/HomeScreen';
 import DetailsScreen from './src/views/DetailsScreen';
 import ChangeTheme from './src/views/ChangeTheme';
 import ChangeThemeSecond from './src/views/ChangeThemeSecond';
+import RestaurantsScreen from './src/views/RestaurantsScreen';
+
+import firestore from '@react-native-firebase/firestore';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -42,7 +45,7 @@ const styles = StyleSheet.create({
 function BottomTabNavigator() {
   return (
     <Tab.Navigator
-      initialRouteName="Details"
+      initialRouteName="Home"
       screenOptions={{
         tabBarActiveTintColor: 'purple',
         tabBarInactiveTintColor: 'gray',
@@ -91,6 +94,17 @@ function BottomTabNavigator() {
                 ),
               }}
             />
+<Tab.Screen
+        name="Restaurants"
+        component={RestaurantsScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <View style={styles.iconCircle}>
+              <FontAwesomeIcon icon={faUtensils} color={color} size={size} />
+            </View>
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }
@@ -99,10 +113,20 @@ function App() {
   const drawerRef = useRef<DrawerLayoutAndroid>(null);
   const [navigationObj, setNavigationObj] = useState(null);
 
+const restaurantsCollection = firestore().collection('restaurants');
+
+restaurantsCollection.get().then((querySnapshot) => {
+  querySnapshot.forEach((doc) => {
+    console.log(doc.id, " => ", doc.data());
+  });
+}).catch((error) => {
+  console.error("Chyba pri načítavaní dokumentov: ", error);
+});
+
   const navigationView = ({ navigation }) => (
     <View className='flex-1 bg-gray-200 p-0 dark:bg-gray-500'>
         <Text className='p-4 py-16 text-center text-lg text-black dark:text-white'>
-        Názov appky
+        app
       </Text>
 
       <Pressable className='items-center justify-center py-5 px-8 rounded mb-3 bg-black'>
@@ -158,7 +182,7 @@ function App() {
               setNavigationObj(navigation);
             }}
             options={{
-                title: 'Názov App',
+                title: `Seat's App`,
                 headerLeft: () => (
                   <HeaderButtons>
                     <Pressable onPress={() => drawerRef.current?.openDrawer()}>
@@ -203,8 +227,9 @@ function App() {
               }}
             />
 
-            <Stack.Screen name="ChangeTheme" component={ChangeTheme, BottomTabNavigator} />
-            <Stack.Screen name="ChangeThemeSecond" component={ChangeThemeSecond, BottomTabNavigator} />
+        <Stack.Screen name="Restaurants" component={RestaurantsScreen} />
+        <Stack.Screen name="ChangeTheme" component={ChangeTheme} />
+        <Stack.Screen name="ChangeThemeSecond" component={ChangeThemeSecond} />
 
           </Stack.Navigator>
         </NavigationContainer>
