@@ -31,12 +31,12 @@ const buttonData = [
 function HomeScreen({ navigation }) {
   return (
     <ScrollView>
-        <StyledView className={('flex-1 min-h-[95vh] items-center justify-start')}>
-            <StyledView className={('h-[7%] w-full py-4')}>
+        <StyledView className={('flex-1 min-h-[90vh] items-center justify-start')}>
+            <StyledView className={('h-[10%] w-full py-4')}>
                 <Image source={require('./../../assets/images/logo-no-background.png')} className={('h-full self-center')} resizeMode="contain" />
             </StyledView>
-            <StyledView className={('w-full h-[93%] items-center')}>
-                <StyledView className='max-h-[65%] w-full'>
+            <StyledView className={('w-full h-[90%] items-center')}>
+                <StyledView className='max-h-[60%] w-full'>
                     <Image source={require('./../../assets/images/background.png')} className={('w-full h-full')} resizeMode="contain" />
                 </StyledView>
                 <StyledView className={('max-h-[30%] flex-row flex-wrap justify-between')}>
