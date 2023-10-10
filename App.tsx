@@ -19,8 +19,8 @@ import DetailsScreen from './src/views/DetailsScreen';
 import ChangeTheme from './src/views/ChangeTheme';
 import ChangeThemeSecond from './src/views/ChangeThemeSecond';
 import RestaurantsScreen from './src/views/RestaurantsScreen';
-
-import firestore from '@react-native-firebase/firestore';
+import RestaurantScreen from './src/views/RestaurantScreen';
+import ReserveSeatScreen from './src/views/ReserveSeatScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -112,16 +112,6 @@ function BottomTabNavigator() {
 function App() {
   const drawerRef = useRef<DrawerLayoutAndroid>(null);
   const [navigationObj, setNavigationObj] = useState(null);
-
-const restaurantsCollection = firestore().collection('restaurants');
-
-restaurantsCollection.get().then((querySnapshot) => {
-  querySnapshot.forEach((doc) => {
-    console.log(doc.id, " => ", doc.data());
-  });
-}).catch((error) => {
-  console.error("Chyba pri načítavaní dokumentov: ", error);
-});
 
   const navigationView = ({ navigation }) => (
     <View className='flex-1 bg-gray-200 p-0 dark:bg-gray-500'>
@@ -228,8 +218,10 @@ restaurantsCollection.get().then((querySnapshot) => {
             />
 
         <Stack.Screen name="Restaurants" component={RestaurantsScreen} />
+        <Stack.Screen name="Restaurant" component={RestaurantScreen} />
         <Stack.Screen name="ChangeTheme" component={ChangeTheme} />
         <Stack.Screen name="ChangeThemeSecond" component={ChangeThemeSecond} />
+        <Stack.Screen name="ReserveSeatScreen" component={ReserveSeatScreen} />
 
           </Stack.Navigator>
         </NavigationContainer>
