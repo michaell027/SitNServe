@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ScrollView, Pressable } from 'react-native';
 import { styled } from 'nativewind';
-
 import firestore from '@react-native-firebase/firestore';
 
 function RestaurantsScreen({ navigation }) {
