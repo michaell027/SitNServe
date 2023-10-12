@@ -52,7 +52,7 @@ function RestaurantScreen({ navigation, route }) {
     }, [restaurantId]);
 
     const handleScanQR = () => {
-        navigation.navigate('ReserveSeatScreen')
+        navigation.navigate('ReserveSeatScreen' , { restaurantId: restaurantId })
         console.log(`Scanning QR for restaurant with ID: ${restaurantId}`);
     };
 
