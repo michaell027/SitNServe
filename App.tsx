@@ -21,6 +21,8 @@ import ChangeThemeSecond from './src/views/ChangeThemeSecond';
 import RestaurantsScreen from './src/views/RestaurantsScreen';
 import RestaurantScreen from './src/views/RestaurantScreen';
 import ReserveSeatScreen from './src/views/ReserveSeatScreen';
+import ScanScreen from './src/views/ScanScreen';
+import RestaurantInfoScreen from './src/views/RestaurantInfoScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -222,6 +224,8 @@ function App() {
         <Stack.Screen name="ChangeTheme" component={ChangeTheme} />
         <Stack.Screen name="ChangeThemeSecond" component={ChangeThemeSecond} />
         <Stack.Screen name="ReserveSeatScreen" component={ReserveSeatScreen} />
+        <Stack.Screen name="ScanScreen" component={ScanScreen} />
+        <Stack.Screen name="RestaurantInfoScreen" component={RestaurantInfoScreen} />
 
           </Stack.Navigator>
         </NavigationContainer>
