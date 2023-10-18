@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ImageBackground, StyleSheet, ActivityIndicator } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faQrcode, faChair, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
@@ -97,9 +97,9 @@ function RestaurantScreen({ navigation, route }) {
                 </StyledView>
             </StyledComponent>
         ) : (
-            <StyledView style={('flex-1 justify-center items-center')}>
-                <StyledText>Loading...</StyledText>
-            </StyledView>
+            <StyledComponent component={View} className={(' flex h-[90vh] justify-center items-center ')}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </StyledComponent>
         )
     );
 }
