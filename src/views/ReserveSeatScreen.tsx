@@ -11,33 +11,31 @@ function ReserveSeatScreen({ navigation, route }) {
         .database('https://sitnserve-fbaed-default-rtdb.europe-west1.firebasedatabase.app/')
         .ref(`/restaurant_id/${restaurantId}/seats`);
 
-useEffect(() => {
-    const unsubscribe = reference.on('value', snapshot => {
-        if (snapshot?.exists()) { // Check if snapshot exists
-            const seatsData = snapshot.val();
-            if (seatsData) {
-                const seatsArray = Object.keys(seatsData).map(key => ({
-                    ...seatsData[key],
-                    id: key
-                }));
-                setSeats(seatsArray);
+    useEffect(() => {
+        const unsubscribe = reference.on('value', snapshot => {
+            if (snapshot?.exists()) {
+                const seatsData = snapshot.val();
+                if (seatsData) {
+                    const seatsArray = Object.keys(seatsData).map(key => ({
+                        ...seatsData[key],
+                        id: key
+                    }));
+                    setSeats(seatsArray);
+                }
+            } else {
+                console.log('Firebase snapshot is not valid or cannot read from database.');
             }
-        } else {
-            console.log('Firebase snapshot is not valid or cannot read from database.');
-        }
-    });
+        });
 
-    return () => {
-        unsubscribe();
-    };
-}, []);
-
-
+        return () => {
+            unsubscribe();
+        };
+    }, []);
 
 
 const renderItem = ({ item, index }) => (
-    <View style={styles.seatContainer}>
-        <Text style={styles.seatText}>ID: {item.id} Seat: {item.seat}</Text>
+    <View className={'flex flex-row items-center justify-between p-2.5 border-2 border-gray-500 mb-4'}>
+        <Text className={'text-lg'}>ID: {item.id} Seat: {item.seat}</Text>
         <Button
             title={item.occupied ? "Reserved" : "Select"}
             onPress={() => {
@@ -53,7 +51,7 @@ const renderItem = ({ item, index }) => (
 
 
     return (
-        <View style={styles.container}>
+        <View className={'flex-1 p-2'}>
             <FlatList
                 data={seats}
                 renderItem={renderItem}
@@ -62,24 +60,5 @@ const renderItem = ({ item, index }) => (
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 10
-    },
-    seatContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: 10,
-        borderWidth: 1,
-        borderColor: 'gray',
-        marginBottom: 10
-    },
-    seatText: {
-        fontSize: 16
-    }
-});
 
 export default ReserveSeatScreen;

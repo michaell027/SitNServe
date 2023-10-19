@@ -15,6 +15,7 @@ function RestaurantInfoScreen({ navigation, route }) {
             try {
                 const doc = await firestore().collection('restaurants').doc(route.params.restaurantId).get();
                 if (doc.exists) {
+                    console.log(doc.data().openingHours);
                     setRestaurant(doc.data());
                 } else {
                     console.log('No such document!');
@@ -26,6 +27,18 @@ function RestaurantInfoScreen({ navigation, route }) {
 
         fetchRestaurantData();
     }, [route.params.restaurantId]);
+
+    const renderOpeningHours = () => {
+        const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const openingHours = restaurant.openingHours || {};
+
+        return daysOfWeek.map((day) => (
+            <View key={day} className={'flex flex-row justify-between py-1 border-b-[1px] mb-4'}>
+                <Text className={'text-black text-lg'}>{day}</Text>
+                <Text className={'text-black text-lg'}>{openingHours[day] || "Closed"}</Text>
+            </View>
+        ));
+    };
 
     // Tab Icons UI
     const renderTabIcon = (selectedContent, icon) => (
@@ -52,18 +65,24 @@ function RestaurantInfoScreen({ navigation, route }) {
                 {/* Tabs */}
                 <View className={'w-full flex flex-row w-full justify-between px-8 mb-1 mt-2'}>
                     {renderTabIcon('info', faCircleInfo)}
-                    {renderTabIcon('menu', faClock)}
+                    {renderTabIcon('openingHours', faClock)}
                     {renderTabIcon('reviews', faMapLocationDot)}
                 </View>
 
                 {/* Restaurant Description */}
                 {content == 'info' && (
-                    <View className={'px-2'}>
+                    <View className={'px-2 mt-4'}>
                         <View className={'flex flex-row justify-between items-center mt-2'}>
-                            <Text className={'text-black text-lg font-bold'}>About the restaurant...</Text>
+                            <Text className={'text-black text-xl font-bold'}>About the restaurant...</Text>
                             <Text className={'text-black text-lg font-bold'}>{restaurant.rating}</Text>
                         </View>
                         <Text className={'text-black text-lg mt-2'}>{restaurant.description}</Text>
+                    </View>
+                )}
+                {content == 'openingHours' && (
+                    <View className={'mt-4 px-2'}>
+                        <Text className={'text-black text-xl font-bold mb-6'}>Opening Hours</Text>
+                        {renderOpeningHours()}
                     </View>
                 )}
             </View>

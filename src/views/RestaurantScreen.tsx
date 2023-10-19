@@ -73,7 +73,7 @@ function RestaurantScreen({ navigation, route }) {
 
     return (
         imageUrl ? (
-            <StyledComponent component={ImageBackground} source={{ uri: imageUrl }} className={(' flex h-[90vh] justify-center items-center ')}>
+            <StyledComponent component={ImageBackground} source={{ uri: imageUrl }} className={(' flex h-[96vh] justify-center items-center ')}>
                 <StyledView className={orientation === 'LANDSCAPE' ?
                     'flex flex-row items-center bg-gray-300/80 w-fit py-6 px-10 rounded-xl space-x-2' :
                     'flex flex-col items-center bg-gray-300/80 w-fit py-6 px-10 rounded-xl space-y-6'}>
