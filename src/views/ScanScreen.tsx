@@ -74,18 +74,18 @@ import { RNCamera } from 'react-native-camera';
 
 function ScanScreen({ navigation, route }) {
     const { restaurantId } = route.params;
-    const [restaurant, setRestaurant] = useState(null);
+    const [restaurantIdAndSeat, setRestaurantIdAndSeat] = useState(null);
 
     const onSuccess = useCallback((e) => {
-        const restaurant = JSON.parse(e.data);
-        setRestaurant(restaurant);
-        checkData(restaurant);
+        const data = JSON.parse(e.data);
+        setRestaurantIdAndSeat(data);
+        checkData(data);
     }, []);
 
-    const checkData = useCallback((restaurant) => {
-        if (restaurant.restaurant_id === restaurantId) {
-            console.log(restaurant);
-            navigation.navigate('MenuListScreen', { restaurant });
+    const checkData = useCallback((restaurantIdAndSeat) => {
+        if (restaurantIdAndSeat.restaurant_id === restaurantId) {
+            console.log(restaurantIdAndSeat);
+            navigation.navigate('MenuListScreen', { restaurantIdAndSeat });
         } else {
             Alert.alert(
                 "Wrong QR code",
