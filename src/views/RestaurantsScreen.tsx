@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, Image, ScrollView, Pressable, ActivityIndicator, TextInput, StyleSheet } from 'react-native';
 import { styled } from 'nativewind';
 import firestore from '@react-native-firebase/firestore';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+
 
 function RestaurantsScreen({ navigation }) {
-    // State Declarations
     const [restaurants, setRestaurants] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // Fetch restaurants data on component mount
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -27,7 +29,10 @@ function RestaurantsScreen({ navigation }) {
         fetchData();
     }, []);
 
-    // Restaurant Card UI
+    const filteredRestaurants = restaurants.filter(restaurant =>
+        restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     const renderRestaurantCard = (restaurant) => (
         <Pressable
             key={restaurant.id}
@@ -55,10 +60,37 @@ function RestaurantsScreen({ navigation }) {
     return (
         <ScrollView>
             <View className={"flex flex-col w-full h-full px-2"}>
-                {restaurants.map(restaurant => renderRestaurantCard(restaurant))}
+                <View className={"px-2 rounded-3xl space-x-2"} style={styles.searchBar}>
+                    <FontAwesomeIcon icon={faMagnifyingGlass} />
+                    <TextInput
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        placeholder="Search..."
+                        style={styles.searchInput}
+                    />
+                </View>
+                {filteredRestaurants.map(restaurant => renderRestaurantCard(restaurant))}
             </View>
         </ScrollView>
     );
 }
+
+const styles = StyleSheet.create({
+    searchBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderColor: 'gray',
+        borderWidth: 2,
+        margin: 10,
+    },
+    searchIcon: {
+        marginLeft: 5,
+    },
+    searchInput: {
+        flex: 1,
+        height: 40,
+        paddingLeft: 5,
+    },
+});
 
 export default RestaurantsScreen;

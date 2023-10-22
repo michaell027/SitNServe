@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    
+
     <application
         android:name=".MainApplication"
         android:allowBackup="false"
@@ -23,5 +23,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCPe1QYMUIJW_Tq8lkDLTZY1LQ-M9wi6S0" />
     </application>
 </manifest>

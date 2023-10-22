@@ -3,6 +3,8 @@ import { View, Text, ScrollView, ImageBackground, Pressable } from 'react-native
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleInfo, faClock, faMapLocationDot } from '@fortawesome/free-solid-svg-icons';
 import firestore from '@react-native-firebase/firestore';
+import MapView from 'react-native-maps';
+import {Marker} from 'react-native-maps';
 
 function RestaurantInfoScreen({ navigation, route }) {
     // State Declarations
@@ -66,7 +68,7 @@ function RestaurantInfoScreen({ navigation, route }) {
                 <View className={'w-full flex flex-row w-full justify-between px-8 mb-1 mt-2'}>
                     {renderTabIcon('info', faCircleInfo)}
                     {renderTabIcon('openingHours', faClock)}
-                    {renderTabIcon('reviews', faMapLocationDot)}
+                    {renderTabIcon('map', faMapLocationDot)}
                 </View>
 
                 {/* Restaurant Description */}
@@ -83,6 +85,29 @@ function RestaurantInfoScreen({ navigation, route }) {
                     <View className={'mt-4 px-2'}>
                         <Text className={'text-black text-xl font-bold mb-6'}>Opening Hours</Text>
                         {renderOpeningHours()}
+                    </View>
+                )}
+                {content == 'map' && (
+                    <View className={'mt-4 px-2'}>
+                        <Text className={'text-black text-xl font-bold mb-2'}>Location</Text>
+                        <MapView
+                            style={{ width: '100%', height: 500 }}
+                            initialRegion={{
+                                latitude: 37.78825,
+                                longitude: -122.4324,
+                                latitudeDelta: 0.0922,
+                                longitudeDelta: 0.0421,
+                            }}
+                        >
+                            <Marker
+                                coordinate={{
+                                    latitude: 37.78825,
+                                    longitude: -122.4324,
+                                }}
+                                title={'Restaurant'}
+                                description={'Restaurant Description'}
+                            />
+                        </MapView>
                     </View>
                 )}
             </View>
