@@ -73,26 +73,26 @@ function RestaurantScreen({ navigation, route }) {
 
     return (
         imageUrl ? (
-            <StyledComponent component={ImageBackground} source={{ uri: imageUrl }} className={(' flex h-[96vh] justify-center items-center ')}>
+            <StyledComponent component={ImageBackground} source={{ uri: imageUrl }} className={"flex h-[96vh] justify-center items-center"}>
                 <StyledView className={orientation === 'LANDSCAPE' ?
                     'flex flex-row items-center bg-gray-300/80 w-fit py-6 px-10 rounded-xl space-x-2' :
                     'flex flex-col items-center bg-gray-300/80 w-fit py-6 px-10 rounded-xl space-y-6'}>
                     <StyledText style={{ textShadowColor: 'black', textShadowRadius: 4, textShadowOffset: { width: 2, height: 2 } }} className={'font-bold text-2xl text-center text-white truncate'}>
                         {restaurantName}
                     </StyledText>
-                    <StyledComponent component={Pressable} onPress={handleScanQR} className={(' bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3 ')}>
+                    <StyledComponent component={Pressable} onPress={handleScanQR} className={"bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3"}>
                         <FontAwesomeIcon icon={faQrcode} color="#ffffff" size={20} />
-                        <StyledText className={(' text-xl text-white font-bold ')}>Scan QR Code</StyledText>
+                        <StyledText className={'text-xl text-white font-bold'}>Scan QR Code</StyledText>
                     </StyledComponent>
 
                     <StyledComponent component={Pressable} onPress={handleReserveSeat} className={(' bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3 ')}>
                         <FontAwesomeIcon icon={faChair} color="#ffffff" size={20} />
-                        <StyledText className={(' text-xl text-white font-bold ')}>Reserve a seat</StyledText>
+                        <StyledText className={'text-xl text-white font-bold'}>Reserve a seat</StyledText>
                     </StyledComponent>
 
                     <StyledComponent component={Pressable} onPress={handleViewInfo} className={(' bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3 ')}>
                         <FontAwesomeIcon icon={faCircleInfo} color="#ffffff" size={20} />
-                        <StyledText className={(' text-xl text-white font-bold ')}>View Info</StyledText>
+                        <StyledText className={'text-xl text-white font-bold'}>View Info</StyledText>
                     </StyledComponent>
                 </StyledView>
             </StyledComponent>
