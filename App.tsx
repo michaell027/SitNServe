@@ -24,6 +24,7 @@ import ReserveSeatScreen from './src/views/ReserveSeatScreen';
 import ScanScreen from './src/views/ScanScreen';
 import RestaurantInfoScreen from './src/views/RestaurantInfoScreen';
 import MenuListScreen from './src/views/MenuListScreen';
+import LoginScreen from './src/views/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -228,6 +229,7 @@ function App() {
         <Stack.Screen name="ScanScreen" component={ScanScreen} />
         <Stack.Screen name="RestaurantInfoScreen" component={RestaurantInfoScreen} />
         <Stack.Screen name="MenuListScreen" component={MenuListScreen} />
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
 
           </Stack.Navigator>
         </NavigationContainer>
