@@ -49,6 +49,54 @@ function ReserveSeatScreen({ navigation, route }) {
         }
     };
 
+    const handleReserve = async () => {
+        if (!date || selectedTimes.length === 0) {
+            console.log('Please select date and time');
+            return;
+        }
+
+        const dateString = date.toISOString().split('T')[0];
+        const seat = seats.find(seat => seat.id === selectedSeatId);
+        const times = seat?.reserved[dateString];
+        console.log("times", times);
+        if (!seat || !times) {
+            console.log('Seat or times not found');
+            return;
+        }
+
+        const newTimes = selectedTimes.reduce((acc, time) => {
+            acc[time] = {
+                occupied: {
+                    value: true,
+                    by: 'user_id',
+                },
+            };
+            return acc;
+        }, {});
+        console.log("newTimes", newTimes);
+
+        const newReserved = {
+            ...times,
+            ...newTimes,
+        };
+        console.log("newReserved", newReserved);
+
+        const newSeat = {
+            ...seat,
+            reserved: {
+                ...seat.reserved,
+                [dateString]: newReserved,
+            },
+        };
+        console.log("newSeat", newSeat);
+
+        await reference.child(selectedSeatId).set(newSeat);
+        setSelectedSeatId(null);
+        setSelectedTimes([]);
+    };
+
+
+
     const renderTimes = (id) => {
         const seat = seats.find(seat => seat.id === id);
         const dateString = date.toISOString().split('T')[0];
@@ -82,6 +130,9 @@ function ReserveSeatScreen({ navigation, route }) {
                 <Text style={styles.text}>{time}</Text>
               </Pressable>
             ))}
+            <Pressable onPress={()=>handleReserve()}>
+                <Text>Send reservation</Text>
+            </Pressable>
         </View>
       );
     };
@@ -146,7 +197,7 @@ function ReserveSeatScreen({ navigation, route }) {
                         is24Hour={true}
                         display='default'
                         onChange={onChange}
-                        minimumDate={new Date()}
+                        minimumDate={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
                         maximumDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)}
                     />
 
