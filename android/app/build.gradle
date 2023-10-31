@@ -74,6 +74,7 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     namespace "com.awesomeprojects"
+    testNamespace "com.awesomeprojects.test"
     defaultConfig {
         applicationId "com.awesomeprojects"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -109,6 +110,7 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-database-ktx")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

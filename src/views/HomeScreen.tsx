@@ -20,9 +20,9 @@ function getIconSize() {
 }
 
 const buttonData = [
-    {icon: faInfo, text: 'About', navigate: 'Home'},
+    {icon: faInfo, text: 'About', navigate: 'AboutScreen'},
     {icon: faUtensils, text: 'Restaurants', navigate: 'Restaurants'},
-    {icon: faMap, text: 'Map', navigate: 'ChangeTheme'},
+    {icon: faMap, text: 'Map', navigate: 'MapScreen'},
     {icon: faQrcode, text: 'Scan', navigate: 'ChangeThemeSecond'},
     {icon: faGear, text: 'Settings'},
     {icon: faUser, text: 'My profile', navigate: 'LoginScreen'}
@@ -38,7 +38,7 @@ function HomeScreen({navigation}) {
                 </StyledView>
                 <StyledView className={('w-full h-[90%] items-center')}>
                     <StyledView className='max-h-[60%] w-full'>
-                        <Image source={require('./../../assets/images/background.png')} className={('w-full h-full')}
+                        <Image source={require('./../../assets/images/table.png')} className={('w-full h-full')}
                                resizeMode="contain"/>
                     </StyledView>
                     <StyledView className={('max-h-[30%] flex-row flex-wrap justify-between')}>

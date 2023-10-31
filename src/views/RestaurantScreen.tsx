@@ -85,12 +85,12 @@ function RestaurantScreen({ navigation, route }) {
                         <StyledText className={'text-xl text-white font-bold'}>Scan QR Code</StyledText>
                     </StyledComponent>
 
-                    <StyledComponent component={Pressable} onPress={handleReserveSeat} className={(' bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3 ')}>
+                    <StyledComponent component={Pressable} onPress={handleReserveSeat} className={"bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3"}>
                         <FontAwesomeIcon icon={faChair} color="#ffffff" size={20} />
                         <StyledText className={'text-xl text-white font-bold'}>Reserve a seat</StyledText>
                     </StyledComponent>
 
-                    <StyledComponent component={Pressable} onPress={handleViewInfo} className={(' bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3 ')}>
+                    <StyledComponent component={Pressable} onPress={handleViewInfo} className={"bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3"}>
                         <FontAwesomeIcon icon={faCircleInfo} color="#ffffff" size={20} />
                         <StyledText className={'text-xl text-white font-bold'}>View Info</StyledText>
                     </StyledComponent>

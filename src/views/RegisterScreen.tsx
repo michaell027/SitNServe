@@ -1,82 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, ScrollView, TextInput, Image } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function LoginScreen({ navigation, route }) {
+function RegisterScreen({ navigation, route }) {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
   const [email, setEmail] = useState('jane.doe@example.com');
   const [password, setPassword] = useState('SuperSecretPassword!');
 
-    const storeUser = async (user) => {
-      try {
-        await AsyncStorage.setItem('user', JSON.stringify(user));
-      } catch (error) {
-        console.log('Error storing user:', error);
-      }
-    };
+  function register() {
+    auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        console.log('User account created & signed in!');
+      })
+      .catch(error => {
+        if (error.code === 'auth/email-already-in-use') {
+          console.log('That email address is already in use!');
+        }
 
-  const loadUser = async () => {
-    try {
-      const user = await AsyncStorage.getItem('user');
-      if (user !== null) {
-        setUser(JSON.parse(user));
-      }
-    } catch (error) {
-      console.log('Error loading user:', error);
-    }
-  };
+        if (error.code === 'auth/invalid-email') {
+          console.log('That email address is invalid!');
+        }
 
-  const register = () => {
-    navigation.navigate('RegisterScreen');
-  };
+        console.error(error);
+      });
+  }
 
   function signOut() {
     auth()
       .signOut()
-      .then(() => {
-        console.log('User signed out!');
-        setUser(null);
-        AsyncStorage.removeItem('user');
-      });
+      .then(() => console.log('User signed out!'));
   }
 
-  function signIn() {
-    auth()
-      .signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            console.log('User signed in!');
-            storeUser(userCredential.user);
-            console.log(userCredential)
-        })
-        .catch(error => {
-            if (error.code === 'auth/email-already-in-use') {
-            console.log('That email address is already in use!');
-            }
-
-            if (error.code === 'auth/invalid-email') {
-            console.log('That email address is invalid!');
-            }
-
-            console.error(error);
-        });
-    }
+  const signIn = () => {
+    navigation.navigate('LoginScreen');
+  };
 
   function onAuthStateChanged(user) {
     setUser(user);
-    if (user) {
-      storeUser(user);
-    } else {
-      loadUser();
-    }
     if (initializing) setInitializing(false);
   }
 
   useEffect(() => {
-      const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-      return subscriber;
-    }, []);
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
 
   if (initializing) return null;
 
@@ -98,32 +67,31 @@ function LoginScreen({ navigation, route }) {
 
          <TextInput
            placeholder={'Email'}
-           value={email}
            className={'border-b-2 border-black/50 bg-black/5 rounded-t-md'}
            onChangeText={setEmail}
+              value={email}
          />
 
          <TextInput
            placeholder={'Password'}
-           value={password}
            className={'border-b-2 border-black/50 my-2 bg-black/5 rounded-t-md'}
            secureTextEntry={true}
            onChangeText={setPassword}
+           value={password}
          />
 
          <View className={'flex-row justify-between mt-4 gap-2'}>
+                    <Pressable
+                      className={'flex-1 rounded-md bg-white/70 flex items-center justify-center p-2'}
+                      onPress={() => register()}
+                    >
+                      <Text>Register</Text>
+                    </Pressable>
            <Pressable
              className={'flex-1 rounded-md bg-white/70 flex items-center justify-center p-2'}
              onPress={() => signIn()}
            >
              <Text>Login</Text>
-           </Pressable>
-
-           <Pressable
-             className={'flex-1 rounded-md bg-white/70 flex items-center justify-center p-2'}
-             onPress={() => register()}
-           >
-             <Text>Register</Text>
            </Pressable>
          </View>
 
@@ -143,4 +111,4 @@ function LoginScreen({ navigation, route }) {
   );
 }
 
-export default LoginScreen;
+export default RegisterScreen;

@@ -19,8 +19,10 @@ function RestaurantInfoScreen({ navigation, route }) {
         const doc = await firestore().collection('restaurants').doc(route.params.restaurantId).get();
         if (doc.exists) {
           setRestaurant(doc.data());
+          const AddressString = `${doc.data().address.street} ${doc.data().address.number}, ${doc.data().address.city}, ${doc.data().address.postalCode}, ${doc.data().address.country}`;
+          console.log(AddressString);
           // Geocoding
-          fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent('Sokoľany 259')}&key=AIzaSyCPe1QYMUIJW_Tq8lkDLTZY1LQ-M9wi6S0`)
+          fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(AddressString)}&key=AIzaSyCPe1QYMUIJW_Tq8lkDLTZY1LQ-M9wi6S0`)
             .then(response => response.json())
             .then(data => {
               const location = data.results[0].geometry.location;
