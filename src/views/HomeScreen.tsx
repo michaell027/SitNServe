@@ -25,7 +25,7 @@ const buttonData = [
     {icon: faMap, text: 'Map', navigate: 'MapScreen'},
     {icon: faQrcode, text: 'Scan', navigate: 'ChangeThemeSecond'},
     {icon: faGear, text: 'Settings'},
-    {icon: faUser, text: 'My profile', navigate: 'LoginScreen'}
+    {icon: faUser, text: 'My profile', navigate: 'ProfileScreen'},
 ];
 
 function HomeScreen({navigation}) {

@@ -197,7 +197,7 @@ function ReserveSeatScreen({ navigation, route }) {
                         is24Hour={true}
                         display='default'
                         onChange={onChange}
-                        minimumDate={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
+                        minimumDate={new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)}
                         maximumDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)}
                     />
 

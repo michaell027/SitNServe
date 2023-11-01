@@ -12,6 +12,7 @@ function LoginScreen({ navigation, route }) {
     const storeUser = async (user) => {
       try {
         await AsyncStorage.setItem('user', JSON.stringify(user));
+        console.log('stored: ' + AsyncStorage.getItem('user'));
       } catch (error) {
         console.log('Error storing user:', error);
       }
@@ -20,6 +21,7 @@ function LoginScreen({ navigation, route }) {
   const loadUser = async () => {
     try {
       const user = await AsyncStorage.getItem('user');
+      console.log('loaded: ' + AsyncStorage.getItem('user'));
       if (user !== null) {
         setUser(JSON.parse(user));
       }
@@ -39,6 +41,7 @@ function LoginScreen({ navigation, route }) {
         console.log('User signed out!');
         setUser(null);
         AsyncStorage.removeItem('user');
+        console.log('logged out: ' + AsyncStorage.getItem('user'));
       });
   }
 
@@ -78,10 +81,15 @@ function LoginScreen({ navigation, route }) {
       return subscriber;
     }, []);
 
+useEffect(() => {
+    if (user) {
+      navigation.navigate('ProfileScreen');
+    }
+  }, [user]);
+
   if (initializing) return null;
 
-  if (!user) {
-    return (
+  return (
    <ScrollView>
      <View className={'flex min-h-[90vh] w-full items-center justify-center px-2'}>
        <View className={'h-2/3 w-full bg-amber-200/50 rounded-3xl p-4'}>
@@ -133,14 +141,5 @@ function LoginScreen({ navigation, route }) {
     );
   }
 
-  return (
-    <View>
-      <Text>Welcome {user.email}</Text>
-      <Pressable onPress={()=>signOut()}>
-        <Text>Sign Out</Text>
-      </Pressable>
-    </View>
-  );
-}
 
 export default LoginScreen;
