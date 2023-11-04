@@ -31,7 +31,7 @@ const buttonData = [
 function HomeScreen({navigation}) {
     return (
         <ScrollView>
-            <StyledView className={('flex-1 min-h-[90vh] items-center justify-start')}>
+            <StyledView className='flex-1 h-[90vh] items-center justify-start'>
                 <StyledView className={('h-[10%] w-full py-4')}>
                     <Image source={require('./../../assets/images/logo-no-background.png')}
                            className={('h-full self-center')} resizeMode="contain"/>
