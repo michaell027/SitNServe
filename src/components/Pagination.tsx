@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, Animated, Dimensions } from 'react-native';
+import {View, StyleSheet, Animated, Dimensions} from 'react-native';
 
-const { width } = Dimensions.get('screen');
+const {width} = Dimensions.get('screen');
 
 interface Item {
     mainTitle: string;
@@ -18,11 +18,15 @@ interface PaginationProps {
     index: number;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ data, scrollX, index }) => {
+const Pagination: React.FC<PaginationProps> = ({data, scrollX, index}) => {
     return (
         <View style={styles.container}>
             {data.map((_, i) => {
-                const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
+                const inputRange = [
+                    (i - 1) * width,
+                    i * width,
+                    (i + 1) * width,
+                ];
                 const dotWidth = scrollX.interpolate({
                     inputRange,
                     outputRange: [12, 30, 12],

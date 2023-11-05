@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions, Image, Button } from 'react-native';
+import {View, Text, StyleSheet, Dimensions, Image, Button} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const { width, height } = Dimensions.get('screen');
+const {width, height} = Dimensions.get('screen');
 
 interface CarouselItemProps {
     item: {
@@ -15,7 +15,7 @@ interface CarouselItemProps {
     };
 }
 
-const CarouselItem: React.FC<CarouselItemProps> = ({ item }) => {
+const CarouselItem: React.FC<CarouselItemProps> = ({item}) => {
     return (
         <View style={styles.container}>
             <View style={styles.topContainer}>
@@ -23,18 +23,28 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ item }) => {
                 <Text style={styles.mainSubTitle}>{item.mainSubTitle}</Text>
             </View>
             <View style={styles.imageHolder}>
-                <Image source={item.image} resizeMode="contain" style={styles.image}></Image>
+                <Image
+                    source={item.image}
+                    resizeMode="contain"
+                    style={styles.image}></Image>
             </View>
             <LinearGradient
-                colors={['rgba(85, 204, 204, 0.8)', 'rgba(255, 255, 255, 0.8)', 'rgba(250, 250, 210, 0.8)']}
-                start={{ x: 0.0, y: 0.5 }}
-                end={{ x: 0.5, y: 0.0 }}
+                colors={[
+                    'rgba(85, 204, 204, 0.8)',
+                    'rgba(255, 255, 255, 0.8)',
+                    'rgba(250, 250, 210, 0.8)',
+                ]}
+                start={{x: 0.0, y: 0.5}}
+                end={{x: 0.5, y: 0.0}}
                 locations={[0.1, 0.5, 0.9]}
-                style={styles.content}
-            >
+                style={styles.content}>
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.description}>{item.description}</Text>
-                <Button title={item.buttonTitle.toString()} onPress={() => {}} color="#1B3A4B" />
+                <Button
+                    title={item.buttonTitle.toString()}
+                    onPress={() => {}}
+                    color="#1B3A4B"
+                />
             </LinearGradient>
         </View>
     );

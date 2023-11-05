@@ -1,23 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, StyleSheet, Platform, Pressable } from 'react-native';
-import { firebase } from '@react-native-firebase/database';
+import React, {useState, useEffect} from 'react';
+import {
+    View,
+    Text,
+    Button,
+    FlatList,
+    StyleSheet,
+    Platform,
+    Pressable,
+} from 'react-native';
+import {firebase} from '@react-native-firebase/database';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircle, faCircleCheck } from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faCircle, faCircleCheck} from '@fortawesome/free-regular-svg-icons';
 
-function ReserveSeatScreen({ navigation, route }) {
+function ReserveSeatScreen({navigation, route}) {
     const [seats, setSeats] = useState([]);
     const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
     const [showTimes, setShowTimes] = useState(false);
     const [selectedSeatId, setSelectedSeatId] = useState(null);
     const [selectedTimes, setSelectedTimes] = useState([]);
-    const { restaurantId } = route.params;
+    const {restaurantId} = route.params;
     const [selectView, setSelectView] = useState<'date' | 'table'>('date');
 
     const reference = firebase
         .app()
-        .database('https://sitnserve-fbaed-default-rtdb.europe-west1.firebasedatabase.app/')
+        .database(
+            'https://sitnserve-fbaed-default-rtdb.europe-west1.firebasedatabase.app/',
+        )
         .ref(`/restaurant_id/${restaurantId}/tables`);
 
     useEffect(() => {
@@ -32,7 +42,9 @@ function ReserveSeatScreen({ navigation, route }) {
                     setSeats(seatsArray);
                 }
             } else {
-                console.log('Firebase snapshot is not valid or cannot read from database.');
+                console.log(
+                    'Firebase snapshot is not valid or cannot read from database.',
+                );
             }
         });
 
@@ -41,7 +53,7 @@ function ReserveSeatScreen({ navigation, route }) {
         };
     }, []);
 
-    const handleTimeSelect = (time) => {
+    const handleTimeSelect = time => {
         if (selectedTimes.includes(time)) {
             setSelectedTimes(selectedTimes.filter(t => t !== time));
         } else {
@@ -58,7 +70,7 @@ function ReserveSeatScreen({ navigation, route }) {
         const dateString = date.toISOString().split('T')[0];
         const seat = seats.find(seat => seat.id === selectedSeatId);
         const times = seat?.reserved[dateString];
-        console.log("times", times);
+        console.log('times', times);
         if (!seat || !times) {
             console.log('Seat or times not found');
             return;
@@ -73,13 +85,13 @@ function ReserveSeatScreen({ navigation, route }) {
             };
             return acc;
         }, {});
-        console.log("newTimes", newTimes);
+        console.log('newTimes', newTimes);
 
         const newReserved = {
             ...times,
             ...newTimes,
         };
-        console.log("newReserved", newReserved);
+        console.log('newReserved', newReserved);
 
         const newSeat = {
             ...seat,
@@ -88,16 +100,14 @@ function ReserveSeatScreen({ navigation, route }) {
                 [dateString]: newReserved,
             },
         };
-        console.log("newSeat", newSeat);
+        console.log('newSeat', newSeat);
 
         await reference.child(selectedSeatId).set(newSeat);
         setSelectedSeatId(null);
         setSelectedTimes([]);
     };
 
-
-
-    const renderTimes = (id) => {
+    const renderTimes = id => {
         const seat = seats.find(seat => seat.id === id);
         const dateString = date.toISOString().split('T')[0];
         const times = seat?.reserved[dateString];
@@ -108,36 +118,36 @@ function ReserveSeatScreen({ navigation, route }) {
 
         return (
             <View>
-                {times && Object.keys(times)
-                    .sort((a, b) => a.localeCompare(b))
-                    .map(time => (
-                        <Pressable
-                            key={time}
-                            style={styles.button}
-                            onPress={() => {
-                        if (!times[time].occupied.value) {
-                            console.log(time);
-                            handleTimeSelect(time);
-                        }
-                    }}
-                            disabled={times[time].occupied.value}
-                        >
-                    {selectedTimes.includes(time) ? (
-                  <FontAwesomeIcon icon={faCircleCheck} />
-                ) : (
-                  <FontAwesomeIcon icon={faCircle} />
-                )}
-                <Text style={styles.text}>{time}</Text>
-              </Pressable>
-            ))}
-            <Pressable onPress={()=>handleReserve()}>
-                <Text>Send reservation</Text>
-            </Pressable>
-        </View>
-      );
+                {times &&
+                    Object.keys(times)
+                        .sort((a, b) => a.localeCompare(b))
+                        .map(time => (
+                            <Pressable
+                                key={time}
+                                style={styles.button}
+                                onPress={() => {
+                                    if (!times[time].occupied.value) {
+                                        console.log(time);
+                                        handleTimeSelect(time);
+                                    }
+                                }}
+                                disabled={times[time].occupied.value}>
+                                {selectedTimes.includes(time) ? (
+                                    <FontAwesomeIcon icon={faCircleCheck} />
+                                ) : (
+                                    <FontAwesomeIcon icon={faCircle} />
+                                )}
+                                <Text style={styles.text}>{time}</Text>
+                            </Pressable>
+                        ))}
+                <Pressable onPress={() => handleReserve()}>
+                    <Text>Send reservation</Text>
+                </Pressable>
+            </View>
+        );
     };
 
-    const renderItem = ({ item, index }) => (
+    const renderItem = ({item, index}) => (
         <View style={styles.container}>
             <Text style={styles.text}>
                 ID: {item.id} Seats: {item.seats}
@@ -145,7 +155,9 @@ function ReserveSeatScreen({ navigation, route }) {
             <Pressable
                 className={`bg-blue-500 p-2 rounded-md`}
                 onPress={() => {
-                    setSelectedSeatId(prevId => (prevId === item.id ? null : item.id));
+                    setSelectedSeatId(prevId =>
+                        prevId === item.id ? null : item.id,
+                    );
                     setSelectedTimes([]);
                 }}>
                 <Text>Select time</Text>
@@ -171,15 +183,31 @@ function ReserveSeatScreen({ navigation, route }) {
             <View className={`flex flex-row w-full`}>
                 <Pressable
                     onPress={() => setSelectView('date')}
-                    className={`${selectView === 'date' ? 'border-b-2 border-blue-500' : ''} w-1/2 items-center`}
-                >
-                    <Text className={`${selectView === 'date' ? 'text-blue-500' : ''} text-lg`}>Select date</Text>
+                    className={`${
+                        selectView === 'date'
+                            ? 'border-b-2 border-blue-500'
+                            : ''
+                    } w-1/2 items-center`}>
+                    <Text
+                        className={`${
+                            selectView === 'date' ? 'text-blue-500' : ''
+                        } text-lg`}>
+                        Select date
+                    </Text>
                 </Pressable>
                 <Pressable
                     onPress={() => setSelectView('table')}
-                    className={`${selectView === 'table' ? 'border-b-2 border-blue-500' : ''} w-1/2 items-center`}
-                >
-                    <Text className={`${selectView === 'table' ? 'text-blue-500' : ''} text-lg`}>Select table</Text>
+                    className={`${
+                        selectView === 'table'
+                            ? 'border-b-2 border-blue-500'
+                            : ''
+                    } w-1/2 items-center`}>
+                    <Text
+                        className={`${
+                            selectView === 'table' ? 'text-blue-500' : ''
+                        } text-lg`}>
+                        Select table
+                    </Text>
                 </Pressable>
             </View>
             {selectView === 'date' && (
@@ -188,25 +216,28 @@ function ReserveSeatScreen({ navigation, route }) {
                 </View>
             )}
             <View>
-                <Button onPress={showDatePicker} title='Show date picker' />
+                <Button onPress={showDatePicker} title="Show date picker" />
                 {show && (
                     <DateTimePicker
-                        testID='dateTimePicker'
+                        testID="dateTimePicker"
                         value={date}
-                        mode='date'
+                        mode="date"
                         is24Hour={true}
-                        display='default'
+                        display="default"
                         onChange={onChange}
-                        minimumDate={new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)}
-                        maximumDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)}
+                        minimumDate={
+                            new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
+                        }
+                        maximumDate={
+                            new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                        }
                     />
-
                 )}
             </View>
             <FlatList
                 data={seats}
                 renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={item => item.id.toString()}
             />
         </View>
     );

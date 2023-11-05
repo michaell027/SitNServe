@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { Text, View, FlatList, Animated } from 'react-native';
+import React, {useRef, useState} from 'react';
+import {Text, View, FlatList, Animated} from 'react-native';
 import aboutInfo from './../data/aboutInfo';
 import CarouselItem from './CarouselItem';
 import Pagination from './Pagination';
@@ -23,14 +23,14 @@ const Carousel: React.FC<CarouselProps> = () => {
             ],
             {
                 useNativeDriver: false,
-            }
+            },
         )(event);
     };
 
     const handleViewableItemsChanged = useRef(
-        ({ viewableItems }: { viewableItems: any[] }) => {
+        ({viewableItems}: {viewableItems: any[]}) => {
             setCurrentIndex(viewableItems[0].index);
-        }
+        },
     ).current;
 
     const viewabilityConfig = useRef({
@@ -41,17 +41,21 @@ const Carousel: React.FC<CarouselProps> = () => {
         <View>
             <FlatList
                 data={aboutInfo}
-                renderItem={({ item }) => <CarouselItem item={item} />}
+                renderItem={({item}) => <CarouselItem item={item} />}
                 horizontal
                 pagingEnabled
                 snapToAlignment="center"
                 showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
+                keyExtractor={item => item.id}
                 onScroll={handleScroll}
                 onViewableItemsChanged={handleViewableItemsChanged}
                 viewabilityConfig={viewabilityConfig}
             />
-            <Pagination data={aboutInfo} scrollX={scrollX} index={currentIndex} />
+            <Pagination
+                data={aboutInfo}
+                scrollX={scrollX}
+                index={currentIndex}
+            />
         </View>
     );
 };

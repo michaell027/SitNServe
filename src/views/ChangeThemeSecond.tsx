@@ -35,11 +35,13 @@ function ChangeThemeSecond() {
         <StyledPressable
             onPress={toggleColorScheme}
             className="flex-1 items-center justify-center dark:bg-slate-800">
-            <StyledText selectable={false} className="text-black dark:text-white">
+            <StyledText
+                selectable={false}
+                className="text-black dark:text-white">
                 {`Try clicking me! ${colorScheme === 'dark' ? '🌙' : '🌞'}`}
             </StyledText>
             <Text className="text-black dark:text-white">aaaaaaaaaaaa</Text>
-            <Button className="bg-red-300" title="aaa"/>
+            <Button className="bg-red-300" title="aaa" />
         </StyledPressable>
     );
 }

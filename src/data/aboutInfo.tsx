@@ -5,7 +5,8 @@ const aboutInfo = [
         mainSubTitle: 'Revolutionizing the way you dine.',
         image: require('./../../assets/images/reserve_seat.png'),
         title: 'Reservations',
-        description: 'Secure your spot in advance at your preferred restaurant. No more waiting in lines!',
+        description:
+            'Secure your spot in advance at your preferred restaurant. No more waiting in lines!',
         buttonTitle: 'Discover More',
     },
     {
@@ -14,7 +15,8 @@ const aboutInfo = [
         mainSubTitle: 'Your entire dining experience in one scan.',
         image: require('./../../assets/images/plate_mobile.png'),
         title: 'Scan, Order & Dine',
-        description: 'Scan the QR code to access the menu, make your selections, and place your order seamlessly.',
+        description:
+            'Scan the QR code to access the menu, make your selections, and place your order seamlessly.',
         buttonTitle: 'Explore Now',
     },
     {
@@ -23,7 +25,8 @@ const aboutInfo = [
         mainSubTitle: 'Fast, secure payments.',
         image: require('./../../assets/images/mobile_pay.png'),
         title: 'Easy Checkout',
-        description: 'After enjoying your meal, pay instantly through the app. No more waiting for the bill!',
+        description:
+            'After enjoying your meal, pay instantly through the app. No more waiting for the bill!',
         buttonTitle: 'Learn More',
     },
     {
@@ -32,9 +35,10 @@ const aboutInfo = [
         mainSubTitle: 'Experience the future of dining.',
         image: require('./../../assets/images/mobile_app.png'),
         title: 'Our Mission',
-        description: "Bridging technology with dining. We're here to elevate every meal into a delightful experience.",
+        description:
+            "Bridging technology with dining. We're here to elevate every meal into a delightful experience.",
         buttonTitle: 'Join the Revolution',
     },
-]
+];
 
 export default aboutInfo;
