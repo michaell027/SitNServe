@@ -7,7 +7,7 @@ import ProfileCard from '../components/ProfileCard';
 
 function ProfileScreen({navigation, route}) {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true); // Added loading state
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const subscriber = auth().onAuthStateChanged(

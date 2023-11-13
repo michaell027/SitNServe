@@ -64,7 +64,7 @@ function MapScreen({navigation, route}) {
                     }}>
                     Location
                 </Text>
-                {position && (
+                {(position && (
                     <MapView
                         style={{width: '100%', height: 300}}
                         initialRegion={{
@@ -82,6 +82,10 @@ function MapScreen({navigation, route}) {
                             description="This is my current location"
                         />
                     </MapView>
+                )) || (
+                    <Text style={{color: 'black', fontSize: 16}}>
+                        Loading map...
+                    </Text>
                 )}
             </View>
         </View>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Dimensions,
     Image,
@@ -17,6 +17,9 @@ import {
     faUser,
     faUtensils,
 } from '@fortawesome/free-solid-svg-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoggedInHome from '../components/LoggedInHome';
+import NotLoggedHome from '../components/NotLoggedHome';
 
 const StyledView = styled(View);
 const StyledText = styled(Text);
@@ -33,7 +36,7 @@ function getIconSize() {
     }
 }
 
-const buttonData = [
+const buttonDataAfterLogin = [
     {icon: faInfo, text: 'About', navigate: 'AboutScreen'},
     {icon: faUtensils, text: 'Restaurants', navigate: 'Restaurants'},
     {icon: faMap, text: 'Map', navigate: 'MapScreen'},
@@ -42,57 +45,44 @@ const buttonData = [
     {icon: faUser, text: 'My profile', navigate: 'ProfileScreen'},
 ];
 
+const buttonDataBeforeLogin = [
+    {icon: faInfo, text: 'About', navigate: 'AboutScreen'},
+    {icon: faUser, text: 'Login', navigate: 'LoginScreen'},
+];
+
 function HomeScreen({navigation}) {
+    const [isLogged, setIsLogged] = useState(false);
+    const [user, setUser] = useState(null);
+
+    //         useEffect(() => {
+    //             const unsubscribe = navigation.addListener('focus', () => {
+    //                 AsyncStorage.getItem('user').then((user) => {
+    //                     if (user) {
+    //                         setUser(JSON.parse(user));
+    //                         setIsLogged(true);
+    //                         console.log(user);
+    //                     } else {
+    //                         setIsLogged(false);
+    //                     }
+    //                 });
+    //             });
+    //             return unsubscribe;
+    //         }, [navigation]);
+
     return (
         <ScrollView>
-            <StyledView className="flex-1 h-[90vh] items-center justify-start">
-                <StyledView className={'h-[10%] w-full py-4'}>
-                    <Image
-                        source={require('./../../assets/images/logo-no-background.png')}
-                        className={'h-full self-center'}
-                        resizeMode="contain"
-                    />
-                </StyledView>
-                <StyledView className={'w-full h-[90%] items-center'}>
-                    <StyledView className="max-h-[60%] w-full">
-                        <Image
-                            source={require('./../../assets/images/table.png')}
-                            className={'w-full h-full'}
-                            resizeMode="contain"
-                        />
-                    </StyledView>
-                    <StyledView
-                        className={
-                            'max-h-[30%] flex-row flex-wrap justify-between'
-                        }>
-                        {buttonData.map((button, index) => (
-                            <StyledView
-                                key={index}
-                                className="w-1/3 items-center justify-center py-2">
-                                <Pressable
-                                    onPress={() =>
-                                        navigation.navigate(button.navigate)
-                                    }
-                                    className={
-                                        'items-center justify-center p-5 sm:p-8 rounded-full border-4 border-black'
-                                    }>
-                                    <FontAwesomeIcon
-                                        icon={button.icon}
-                                        size={getIconSize()}
-                                        color="black"
-                                    />
-                                </Pressable>
-                                <Text
-                                    className={
-                                        'text-black font-bold tracking-wider'
-                                    }>
-                                    {button.text}
-                                </Text>
-                            </StyledView>
-                        ))}
-                    </StyledView>
-                </StyledView>
-            </StyledView>
+            {isLogged ? (
+                <LoggedInHome
+                    navigation={navigation}
+                    buttonDataAfterLogin={buttonDataAfterLogin}
+                    getIconSize={getIconSize}
+                />
+            ) : (
+                <NotLoggedHome
+                    navigation={navigation}
+                    buttonData={buttonDataBeforeLogin}
+                />
+            )}
         </ScrollView>
     );
 }

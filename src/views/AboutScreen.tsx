@@ -5,7 +5,7 @@ import Carousel from './../components/Carousel';
 
 export default function AboutScreen() {
     return (
-        <View className="flex-1">
+        <View>
             <Carousel />
         </View>
     );

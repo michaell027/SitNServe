@@ -7,23 +7,49 @@ import {
     TextInput,
     Image,
     TouchableOpacity,
+    KeyboardAvoidingView,
+    FlatList,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faEnvelope, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
 import FirstRegisterStep from './FirstRegisterStep';
 import SecondRegisterStep from './SecondRegisterStep';
+import ThirdRegisterStep from './ThirdRegisterStep';
+
+interface Address {
+    address?: string;
+    street: string;
+    number: string;
+    city: string;
+    state: string;
+    zip: string;
+}
 
 interface User {
     email: string;
     password: string;
     repeatPassword: string;
+    address: Address;
+    firstName: string;
+    lastName: string;
+    phone: string;
 }
 
 const initialState: User = {
     email: 'jane.doe@example.com',
     password: 'SuperSecretPassword!',
     repeatPassword: 'SuperSecretPassword!',
+    address: {
+        street: 'Sokolovska',
+        number: '1',
+        city: 'Kosice',
+        state: 'Slovakia',
+        zip: '03389',
+    },
+    firstName: 'Jane',
+    lastName: 'Doe',
+    phone: '+421 123 456 789',
 };
 
 function RegisterForm({navigation}) {
@@ -38,6 +64,17 @@ function RegisterForm({navigation}) {
         setUser(prevUser => ({
             ...prevUser,
             [key]: value,
+        }));
+    };
+
+    const updateUserAddress = (key: keyof Address, value: string) => {
+        console.log(key, value);
+        setUser(prevUser => ({
+            ...prevUser,
+            address: {
+                ...prevUser.address,
+                [key]: value,
+            },
         }));
     };
 
@@ -79,34 +116,45 @@ function RegisterForm({navigation}) {
     }
 
     return (
-        <ScrollView className={`px-4 py-5`}>
-            <Text className={`text-3xl text-teal-600 font-bold mb-2`}>
-                Create account
-            </Text>
-            {step === 1 && (
-                <FirstRegisterStep
-                    navigation={navigation}
-                    user={user}
-                    updateUser={updateUser}
-                    nextStep={nextStep}
-                />
-            )}
-            {step === 2 && (
-                <SecondRegisterStep
-                    navigation={navigation}
-                    user={user}
-                    updateUser={updateUser}
-                    nextStep={nextStep}
-                    prevStep={prevStep}
-                />
-            )}
+        <KeyboardAvoidingView
+            style={{flex: 1}}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}>
+            <ScrollView className={`px-4 py-5`}>
+                <Text className={`text-3xl text-teal-600 font-bold mb-2`}>
+                    Create account
+                </Text>
+                {step === 1 && (
+                    <FirstRegisterStep
+                        navigation={navigation}
+                        user={user}
+                        updateUser={updateUser}
+                        nextStep={nextStep}
+                    />
+                )}
+                {step === 2 && (
+                    <SecondRegisterStep
+                        navigation={navigation}
+                        user={user}
+                        updateUser={updateUser}
+                        nextStep={nextStep}
+                        prevStep={prevStep}
+                        updateUserAddress={updateUserAddress}
+                    />
+                )}
 
-            <Text className={`text-center text-[16px] text-gray-500 mb-4`}>
-                By registering you agree to our{' '}
-                <Text className={`text-teal-600`}>Terms of Service</Text> and{' '}
-                <Text className={`text-teal-600`}>Privacy Policy</Text>
-            </Text>
-        </ScrollView>
+                {step === 3 && (
+                    <ThirdRegisterStep
+                        navigation={navigation}
+                        user={user}
+                        updateUser={updateUser}
+                        nextStep={nextStep}
+                        prevStep={prevStep}
+                        register={register}
+                    />
+                )}
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 

@@ -38,7 +38,10 @@ function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
             <Text className={`mb-6 text-lg`}>
                 Please enter your email and password
             </Text>
-            <Text className={`mb-2 font-[900] text-lg`}>Your email:</Text>
+            <Text className={`mb-2 font-[900] text-lg`}>
+                <Text className="text-red-400">* </Text>
+                Your email:
+            </Text>
 
             <View
                 className={`flex flex-row w-full items-center border-2 border-gray-400 pl-2 pr-4 rounded-lg mb-4 justify-between`}>
@@ -51,7 +54,10 @@ function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
                 />
                 <FontAwesomeIcon icon={faEnvelope} size={20} />
             </View>
-            <Text className={`mb-2 font-[900] text-lg`}>Password:</Text>
+            <Text className={`mb-2 font-[900] text-lg`}>
+                <Text className="text-red-400">* </Text>
+                Password:
+            </Text>
             <View
                 className={`flex flex-row w-full items-center border-2 border-gray-400 pl-2 pr-4 rounded-lg mb-4 justify-between`}>
                 <TextInput
@@ -67,7 +73,10 @@ function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
                     />
                 </TouchableOpacity>
             </View>
-            <Text className={`mb-2 font-[900] text-lg`}>Repeat password:</Text>
+            <Text className={`mb-2 font-[900] text-lg`}>
+                <Text className="text-red-400">* </Text>
+                Repeat password:
+            </Text>
             <View
                 className={`flex flex-row w-full items-center border-2 border-gray-400 pl-2 pr-4 rounded-lg mb-4 justify-between`}>
                 <TextInput

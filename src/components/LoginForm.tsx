@@ -14,6 +14,7 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
+import {FloatingLabelInput} from 'react-native-floating-label-input';
 
 const LoginForm: React.FC = ({navigation}) => {
     const [username, setUsername] = useState<string>('jane.doe@example.com');
@@ -83,33 +84,71 @@ const LoginForm: React.FC = ({navigation}) => {
                 />
             </View>
             <View className="flex w-full space-y-2 items-center px-10">
-                <TextInput
-                    className="w-full h-12 border-2 border-gray-300 rounded-md px-4"
-                    placeholder="Username"
+                <FloatingLabelInput
+                    label="Username"
                     value={username}
                     onChangeText={setUsername}
+                    customLabelStyles={{
+                        colorFocused: '#777777',
+                        colorBlurred: '#777777',
+                    }}
+                    containerStyles={{
+                        borderRadius: 4,
+                        paddingHorizontal: 8,
+                        height: 48,
+                        width: '100%',
+                        borderColor: '#b3b2ae',
+                        borderWidth: 1.5,
+                        marginBottom: 8,
+                    }}
+                    labelStyles={{
+                        paddingHorizontal: 4,
+                    }}
+                    inputStyles={{
+                        paddingHorizontal: 4,
+                        color: '#000',
+                    }}
                 />
-                <View className="flex flex-row justify-between w-full h-12 border-2 border-gray-300 rounded-md px-2 items-center">
-                    <TextInput
-                        className="w-11/12"
-                        placeholder="Password"
-                        secureTextEntry={!showPassword}
-                        value={password}
-                        onChangeText={setPassword}
-                    />
-                    <Pressable
-                        onPress={toggleShowPassword}
-                        className="flex items-center justify-center">
-                        {showPassword ? (
-                            <FontAwesomeIcon
-                                icon={faEyeSlash}
-                                color="#00AEB5"
-                            />
-                        ) : (
-                            <FontAwesomeIcon icon={faEye} color="#00AEB5" />
-                        )}
-                    </Pressable>
-                </View>
+                <FloatingLabelInput
+                    label="Password"
+                    value={password}
+                    onChangeText={setPassword}
+                    width={200}
+                    customLabelStyles={{
+                        colorFocused: '#777777',
+                        colorBlurred: '#777777',
+                    }}
+                    containerStyles={{
+                        borderRadius: 4,
+                        paddingHorizontal: 8,
+                        height: 48,
+                        width: '80%',
+                        borderColor: '#b3b2ae',
+                        borderWidth: 1.5,
+                    }}
+                    labelStyles={{
+                        paddingHorizontal: 4,
+                    }}
+                    inputStyles={{
+                        paddingHorizontal: 4,
+                        color: '#000',
+                    }}
+                    secureTextEntry={!showPassword}
+                    rightComponent={
+                        <Pressable
+                            onPress={toggleShowPassword}
+                            className="flex items-center justify-center">
+                            {showPassword ? (
+                                <FontAwesomeIcon
+                                    icon={faEyeSlash}
+                                    color="#00AEB5"
+                                />
+                            ) : (
+                                <FontAwesomeIcon icon={faEye} color="#00AEB5" />
+                            )}
+                        </Pressable>
+                    }
+                />
                 <View className="flex flex-row justify-between w-full items-center">
                     <View className="flex flex-row items-center justify-left">
                         <CheckBox

@@ -1,12 +1,15 @@
-import React from 'react';
-import {View, Text, Pressable, TouchableOpacity, TextInput} from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import React, {useState, useEffect} from 'react';
 import {
-    faEnvelope,
-    faEye,
-    faEyeSlash,
-    faAngleLeft,
-} from '@fortawesome/free-solid-svg-icons';
+    View,
+    Text,
+    Pressable,
+    TextInput,
+    KeyboardAvoidingView,
+} from 'react-native';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {Picker} from '@react-native-picker/picker';
+import {getCountries, Country} from '../services/countryService';
+import {faAngleLeft} from '@fortawesome/free-solid-svg-icons';
 
 function SecondRegisterStep({
     navigation,
@@ -14,31 +17,152 @@ function SecondRegisterStep({
     updateUser,
     nextStep,
     prevStep,
+    updateUserAddress,
 }) {
+    const [country, setCountry] = useState(
+        user.address.country || 'placeholder',
+    );
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [error, setError] = useState<string>('');
+
+    useEffect(() => {
+        console.log('aaa' + user.address.state);
+        if (user.address.state !== '' && user.address.state !== undefined) {
+            setCountry(user.address.state);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (country !== 'placeholder') {
+            updateUserAddress('state', country);
+        } else {
+            updateUserAddress('state', '');
+        }
+    }, [country]);
+
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const data: Country[] = await getCountries();
+                const countries = [];
+                data.forEach(country => {
+                    countries.push(country.name);
+                });
+                setCountries(countries);
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchCountries();
+    }, []);
+
+    const handleNextStep = () => {
+        if (
+            (country === 'placeholder',
+            user.address.city === '',
+            user.address.street === '',
+            user.address.number === '',
+            user.address.zip === '')
+        ) {
+            setError('Please fill all fields');
+            return;
+        }
+        nextStep();
+    };
+
     return (
         <View>
-            <Text className={`mb-6 text-lg`}>
-                Please enter your email and password
-            </Text>
-            <Text className={`mb-2 font-[900] text-lg`}>Your email:</Text>
+            <Text className={`mb-6 text-lg`}>Please enter your address</Text>
+            <Text className={`mb-2 font-[900] text-lg`}>Your address:</Text>
+            <View className={`border-2 border-gray-400 rounded-lg mb-4`}>
+                <Picker
+                    selectedValue={country}
+                    onValueChange={(itemValue, itemIndex) => {
+                        console.log(itemValue);
+                        setCountry(itemValue);
+                    }}>
+                    <Picker.Item
+                        label="*Select country"
+                        value={'placeholder'}
+                    />
+
+                    {countries.map(country => (
+                        <Picker.Item
+                            key={country}
+                            label={country}
+                            value={country}
+                        />
+                    ))}
+                </Picker>
+            </View>
+
+            <View className={`border-2 rounded-lg mb-4 pl-2 border-gray-400`}>
+                <TextInput
+                    onChangeText={text => updateUserAddress('city', text)}
+                    value={user.address.city}
+                    placeholder="*City"
+                    editable={country !== 'placeholder'}
+                    placeholderTextColor={
+                        country === 'placeholder' ? '#c0c0c0' : '#000'
+                    }
+                />
+            </View>
+
+            <View className={`border-2 rounded-lg mb-4 pl-2 border-gray-400`}>
+                <TextInput
+                    onChangeText={text => updateUserAddress('address', text)}
+                    value={user.address.address || ''}
+                    placeholder="Address"
+                    editable={country !== 'placeholder'}
+                    placeholderTextColor={
+                        country === 'placeholder' ? '#c0c0c0' : '#000'
+                    }
+                />
+            </View>
 
             <View
-                className={`flex flex-row w-full items-center border-2 border-gray-400 pl-2 pr-4 rounded-lg mb-4 justify-between`}>
+                className={`flex-row border-2 border-gray-400 rounded-lg mb-4 pl-2`}>
                 <TextInput
-                    onChangeText={value => updateUser('email', value)}
-                    value={user.email}
-                    placeholder="Enter your email"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
+                    className={`w-2/3 border-r-2`}
+                    onChangeText={text => updateUserAddress('street', text)}
+                    value={user.address.street}
+                    placeholder="*Street"
+                    editable={country !== 'placeholder'}
+                    placeholderTextColor={
+                        country === 'placeholder' ? '#c0c0c0' : '#000'
+                    }
                 />
-                <FontAwesomeIcon icon={faEnvelope} size={20} />
+                <TextInput
+                    className={`pl-3`}
+                    onChangeText={text => updateUserAddress('number', text)}
+                    value={user.address.number}
+                    placeholder="*Number"
+                    editable={country !== 'placeholder'}
+                    placeholderTextColor={
+                        country === 'placeholder' ? '#c0c0c0' : '#000'
+                    }
+                />
             </View>
-            <Text className={`mb-2 font-[900] text-lg`}>Password:</Text>
-            <Text className={`mb-2 font-[900] text-lg`}>Repeat password:</Text>
-            <Text
-                className={`text-red-500 mb-2 text-center text-[16px] font-bold`}>
-                error
-            </Text>
+
+            <View
+                className={`flex-row border-2 border-gray-400 rounded-lg mb-2 pl-2`}>
+                <TextInput
+                    onChangeText={text => updateUserAddress('zip', text)}
+                    value={user.address.zip}
+                    placeholder="*ZIP code"
+                    keyboardType="numeric"
+                    editable={country !== 'placeholder'}
+                    placeholderTextColor={
+                        country === 'placeholder' ? '#c0c0c0' : '#000'
+                    }
+                />
+            </View>
+            {error !== '' && (
+                <Text className={`text-red-500 text-center text-[16px] my-2`}>
+                    {error}
+                </Text>
+            )}
             <View
                 className={`justify-between w-full flex-row w-full items-center`}>
                 <Pressable
@@ -51,7 +175,8 @@ function SecondRegisterStep({
                     />
                 </Pressable>
                 <Pressable
-                    className={`bg-teal-600 w-4/6 rounded-lg py-2 px-4 mb-4 mt-2`}>
+                    className={`bg-teal-600 w-4/6 rounded-lg py-2 px-4 mb-4 mt-2`}
+                    onPress={handleNextStep}>
                     <Text
                         className={`text-center font-[800] text-lg text-white`}>
                         Next step
@@ -61,5 +186,4 @@ function SecondRegisterStep({
         </View>
     );
 }
-
 export default SecondRegisterStep;
