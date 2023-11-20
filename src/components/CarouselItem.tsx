@@ -29,13 +29,9 @@ const CarouselItem: React.FC<CarouselItemProps> = ({item}) => {
                     style={styles.image}></Image>
             </View>
             <LinearGradient
-                colors={[
-                    'rgba(85, 204, 204, 0.8)',
-                    'rgba(255, 255, 255, 0.8)',
-                    'rgba(250, 250, 210, 0.8)',
-                ]}
-                start={{x: 0.0, y: 0.5}}
-                end={{x: 0.5, y: 0.0}}
+                colors={['#1BBFBF', 'rgba(255, 255, 255, 1)', '#F2BF91']}
+                start={{x: 0.0, y: 0.8}}
+                end={{x: 0.8, y: 0.0}}
                 locations={[0.1, 0.5, 0.9]}
                 style={styles.content}>
                 <Text style={styles.title}>{item.title}</Text>
@@ -43,7 +39,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({item}) => {
                 <Button
                     title={item.buttonTitle.toString()}
                     onPress={() => {}}
-                    color="#1B3A4B"
+                    color="#171E26"
                 />
             </LinearGradient>
         </View>

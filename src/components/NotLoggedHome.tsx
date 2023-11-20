@@ -15,7 +15,7 @@ import {styled} from 'nativewind';
 const StyledView = styled(View);
 const StyledPressable = styled(Pressable);
 
-function NotLoggedHome() {
+function NotLoggedHome({navigation}) {
     return (
         <StyledView className="flex-1 h-[90vh] items-center justify-start px-6 py-6 bg-white">
             <StyledView className="flex w-full h-full bg-[#1FAFBF]/30 rounded-2xl">
@@ -110,7 +110,11 @@ function NotLoggedHome() {
                         </StyledView>
 
                         <StyledView className="flex-row justify-between w-full mt-4 px-6">
-                            <StyledPressable className="bg-[#1FAFBF] py-3 flex-row space-x-2 px-7 rounded-lg">
+                            <StyledPressable
+                                onPress={() =>
+                                    navigation.navigate('ProfileScreen')
+                                }
+                                className="bg-[#1FAFBF] py-3 flex-row space-x-2 px-7 rounded-lg">
                                 <FontAwesomeIcon
                                     icon={faRightToBracket}
                                     color="white"
@@ -120,7 +124,11 @@ function NotLoggedHome() {
                                     Login
                                 </Text>
                             </StyledPressable>
-                            <StyledPressable className="bg-[#1FAFBF] py-3 flex-row space-x-2 px-7 rounded-lg">
+                            <StyledPressable
+                                className="bg-[#1FAFBF] py-3 flex-row space-x-2 px-7 rounded-lg"
+                                onPress={() =>
+                                    navigation.navigate('RegisterScreen')
+                                }>
                                 <FontAwesomeIcon
                                     icon={faUserPlus}
                                     color="white"

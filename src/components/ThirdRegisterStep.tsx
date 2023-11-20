@@ -84,7 +84,7 @@ function ThirdRegisterStep({
                     />
                 </Pressable>
                 <Pressable
-                    className={`bg-teal-600 w-4/6 rounded-lg py-2 px-4`}
+                    className={`bg-[#1FAFBF] w-4/6 rounded-lg py-2 px-4`}
                     onPress={handleRegister}>
                     <Text
                         className={`text-center font-[800] text-lg text-white`}>
@@ -95,8 +95,8 @@ function ThirdRegisterStep({
 
             <Text className={`text-center text-[16px] text-gray-500 px-4`}>
                 By registering you agree to our{' '}
-                <Text className={`text-teal-600`}>Terms of Service</Text> and{' '}
-                <Text className={`text-teal-600`}>Privacy Policy</Text>
+                <Text className={`text-[#1FAFBF]`}>Terms of Service</Text> and{' '}
+                <Text className={`text-[#1FAFBF]`}>Privacy Policy</Text>
             </Text>
         </View>
     );

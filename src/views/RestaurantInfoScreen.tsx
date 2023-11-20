@@ -44,8 +44,8 @@ function RestaurantInfoScreen({navigation, route}) {
                             setRegion({
                                 latitude: location.lat,
                                 longitude: location.lng,
-                                latitudeDelta: 0.0922,
-                                longitudeDelta: 0.0421,
+                                latitudeDelta: 0.02,
+                                longitudeDelta: 0.02,
                             });
                         })
                         .catch(error =>

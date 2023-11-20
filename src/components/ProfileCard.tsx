@@ -37,6 +37,7 @@ function ProfileCard({user, setUser}) {
                 console.log('User signed out!');
                 AsyncStorage.removeItem('user');
                 setUser(null);
+                AsyncStorage.removeItem('user_info');
             });
     }
 

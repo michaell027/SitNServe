@@ -16,25 +16,8 @@ import {faEnvelope, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
 import FirstRegisterStep from './FirstRegisterStep';
 import SecondRegisterStep from './SecondRegisterStep';
 import ThirdRegisterStep from './ThirdRegisterStep';
-
-interface Address {
-    address?: string;
-    street: string;
-    number: string;
-    city: string;
-    state: string;
-    zip: string;
-}
-
-interface User {
-    email: string;
-    password: string;
-    repeatPassword: string;
-    address: Address;
-    firstName: string;
-    lastName: string;
-    phone: string;
-}
+import User from '../../models/User';
+import Address from '../../models/Address';
 
 const initialState: User = {
     email: 'jane.doe@example.com',
@@ -121,7 +104,7 @@ function RegisterForm({navigation}) {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}>
             <ScrollView className={`px-4 py-5`}>
-                <Text className={`text-3xl text-teal-600 font-bold mb-2`}>
+                <Text className={`text-3xl text-[#1FAFBF] font-bold mb-2`}>
                     Create account
                 </Text>
                 {step === 1 && (

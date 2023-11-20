@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Picker} from '@react-native-picker/picker';
-import {getCountries, Country} from '../services/countryService';
+import {getCountries} from '../services/countryService';
+import {Country} from '../models/Country';
 import {faAngleLeft} from '@fortawesome/free-solid-svg-icons';
 
 function SecondRegisterStep({
@@ -175,7 +176,7 @@ function SecondRegisterStep({
                     />
                 </Pressable>
                 <Pressable
-                    className={`bg-teal-600 w-4/6 rounded-lg py-2 px-4 mb-4 mt-2`}
+                    className={`bg-[#1FAFBF] w-4/6 rounded-lg py-2 px-4 mb-4 mt-2`}
                     onPress={handleNextStep}>
                     <Text
                         className={`text-center font-[800] text-lg text-white`}>

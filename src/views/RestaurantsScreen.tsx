@@ -43,6 +43,14 @@ function RestaurantsScreen({navigation}) {
         restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
+    function truncateDescription(description, wordLimit) {
+        const words = description.split(' ');
+        if (words.length > wordLimit) {
+            return words.slice(0, wordLimit).join(' ') + '...';
+        }
+        return description;
+    }
+
     const renderRestaurantCard = restaurant => (
         <Pressable
             key={restaurant.id}
@@ -50,11 +58,11 @@ function RestaurantsScreen({navigation}) {
                 navigation.navigate('Restaurant', {restaurantId: restaurant.id})
             }
             className={
-                'flex flex-row w-full h-fit rounded-3xl mt-2 p-4 bg-gray-400/30'
+                'flex flex-row w-full h-fit rounded-3xl mt-2 p-4 bg-gray-400/30 items-center'
             }>
             <View
                 className={
-                    'w-1/3 sm:w-1/4 h-60 items-center flex justify-center'
+                    'w-1/3 sm:w-1/4 h-44 items-center flex justify-center'
                 }>
                 <Image
                     source={{uri: restaurant.imageUrl}}
@@ -73,7 +81,7 @@ function RestaurantsScreen({navigation}) {
                     {restaurant.name}
                 </Text>
                 <Text className={'mb-3 font-normal'}>
-                    {restaurant.description}
+                    {truncateDescription(restaurant.description, 20)}
                 </Text>
             </View>
         </Pressable>

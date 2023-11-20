@@ -54,20 +54,19 @@ function HomeScreen({navigation}) {
     const [isLogged, setIsLogged] = useState(false);
     const [user, setUser] = useState(null);
 
-    //         useEffect(() => {
-    //             const unsubscribe = navigation.addListener('focus', () => {
-    //                 AsyncStorage.getItem('user').then((user) => {
-    //                     if (user) {
-    //                         setUser(JSON.parse(user));
-    //                         setIsLogged(true);
-    //                         console.log(user);
-    //                     } else {
-    //                         setIsLogged(false);
-    //                     }
-    //                 });
-    //             });
-    //             return unsubscribe;
-    //         }, [navigation]);
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            AsyncStorage.getItem('user').then(user => {
+                if (user) {
+                    setUser(JSON.parse(user));
+                    setIsLogged(true);
+                } else {
+                    setIsLogged(false);
+                }
+            });
+        });
+        return unsubscribe;
+    }, [navigation]);
 
     return (
         <ScrollView>
@@ -76,6 +75,7 @@ function HomeScreen({navigation}) {
                     navigation={navigation}
                     buttonDataAfterLogin={buttonDataAfterLogin}
                     getIconSize={getIconSize}
+                    user={user}
                 />
             ) : (
                 <NotLoggedHome

@@ -99,7 +99,7 @@ function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
                 </Text>
             )}
             <Pressable
-                className={`bg-teal-600 rounded-lg py-2 px-4 mb-4 mt-2`}
+                className={`bg-[#1FAFBF] rounded-lg py-2 px-4 mb-4 mt-2`}
                 onPress={handleNextStep}>
                 <Text className={`text-center font-[800] text-lg text-white`}>
                     Next step
@@ -120,7 +120,7 @@ function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
                     onPress={() => {
                         navigation.navigate('ProfileScreen');
                     }}>
-                    <Text className={`text-center text-[16px] text-teal-600`}>
+                    <Text className={`text-center text-[16px] text-[#1FAFBF]`}>
                         Login
                     </Text>
                 </TouchableOpacity>

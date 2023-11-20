@@ -1,20 +1,11 @@
 import axios from 'axios';
+import {City} from '../models/City';
+import {Country} from '../models/Country';
 
 const API_URL_COUNTRIES =
     'https://countriesnow.space/api/v0.1/countries/capital';
 
 const API_URL_CITIES = 'https://countriesnow.space/api/v0.1/countries/cities';
-
-interface City {
-    name: string;
-    lat: number;
-    lng: number;
-}
-
-export interface Country {
-    country: string;
-    capital: string;
-}
 
 const getCountries = async (): Promise<Country[]> => {
     try {

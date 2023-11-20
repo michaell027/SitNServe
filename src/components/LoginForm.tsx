@@ -43,6 +43,7 @@ const LoginForm: React.FC = ({navigation}) => {
             .then(userCredential => {
                 console.log('User signed in!');
                 storeUser(userCredential.user);
+                navigation.navigate('Home');
             })
             .catch(error => {
                 console.log('Error signing in:', error.code);
@@ -72,13 +73,17 @@ const LoginForm: React.FC = ({navigation}) => {
     };
 
     return (
-        <View className="flex-1 w-full items-center justify-center">
-            <Text className="text-3xl font-[900] text-teal-600 uppercase">
-                Welcome back
-            </Text>
-            <View className="h-20 w-full my-8">
+        <View className="flex w-full items-center justify-center py-10">
+            <View className="w-3/4">
                 <Image
-                    source={require('./../../assets/images/logo-no-background.png')}
+                    source={require('./../../assets/images/welcome_back.png')}
+                    className="self-center w-full"
+                    resizeMode="contain"
+                />
+            </View>
+            <View className="h-48 w-full my-3">
+                <Image
+                    source={require('./../../assets/images/matus_logo.png')}
                     className="h-full self-center"
                     resizeMode="contain"
                 />
@@ -141,10 +146,10 @@ const LoginForm: React.FC = ({navigation}) => {
                             {showPassword ? (
                                 <FontAwesomeIcon
                                     icon={faEyeSlash}
-                                    color="#00AEB5"
+                                    color="#1FAFBF"
                                 />
                             ) : (
-                                <FontAwesomeIcon icon={faEye} color="#00AEB5" />
+                                <FontAwesomeIcon icon={faEye} color="#1FAFBF" />
                             )}
                         </Pressable>
                     }
@@ -157,15 +162,15 @@ const LoginForm: React.FC = ({navigation}) => {
                             onValueChange={newValue =>
                                 setToggleCheckBox(newValue)
                             }
-                            tintColors={{true: '#00AEB5', false: '#00AEB5'}}
+                            tintColors={{true: '#1FAFBF', false: '#1FAFBF'}}
                         />
                         <Text>Remember me</Text>
                     </View>
-                    <Text className="text-teal-600">Forgot password?</Text>
+                    <Text className="text-[#1FAFBF]">Forgot password?</Text>
                 </View>
                 <Pressable
-                    onPress={signIn}
-                    className="w-3/4 h-10 bg-teal-600 rounded-md flex items-center justify-center shadow-lg">
+                    className="w-3/4 h-10 bg-[#1FAFBF] rounded-md flex items-center justify-center shadow-lg"
+                    onPress={signIn}>
                     <Text className="text-white text-xl font-bold">Login</Text>
                 </Pressable>
                 {error !== '' && <Text className="text-red-500">{error}</Text>}
@@ -173,7 +178,7 @@ const LoginForm: React.FC = ({navigation}) => {
                     <Text>Don't have an account? </Text>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('RegisterScreen')}>
-                        <Text className="text-teal-600">Sign up</Text>
+                        <Text className="text-[#1FAFBF]">Sign up</Text>
                     </TouchableOpacity>
                 </View>
             </View>

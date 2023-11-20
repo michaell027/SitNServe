@@ -41,6 +41,7 @@ import RegisterScreen from './src/views/RegisterScreen';
 import MapScreen from './src/views/MapScreen';
 import AboutScreen from './src/views/AboutScreen';
 import ProfileScreen from './src/views/ProfileScreen';
+import LoginScreen from './src/views/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -293,6 +294,7 @@ function App() {
                     />
                     <Stack.Screen name="MapScreen" component={MapScreen} />
                     <Stack.Screen name="AboutScreen" component={AboutScreen} />
+                    <Stack.Screen name="LoginScreen" component={LoginScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
         </DrawerLayoutAndroid>
