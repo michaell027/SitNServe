@@ -46,7 +46,7 @@ function ProfileScreen({navigation, route}) {
         return <LoginForm navigation={navigation} />;
     }
 
-    return <ProfileCard user={user} setUser={setUser} />;
+    return <ProfileCard user={user} setUser={setUser} navigation={navigation} />;
 }
 
 export default ProfileScreen;

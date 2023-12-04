@@ -42,6 +42,8 @@ import MapScreen from './src/views/MapScreen';
 import AboutScreen from './src/views/AboutScreen';
 import ProfileScreen from './src/views/ProfileScreen';
 import LoginScreen from './src/views/LoginScreen';
+import FavoriteRestaurantsScreen from './src/views/FavoriteRestaurantsScreen';
+import {RestaurantProvider} from "./src/services/FavouriteRestaurantContext";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -189,6 +191,7 @@ function App() {
     );
 
     return (
+        <RestaurantProvider>
         <DrawerLayoutAndroid
             ref={drawerRef}
             drawerWidth={300}
@@ -295,9 +298,11 @@ function App() {
                     <Stack.Screen name="MapScreen" component={MapScreen} />
                     <Stack.Screen name="AboutScreen" component={AboutScreen} />
                     <Stack.Screen name="LoginScreen" component={LoginScreen} />
+                    <Stack.Screen name="FavoriteRestaurantsScreen" component={FavoriteRestaurantsScreen}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </DrawerLayoutAndroid>
+        </RestaurantProvider>
     );
 }
 

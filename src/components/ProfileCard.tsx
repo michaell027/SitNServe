@@ -17,7 +17,7 @@ import {
     faStar,
 } from '@fortawesome/free-solid-svg-icons';
 
-function ProfileCard({user, setUser}) {
+function ProfileCard({user, setUser, navigation}) {
     useEffect(() => {
         const creationDate = new Date(user.metadata.creationTime);
         const formattedCreationDate = creationDate.toLocaleDateString('sk-SK');
@@ -89,12 +89,14 @@ function ProfileCard({user, setUser}) {
                         </View>
                     </View>
 
-                    <View className="flex flex-row mt-6 items-center space-x-4">
+                    <TouchableOpacity className="flex flex-row mt-6 items-center space-x-4"
+                    onPress={() => navigation.navigate('FavoriteRestaurantsScreen')}
+                    >
                         <FontAwesomeIcon icon={faHeart} size={20} />
                         <Text className="text-lg text-gray-500 ml-2">
                             Favourite
                         </Text>
-                    </View>
+                    </TouchableOpacity>
                     <View className="flex flex-row mt-6 items-center space-x-4">
                         <FontAwesomeIcon icon={faCreditCard} size={20} />
                         <Text className="text-lg text-gray-500 ml-2">

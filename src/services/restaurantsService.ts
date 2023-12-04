@@ -1,33 +1,10 @@
 import firestore from '@react-native-firebase/firestore';
 import {Address} from '../models/Address';
+import {Restaurant} from "../models/Restaurant";
 
 interface Coordinates {
     latitude: number;
     longitude: number;
-}
-
-interface MenuItem {
-    name: string;
-    price: number;
-}
-
-interface OpeningHours {
-    monday?: string;
-    tuesday?: string;
-    wednesday?: string;
-    thursday?: string;
-    friday?: string;
-    saturday?: string;
-    sunday?: string;
-}
-
-interface Restaurant {
-    name: string;
-    description: string;
-    address: Address;
-    imageUrl: string;
-    openingHours: OpeningHours;
-    menu?: MenuItem[];
 }
 
 export const getRestaurants = async (): Promise<Restaurant[]> => {

@@ -32,7 +32,6 @@ function MapScreen({navigation, route}) {
     });
     const [nearbyRestaurants, setNearbyRestaurants] = useState([]);
 
-
     const handleRegionChange = newRegion => {
         setRegion(newRegion);
         fetchRestaurantsInView(newRegion);
@@ -231,10 +230,7 @@ function MapScreen({navigation, route}) {
                                     description={truncateDescription(
                                         restaurant.addressString,
                                         5,
-                                    )}
->
-
-
+                                    )}>
                                     <View>
                                         <Image
                                             source={require('../../assets/images/30.png')}
@@ -259,9 +255,11 @@ function MapScreen({navigation, route}) {
                     )}
                     {nearbyRestaurants.map((restaurant, index) => (
                         <Pressable
-                        onPress={() =>
-                                        navigation.navigate('Restaurant', {restaurantId: restaurant.restaurant.id})
-                                    }
+                            onPress={() =>
+                                navigation.navigate('Restaurant', {
+                                    restaurantId: restaurant.restaurant.id,
+                                })
+                            }
                             key={index}
                             className={
                                 'flex flex-row w-full h-fit rounded-3xl mt-2 p-4 bg-gray-400/30 items-center'
