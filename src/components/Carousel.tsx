@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Text, View, FlatList, Animated} from 'react-native';
+import {View, FlatList, Animated} from 'react-native';
 import aboutInfo from './../data/aboutInfo';
 import CarouselItem from './CarouselItem';
 import Pagination from './Pagination';
@@ -46,7 +46,7 @@ const Carousel: React.FC<CarouselProps> = () => {
                 pagingEnabled
                 snapToAlignment="center"
                 showsHorizontalScrollIndicator={false}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item.id.toString()}
                 onScroll={handleScroll}
                 onViewableItemsChanged={handleViewableItemsChanged}
                 viewabilityConfig={viewabilityConfig}

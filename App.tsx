@@ -44,6 +44,8 @@ import ProfileScreen from './src/views/ProfileScreen';
 import LoginScreen from './src/views/LoginScreen';
 import FavoriteRestaurantsScreen from './src/views/FavoriteRestaurantsScreen';
 import {RestaurantProvider} from "./src/services/FavouriteRestaurantContext";
+import OrdersScreen from "./src/views/OrdersScreen";
+import ReservationsScreen from "./src/views/ReservationsScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -299,6 +301,8 @@ function App() {
                     <Stack.Screen name="AboutScreen" component={AboutScreen} />
                     <Stack.Screen name="LoginScreen" component={LoginScreen} />
                     <Stack.Screen name="FavoriteRestaurantsScreen" component={FavoriteRestaurantsScreen}/>
+                    <Stack.Screen name="OrdersScreen" component={OrdersScreen}/>
+                    <Stack.Screen name="ReservationsScreen" component={ReservationsScreen}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </DrawerLayoutAndroid>

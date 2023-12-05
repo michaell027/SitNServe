@@ -1,11 +1,14 @@
 import React from 'react';
 import {View, Text} from 'react-native';
+import {styled} from 'nativewind';
+
+const StyledView = styled(View);
 
 function AutoScrollText() {
     return (
-        <View className="auto-scroll-text">
+        <StyledView className="auto-scroll-text">
             <Text>Auto Scroll Text</Text>
-        </View>
+        </StyledView>
     );
 }
 

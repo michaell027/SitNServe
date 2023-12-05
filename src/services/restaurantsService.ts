@@ -1,6 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
 import {Address} from '../models/Address';
-import {Restaurant} from "../models/Restaurant";
+import {Restaurant} from '../models/Restaurant';
 
 interface Coordinates {
     latitude: number;

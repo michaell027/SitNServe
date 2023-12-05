@@ -1,4 +1,4 @@
-import {Address} from "./Address";
+import {Address} from './Address';
 
 interface MenuItem {
     name: string;

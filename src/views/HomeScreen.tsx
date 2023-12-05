@@ -28,11 +28,11 @@ const screenWidth = Dimensions.get('window').width;
 
 function getIconSize() {
     if (screenWidth <= 640) {
-        return 20;
+        return 25;
     } else if (screenWidth <= 768) {
-        return 40;
+        return 45;
     } else {
-        return 50;
+        return 55;
     }
 }
 
