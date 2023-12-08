@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {
     Dimensions,
     Image,
@@ -8,22 +8,7 @@ import {
     View,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {User} from '../models/User';
-import firestore from '@react-native-firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-interface LoggedInHomeProps {
-    navigation: any;
-    buttonDataAfterLogin: ButtonData[];
-    getIconSize: () => number;
-    user: User;
-}
-
-interface ButtonData {
-    icon: any;
-    navigate: string;
-    text: string;
-}
+import {LoggedInHomeProps} from '../models/LoggedInHomeProps';
 
 const windowHeight = Dimensions.get('window').height;
 
@@ -31,45 +16,7 @@ function LoggedInHome({
     navigation,
     buttonDataAfterLogin,
     getIconSize,
-    user,
 }: LoggedInHomeProps) {
-    const [userInfo, setUserInfo] = useState<User | null>(null);
-
-    const fetchUserInfo = () => {
-        AsyncStorage.getItem('user_info').then(userInfo => {
-            if (userInfo) {
-                setUserInfo(JSON.parse(userInfo));
-                console.log('User data storage: ', userInfo);
-            } else {
-                console.log('No user data in storage, fetching from firestore');
-                const query = firestore()
-                    .collection('users')
-                    .where('uid', '==', user.uid);
-                const subscriber = query.onSnapshot(querySnapshot => {
-                    if (querySnapshot.size > 0) {
-                        const user = querySnapshot.docs[0].data() as User;
-                        AsyncStorage.setItem(
-                            'user_info',
-                            JSON.stringify(user),
-                        );
-                        setUserInfo(user);
-                        console.log('User data: ', user);
-                    }
-                });
-                return () => subscriber();
-            }
-        }).catch(error => {
-            console.error('Error fetching user info:', error);
-        });
-    };
-
-    useEffect(() => {
-        fetchUserInfo();
-        const unsubscribe = navigation.addListener('focus', fetchUserInfo);
-        return unsubscribe;
-    }, []);
-
-
     return (
         <View style={styles.container}>
             <View style={styles.mainContainer}>

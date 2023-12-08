@@ -24,7 +24,7 @@ function ThirdRegisterStep({
             setError('Please fill in all fields');
             return;
         }
-        console.log('registering');
+        register();
     };
     return (
         <View>

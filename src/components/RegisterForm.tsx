@@ -1,25 +1,27 @@
 import React, {useState, useEffect} from 'react';
 import {
-    View,
     Text,
-    Pressable,
     ScrollView,
-    TextInput,
-    Image,
-    TouchableOpacity,
     KeyboardAvoidingView,
-    FlatList,
+    Platform,
+    StyleSheet,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faEnvelope, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
 import FirstRegisterStep from './FirstRegisterStep';
 import SecondRegisterStep from './SecondRegisterStep';
 import ThirdRegisterStep from './ThirdRegisterStep';
-import User from '../../models/User';
-import Address from '../../models/Address';
+import {User} from '../models/User';
+import {Address} from '../models/Address';
+import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {FirebaseUser} from '../models/FirebaseUser';
+
+type Props = {
+    navigation: any;
+};
 
 const initialState: User = {
+    uid: '',
     email: 'jane.doe@example.com',
     password: 'SuperSecretPassword!',
     repeatPassword: 'SuperSecretPassword!',
@@ -35,7 +37,7 @@ const initialState: User = {
     phone: '+421 123 456 789',
 };
 
-function RegisterForm({navigation}) {
+function RegisterForm({navigation}: Props) {
     const [user, setUser] = useState<User>(initialState);
     const [step, setStep] = useState(1);
 
@@ -82,8 +84,45 @@ function RegisterForm({navigation}) {
     function register() {
         auth()
             .createUserWithEmailAndPassword(user.email, user.password)
-            .then(() => {
+            .then(userCredential => {
                 console.log('User account created & signed in!');
+                firestore()
+                    .collection('users')
+                    .doc(userCredential.user.uid)
+                    .set({
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        email: user.email,
+                        phone: user.phone,
+                        address: user.address,
+                        uid: userCredential.user.uid,
+                    })
+                    .then(async () => {
+                        await AsyncStorage.setItem(
+                            'user',
+                            JSON.stringify(
+                                userCredential.user.toJSON() as FirebaseUser,
+                            ),
+                        );
+                        await AsyncStorage.setItem(
+                            'user_info',
+                            JSON.stringify(user),
+                        );
+                        console.log('User added!');
+                        navigation.navigate('Home');
+                    });
+
+                userCredential.user
+                    .sendEmailVerification()
+                    .then(() => {
+                        console.log('Verification email sent!');
+                    })
+                    .catch(emailError => {
+                        console.error(
+                            'Error sending verification email:',
+                            emailError,
+                        );
+                    });
             })
             .catch(error => {
                 if (error.code === 'auth/email-already-in-use') {
@@ -100,13 +139,11 @@ function RegisterForm({navigation}) {
 
     return (
         <KeyboardAvoidingView
-            style={{flex: 1}}
+            style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}>
-            <ScrollView className={`px-4 py-5`}>
-                <Text className={`text-3xl text-[#1FAFBF] font-bold mb-2`}>
-                    Create account
-                </Text>
+            <ScrollView style={styles.scrollView}>
+                <Text style={styles.headerText}>Create account</Text>
                 {step === 1 && (
                     <FirstRegisterStep
                         navigation={navigation}
@@ -142,3 +179,21 @@ function RegisterForm({navigation}) {
 }
 
 export default RegisterForm;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+    },
+    scrollView: {
+        paddingHorizontal: 4,
+        paddingVertical: 5,
+    },
+    headerText: {
+        fontSize: 32,
+        color: '#1FAFBF',
+        fontWeight: 'bold',
+        marginBottom: 2,
+    },
+});

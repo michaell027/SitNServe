@@ -1,5 +1,12 @@
 import React from 'react';
-import {Image, Pressable, Text, View} from 'react-native';
+import {
+    Dimensions,
+    Image,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
     faCalendar,
@@ -9,141 +16,178 @@ import {
     faRightToBracket,
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons';
-import {useNavigation} from '@react-navigation/native';
-import {styled} from 'nativewind';
+import {IconProp} from '@fortawesome/fontawesome-svg-core';
 
-const StyledView = styled(View);
-const StyledPressable = styled(Pressable);
+type NotLoggedHomeProps = {
+    navigation: any;
+};
 
-function NotLoggedHome({navigation}) {
+type OptionSectionProps = {
+    icon: IconProp;
+    title: string;
+    description: string;
+    color: string;
+};
+
+const height = Dimensions.get('window').height;
+
+function NotLoggedHome({navigation}: NotLoggedHomeProps) {
     return (
-        <StyledView className="flex-1 h-[90vh] items-center justify-start px-6 py-6 bg-white">
-            <StyledView className="flex w-full h-full bg-[#1FAFBF]/30 rounded-2xl">
-                <StyledView className="w-full h-[100%] items-center py-4">
-                    <StyledView className="max-h-[8%] w-full">
-                        <Image
-                            source={require('./../../assets/images/welcome_to.png')}
-                            className="w-full h-full rounded-3xl"
-                            resizeMode="contain"
-                        />
-                    </StyledView>
-                    <StyledView className="max-h-[32%] w-full pb-1">
-                        <Image
-                            source={require('./../../assets/images/matus_logo.png')}
-                            className="w-full h-full rounded-3xl"
-                            resizeMode="contain"
-                        />
-                    </StyledView>
-                    <StyledView className="max-h-[60%] flex-row flex-wrap justify-between px-4">
-                        <StyledView className="flex items-center w-full mb-4">
-                            <Text className="text-center text-black font-bold text-[20px] w-full">
-                                <FontAwesomeIcon
-                                    icon={faBowlFood}
-                                    size={20}
-                                    color="#171E26"
-                                />{' '}
-                                Find{' '}
-                                <FontAwesomeIcon
-                                    icon={faBowlFood}
-                                    size={20}
-                                    color="#171E26"
-                                />
-                            </Text>
-                            <Text className="text-center text-black text-[17px] w-full">
-                                Explore the best dining spots near you.
-                            </Text>
-                        </StyledView>
-                        <StyledView className="flex items-center w-full mb-4">
-                            <Text className="text-center text-black font-bold text-[20px] w-full">
-                                <FontAwesomeIcon
-                                    icon={faCalendar}
-                                    size={20}
-                                    color="#F24452"
-                                />{' '}
-                                Reserve{' '}
-                                <FontAwesomeIcon
-                                    icon={faCalendar}
-                                    size={20}
-                                    color="#F24452"
-                                />
-                            </Text>
-                            <Text className="text-center text-black text-[17px] w-full">
-                                Secure your table in advance.
-                            </Text>
-                        </StyledView>
-                        <StyledView className="flex items-center w-full mb-4">
-                            <Text className="text-center text-black font-bold text-[20px] w-full">
-                                <FontAwesomeIcon
-                                    icon={faMobile}
-                                    size={20}
-                                    color="#F2A413"
-                                />{' '}
-                                Order & Pay{' '}
-                                <FontAwesomeIcon
-                                    icon={faMobile}
-                                    size={20}
-                                    color="#F2A413"
-                                />
-                            </Text>
-                            <Text className="text-center text-black text-[17px] w-full">
-                                Scan, order, and pay right from your phone.
-                            </Text>
-                        </StyledView>
+        <View style={styles.container}>
+            <View style={styles.innerContainer}>
+                <View style={styles.imageSection}>
+                    <Image
+                        style={styles.titleImage}
+                        source={require('./../../assets/images/welcome_to.png')}
+                        resizeMode="contain"
+                    />
+                    <Image
+                        style={styles.logoImage}
+                        source={require('./../../assets/images/matus_logo.png')}
+                        resizeMode="contain"
+                    />
+                </View>
+                <View style={styles.optionSection}>
+                    <OptionSection
+                        icon={faBowlFood}
+                        title="Find"
+                        description="Explore the best dining spots near you."
+                        color="#171E26"
+                    />
+                    <OptionSection
+                        icon={faCalendar}
+                        title="Reserve"
+                        description="Secure your table in advance."
+                        color="#F24452"
+                    />
+                    <OptionSection
+                        icon={faMobile}
+                        title="Order & Pay"
+                        description="Scan, order, and pay right from your phone."
+                        color="#F2A413"
+                    />
+                    <OptionSection
+                        icon={faUtensils}
+                        title="Enjoy"
+                        description="Sit back, relax, and enjoy your meal."
+                        color="#1FAFBF"
+                    />
 
-                        <StyledView className="flex items-center w-full mb-4">
-                            <Text className="text-center text-black font-bold text-[20px] w-full">
-                                <FontAwesomeIcon
-                                    icon={faUtensils}
-                                    size={20}
-                                    color="#1FAFBF"
-                                />{' '}
-                                Enjoy{' '}
-                                <FontAwesomeIcon
-                                    icon={faUtensils}
-                                    size={20}
-                                    color="#1FAFBF"
-                                />
-                            </Text>
-                            <Text className="text-center text-black text-[17px] w-full">
-                                Sit back, relax, and enjoy your meal.
-                            </Text>
-                        </StyledView>
-
-                        <StyledView className="flex-row justify-between w-full mt-4 px-6">
-                            <StyledPressable
-                                onPress={() =>
-                                    navigation.navigate('ProfileScreen')
-                                }
-                                className="bg-[#1FAFBF] py-3 flex-row space-x-2 px-7 rounded-lg">
-                                <FontAwesomeIcon
-                                    icon={faRightToBracket}
-                                    color="white"
-                                    size={20}
-                                />
-                                <Text className="text-white font-[500] text-[16px] text-center">
-                                    Login
-                                </Text>
-                            </StyledPressable>
-                            <StyledPressable
-                                className="bg-[#1FAFBF] py-3 flex-row space-x-2 px-7 rounded-lg"
-                                onPress={() =>
-                                    navigation.navigate('RegisterScreen')
-                                }>
-                                <FontAwesomeIcon
-                                    icon={faUserPlus}
-                                    color="white"
-                                    size={20}
-                                />
-                                <Text className="text-white font-[500] text-[16px] text-center">
-                                    Sign Up
-                                </Text>
-                            </StyledPressable>
-                        </StyledView>
-                    </StyledView>
-                </StyledView>
-            </StyledView>
-        </StyledView>
+                    <View style={styles.buttonContainer}>
+                        <Pressable
+                            style={styles.button}
+                            onPress={() =>
+                                navigation.navigate('ProfileScreen')
+                            }>
+                            <FontAwesomeIcon
+                                icon={faRightToBracket}
+                                color="white"
+                                size={20}
+                            />
+                            <Text style={styles.buttonText}>Login</Text>
+                        </Pressable>
+                        <Pressable
+                            style={styles.button}
+                            onPress={() =>
+                                navigation.navigate('RegisterScreen')
+                            }>
+                            <FontAwesomeIcon
+                                icon={faUserPlus}
+                                color="white"
+                                size={20}
+                            />
+                            <Text style={styles.buttonText}>Sign Up</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </View>
+        </View>
     );
 }
 
+const OptionSection = ({
+    icon,
+    title,
+    description,
+    color,
+}: OptionSectionProps) => (
+    <View style={styles.optionSection}>
+        <Text style={styles.optionTitle}>
+            <FontAwesomeIcon icon={icon} size={20} color={color} />
+            {' ' + title + ' '}
+            <FontAwesomeIcon icon={icon} size={20} color={color} />
+        </Text>
+        <Text style={styles.optionDescription}>{description}</Text>
+    </View>
+);
+
 export default NotLoggedHome;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        height: height * 0.9,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    innerContainer: {
+        width: '95%',
+        height: '90%',
+        alignItems: 'center',
+        marginTop: 6,
+        marginBottom: 6,
+        backgroundColor: 'rgba(31, 175, 191, 0.4)',
+        borderRadius: 20,
+    },
+    imageSection: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '75%',
+    },
+    titleImage: {
+        width: '100%',
+        height: '15%',
+    },
+    logoImage: {
+        width: '100%',
+        height: 150,
+    },
+    optionSection: {
+        width: '100%',
+        marginBottom: 10,
+        alignItems: 'center',
+    },
+    optionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#171E26',
+        marginBottom: 5,
+    },
+    optionDescription: {
+        fontSize: 17,
+        color: '#171E26',
+        textAlign: 'center',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        width: '90%',
+    },
+    button: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#1FAFBF',
+        borderRadius: 10,
+        padding: 10,
+        width: 150,
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: '500',
+        marginLeft: 10,
+    },
+});

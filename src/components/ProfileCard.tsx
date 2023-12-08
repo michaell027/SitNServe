@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,10 +16,14 @@ import {
     faStar,
 } from '@fortawesome/free-solid-svg-icons';
 import {styled} from 'nativewind';
+import {FirebaseUser} from '../models/FirebaseUser';
+import {User} from '../models/User';
 
 interface ProfileCardProps {
-    user: any;
+    user: FirebaseUser;
     setUser: any;
+    userInfo: User;
+    setUserInfo: any;
     navigation: any;
 }
 
@@ -28,27 +32,38 @@ const StyledText = styled(Text);
 const StyledImage = styled(Image);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 
-const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
+const ProfileCard = ({
+    user,
+    setUser,
+    userInfo,
+    setUserInfo,
+    navigation,
+}: ProfileCardProps) => {
+    const [creationDate, setCreationDate] = useState<string>('');
+    const [structuredAddress, setStructuredAddress] = useState<string>('');
     useEffect(() => {
         const creationDate = new Date(user.metadata.creationTime);
         const formattedCreationDate = creationDate.toLocaleDateString('sk-SK');
-        console.log(user);
-        console.log(`UID: ${user.uid}`);
-        console.log(`Display Name: ${user.displayName || 'not set'}`);
-        console.log(`Email: ${user.email}`);
-        console.log(`Creation Date: ${formattedCreationDate}`);
-        console.log(`Phone Number: ${user.phoneNumber || 'not set'}`);
-        console.log(`Photo URL: ${user.photoURL || 'not set'}`);
+        setCreationDate(formattedCreationDate);
+
+        const address = userInfo.address;
+        const structuredAddress = `${address.street} ${address.number}, ${address.city}, ${address.state}, ${address.zip}`;
+        setStructuredAddress(structuredAddress);
     }, [user]);
+
+    useEffect(() => {
+        console.log(userInfo);
+    }, [userInfo]);
 
     function signOut() {
         auth()
             .signOut()
-            .then(() => {
+            .then(async () => {
                 console.log('User signed out!');
-                AsyncStorage.removeItem('user');
+                await AsyncStorage.removeItem('user');
                 setUser(null);
-                AsyncStorage.removeItem('user_info');
+                await AsyncStorage.removeItem('user_info');
+                setUserInfo(null);
             });
     }
 
@@ -63,26 +78,24 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
                         />
                         <View>
                             <StyledText className="mt-2 text-2xl font-bold">
-                                Andrew Kumar
+                                {userInfo?.firstName} {userInfo?.lastName}
                             </StyledText>
                             <StyledText className="mt-1 text-sm text-gray-500">
-                                @andrewkumar
+                                @{userInfo.username}
                             </StyledText>
                         </View>
                     </StyledView>
                     <StyledView className="mt-4 flex flex-row space-x-2 items-center">
                         <FontAwesomeIcon icon={faPhone} size={20} />
-                        <Text>+421949327913</Text>
+                        <Text>{userInfo.phone}</Text>
                     </StyledView>
                     <StyledView className="mt-4 flex flex-row space-x-2 items-center">
                         <FontAwesomeIcon icon={faAt} size={20} />
-                        <Text>miselka12345@gmail.com</Text>
+                        <Text>{userInfo.email}</Text>
                     </StyledView>
                     <StyledView className="mt-4 flex flex-row space-x-2 items-center">
                         <FontAwesomeIcon icon={faLocationDot} size={20} />
-                        <Text>
-                            Sokoľany 259, Košice-okolie, 04457, Slovakia
-                        </Text>
+                        <Text>{structuredAddress}</Text>
                     </StyledView>
 
                     <StyledView className="flex flex-row justify-between border-gray-300 border-t-2 border-b-2 mt-6">
@@ -91,7 +104,7 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
                                 Member since
                             </StyledText>
                             <StyledText className="text-lg font-bold">
-                                12.4.2023
+                                {creationDate}
                             </StyledText>
                         </StyledView>
                         <StyledView className="flex flex-col items-center w-1/2 p-1">

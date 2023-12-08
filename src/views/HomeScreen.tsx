@@ -1,14 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {
-    Dimensions,
-    Image,
-    Pressable,
-    ScrollView,
-    Text,
-    View,
-} from 'react-native';
-import {styled} from 'nativewind';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import React, {useEffect, useState} from 'react';
+import {Dimensions, ScrollView} from 'react-native';
 import {
     faGear,
     faInfo,
@@ -21,8 +12,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoggedInHome from '../components/LoggedInHome';
 import NotLoggedHome from '../components/NotLoggedHome';
 
-const StyledView = styled(View);
-const StyledText = styled(Text);
+interface HomeScreenProps {
+    navigation: any;
+}
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -45,27 +37,27 @@ const buttonDataAfterLogin = [
     {icon: faUser, text: 'My profile', navigate: 'ProfileScreen'},
 ];
 
-const buttonDataBeforeLogin = [
-    {icon: faInfo, text: 'About', navigate: 'AboutScreen'},
-    {icon: faUser, text: 'Login', navigate: 'LoginScreen'},
-];
-
-function HomeScreen({navigation}) {
+function HomeScreen({navigation}: HomeScreenProps) {
     const [isLogged, setIsLogged] = useState(false);
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
+        return navigation.addListener('focus', () => {
             AsyncStorage.getItem('user').then(user => {
                 if (user) {
                     setUser(JSON.parse(user));
-                    setIsLogged(true);
+                    AsyncStorage.getItem('user_info').then(userInfo => {
+                        if (userInfo) {
+                            setIsLogged(true);
+                        } else {
+                            setIsLogged(false);
+                        }
+                    });
                 } else {
                     setIsLogged(false);
                 }
             });
         });
-        return unsubscribe;
     }, [navigation]);
 
     return (
@@ -75,13 +67,9 @@ function HomeScreen({navigation}) {
                     navigation={navigation}
                     buttonDataAfterLogin={buttonDataAfterLogin}
                     getIconSize={getIconSize}
-                    user={user}
                 />
             ) : (
-                <NotLoggedHome
-                    navigation={navigation}
-                    buttonData={buttonDataBeforeLogin}
-                />
+                <NotLoggedHome navigation={navigation} />
             )}
         </ScrollView>
     );

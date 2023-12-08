@@ -1,4 +1,5 @@
 import {Address} from './Address';
+import {Restaurant} from './Restaurant';
 
 export interface User {
     uid: string;
@@ -9,4 +10,5 @@ export interface User {
     firstName: string;
     lastName: string;
     phone: string;
+    favoriteRestaurants?: string[];
 }

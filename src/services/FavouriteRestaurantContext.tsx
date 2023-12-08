@@ -1,5 +1,14 @@
-import React, {createContext, useContext, useState, ReactNode} from 'react';
+import React, {
+    createContext,
+    useContext,
+    useState,
+    ReactNode,
+    useEffect,
+} from 'react';
 import {Restaurant} from '../models/Restaurant';
+import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {User} from '../models/User';
 
 type RestaurantContextType = {
     favoriteRestaurants: Restaurant[];
@@ -33,53 +42,40 @@ export const RestaurantProvider = ({children}: {children: ReactNode}) => {
     >([]);
     const [favoriteRestaurants, setFavoriteRestaurants] = useState<
         Restaurant[]
-    >([
-        {
-            id: '1',
-            name: 'Restaurant 1',
-            description: 'uuu',
-            address: {
-                street: 'Kosicka',
-                number: '23',
-                city: 'Kosice',
-                state: 'Slovensko',
-                zip: '04001',
-            },
-            imageUrl:
-                'https://firebasestorage.googleapis.com/v0/b/sitnserve-fbaed.appspot.com/o/restaurants%2Frestaurant_1.jpg?alt=media&token=62c1668f-4a43-43f9-ac1e-e97cfe7eb3a3',
-            openingHours: {},
-        },
-        {
-            id: '2',
-            name: 'Restaurant 2',
-            description: 'oooooooo',
-            address: {
-                street: 'Bratislavska',
-                number: '8',
-                city: 'Kosicovo',
-                state: 'Slovensko',
-                zip: '04001',
-            },
-            imageUrl:
-                'https://firebasestorage.googleapis.com/v0/b/sitnserve-fbaed.appspot.com/o/restaurants%2Frestaurant_2.jpg?alt=media&token=6a015900-2e3e-4de4-8fb5-c1eb350a5530',
-            openingHours: {},
-        },
-        {
-            id: '3',
-            name: 'Restaurant 3',
-            description: 'iaiaia',
-            address: {
-                street: 'Osemsmerova',
-                number: '128906',
-                city: 'Presovovo',
-                state: 'Slovensko',
-                zip: '123456',
-            },
-            imageUrl:
-                'https://firebasestorage.googleapis.com/v0/b/sitnserve-fbaed.appspot.com/o/restaurants%2Frestaurant_3.jpg?alt=media&token=a2c9af9e-2c40-4d07-902b-53fb274b55f0',
-            openingHours: {},
-        },
-    ]);
+    >([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const userString = await AsyncStorage.getItem('user_info');
+                if (!userString) {
+                    return;
+                }
+                const userInfo = JSON.parse(userString) as User;
+                console.log('uinfo' + userInfo.favoriteRestaurants);
+
+                if (userInfo && userInfo.favoriteRestaurants) {
+                    const fetchPromises = userInfo.favoriteRestaurants.map(
+                        async restaurantId => {
+                            const restaurantRef = firestore()
+                                .collection('restaurants')
+                                .doc(restaurantId);
+                            const document = await restaurantRef.get();
+                            console.log(document.data());
+                            return document.data() as Restaurant;
+                        },
+                    );
+
+                    const restaurants = await Promise.all(fetchPromises);
+                    setFavoriteRestaurants(restaurants);
+                }
+            } catch (error) {
+                console.error('Error fetching favorite restaurants:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const toggleRestaurant = (restaurant: Restaurant) => {
         if (selectedRestaurants.length === 0) {

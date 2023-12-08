@@ -4,25 +4,33 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
 import LoginForm from '../components/LoginForm';
 import ProfileCard from '../components/ProfileCard';
+import {FirebaseUser} from '../models/FirebaseUser';
+import {User} from '../models/User';
+import firestore from '@react-native-firebase/firestore';
 
 function ProfileScreen({navigation, route}) {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<FirebaseUser | null>(null);
+    const [userInfo, setUserInfo] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const subscriber = auth().onAuthStateChanged(
             async authenticatedUser => {
-                setLoading(true); // Start loading
+                setLoading(true);
                 try {
                     if (authenticatedUser) {
-                        await AsyncStorage.setItem(
-                            'user',
-                            JSON.stringify(authenticatedUser),
-                        );
-                        setUser(authenticatedUser);
+                        const userRef = firestore()
+                            .collection('users')
+                            .doc(authenticatedUser.uid);
+                        const document = await userRef.get();
+                        const userInfo = document.data() as User;
+                        setUserInfo(userInfo);
+                        setUser(authenticatedUser.toJSON() as FirebaseUser);
                     } else {
                         await AsyncStorage.removeItem('user');
+                        await AsyncStorage.removeItem('user_info');
                         setUser(null);
+                        setUserInfo(null);
                     }
                 } catch (error) {
                     console.error('Failed to handle auth state change:', error);
@@ -47,7 +55,13 @@ function ProfileScreen({navigation, route}) {
     }
 
     return (
-        <ProfileCard user={user} setUser={setUser} navigation={navigation} />
+        <ProfileCard
+            user={user}
+            setUser={setUser}
+            userInfo={userInfo}
+            setUserInfo={setUserInfo}
+            navigation={navigation}
+        />
     );
 }
 

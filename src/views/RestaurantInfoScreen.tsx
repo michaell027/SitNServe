@@ -11,15 +11,15 @@ import MapView from 'react-native-maps';
 import {Marker} from 'react-native-maps';
 import {faHeart as faHeartRegular} from '@fortawesome/free-regular-svg-icons';
 import {faHeart as faHeartSolid} from '@fortawesome/free-solid-svg-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {User} from '../models/User';
 
 function RestaurantInfoScreen({navigation, route}) {
-    // State Declarations
     const [restaurant, setRestaurant] = useState({});
     const [content, setContent] = useState('info');
     const [region, setRegion] = useState(null);
     const [isFavorite, setIsFavorite] = useState(false);
 
-    // Fetch restaurant data on component mount
     useEffect(() => {
         const fetchRestaurantData = async () => {
             try {
@@ -101,6 +101,15 @@ function RestaurantInfoScreen({navigation, route}) {
             <FontAwesomeIcon icon={icon} size={25} />
         </Pressable>
     );
+
+    async function handleClickAddToFavorite() {
+        const userString = await AsyncStorage.getItem('user_info');
+        if (!userString) {
+            return;
+        }
+        const user = JSON.parse(userString) as User;
+        const uid = user.uid;
+    }
 
     return (
         <View className={'flex-1'}>
@@ -209,9 +218,7 @@ function RestaurantInfoScreen({navigation, route}) {
                     className={
                         'bg-[#1FAFBF] p-3 rounded-lg flex flex-row justify-center items-center space-x-2'
                     }
-                    onPress={() => {
-                        setIsFavorite(!isFavorite);
-                    }}>
+                    onPress={handleClickAddToFavorite}>
                     <FontAwesomeIcon
                         icon={isFavorite ? faHeartSolid : faHeartRegular}
                         size={25}

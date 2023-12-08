@@ -1,22 +1,20 @@
 import React, {useState} from 'react';
-import {
-    View,
-    Text,
-    Image,
-    StyleSheet,
-    TextInput,
-    Pressable,
-    TouchableOpacity,
-} from 'react-native';
+import {View, Text, Image, Pressable, TouchableOpacity} from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import {Button} from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
 import {FloatingLabelInput} from 'react-native-floating-label-input';
+import {FirebaseUser} from '../models/FirebaseUser';
+import firestore from '@react-native-firebase/firestore';
+import {User} from '../models/User';
 
-const LoginForm: React.FC = ({navigation}) => {
+interface LoginFormProps {
+    navigation: any;
+}
+
+const LoginForm = ({navigation}: LoginFormProps) => {
     const [username, setUsername] = useState<string>('jane.doe@example.com');
     const [password, setPassword] = useState<string>('SuperSecretPassword!');
     const [toggleCheckBox, setToggleCheckBox] = useState<boolean>(false);
@@ -40,10 +38,9 @@ const LoginForm: React.FC = ({navigation}) => {
 
         auth()
             .signInWithEmailAndPassword(username, password)
-            .then(userCredential => {
+            .then(async userCredential => {
                 console.log('User signed in!');
-                storeUser(userCredential.user);
-                navigation.navigate('Home');
+                await storeUser(userCredential.user.toJSON() as FirebaseUser);
             })
             .catch(error => {
                 console.log('Error signing in:', error.code);
@@ -64,12 +61,22 @@ const LoginForm: React.FC = ({navigation}) => {
             });
     };
 
-    const storeUser = async (user: any) => {
+    const storeUser = async (user: FirebaseUser) => {
         try {
             await AsyncStorage.setItem('user', JSON.stringify(user));
+            await storeUserInfo(user);
         } catch (error) {
             console.log('Error storing user:', error);
         }
+    };
+
+    const storeUserInfo = async (user: FirebaseUser) => {
+        const query = firestore().collection('users').doc(user.uid);
+        query.onSnapshot(querySnapshot => {
+            const userInfo = querySnapshot.data() as User;
+            AsyncStorage.setItem('user_info', JSON.stringify(userInfo));
+            navigation.navigate('Home');
+        });
     };
 
     return (
