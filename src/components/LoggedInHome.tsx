@@ -11,6 +11,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {LoggedInHomeProps} from '../models/LoggedInHomeProps';
 
 const windowHeight = Dimensions.get('window').height;
+const windowWidth = Dimensions.get('window').width;
 
 function LoggedInHome({
     navigation,
@@ -56,21 +57,22 @@ export default LoggedInHome;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        height: windowHeight,
+        height: windowHeight * 0.9,
+        width: windowWidth,
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
     },
     mainContainer: {
-        width: '100%',
+        width: '90%',
         height: '90%',
         alignItems: 'center',
+        justifyContent: 'center',
+        gap: 30,
         marginTop: 6,
         marginBottom: 6,
     },
     imageContainer: {
         maxHeight: '50%',
-        paddingVertical: 6,
-        paddingHorizontal: 2,
         width: '100%',
         alignItems: 'center',
     },
@@ -90,7 +92,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingTop: 10,
-        paddingBottom: 15,
+        paddingBottom: 20,
     },
     pressable: {
         alignItems: 'center',

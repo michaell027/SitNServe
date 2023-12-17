@@ -14,7 +14,6 @@ import {User} from '../models/User';
 import {Address} from '../models/Address';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {FirebaseUser} from '../models/FirebaseUser';
 
 type Props = {
     navigation: any;
@@ -40,6 +39,7 @@ const initialState: User = {
 function RegisterForm({navigation}: Props) {
     const [user, setUser] = useState<User>(initialState);
     const [step, setStep] = useState(1);
+    const [error, setError] = useState<string>('');
 
     useEffect(() => {
         console.log(user);
@@ -85,7 +85,6 @@ function RegisterForm({navigation}: Props) {
         auth()
             .createUserWithEmailAndPassword(user.email, user.password)
             .then(userCredential => {
-                console.log('User account created & signed in!');
                 firestore()
                     .collection('users')
                     .doc(userCredential.user.uid)
@@ -96,19 +95,16 @@ function RegisterForm({navigation}: Props) {
                         phone: user.phone,
                         address: user.address,
                         uid: userCredential.user.uid,
+                        creationDate: formattedCreationDate(
+                            userCredential.user.metadata.creationTime,
+                        ),
+                        emailVerified: userCredential.user.emailVerified,
                     })
                     .then(async () => {
                         await AsyncStorage.setItem(
-                            'user',
-                            JSON.stringify(
-                                userCredential.user.toJSON() as FirebaseUser,
-                            ),
+                            'user_uid',
+                            userCredential.user.uid,
                         );
-                        await AsyncStorage.setItem(
-                            'user_info',
-                            JSON.stringify(user),
-                        );
-                        console.log('User added!');
                         navigation.navigate('Home');
                     });
 
@@ -118,24 +114,31 @@ function RegisterForm({navigation}: Props) {
                         console.log('Verification email sent!');
                     })
                     .catch(emailError => {
-                        console.error(
-                            'Error sending verification email:',
-                            emailError,
+                        setError(
+                            'Error sending verification email:' + emailError,
                         );
                     });
             })
             .catch(error => {
                 if (error.code === 'auth/email-already-in-use') {
-                    console.log('That email address is already in use!');
+                    setError('That email address is already in use!');
                 }
 
                 if (error.code === 'auth/invalid-email') {
-                    console.log('That email address is invalid!');
+                    setError('That email address is invalid!');
                 }
-
-                console.error(error);
+                setError(error.message);
             });
     }
+
+    const formattedCreationDate = (creationDateStr: string | undefined) => {
+        if (!creationDateStr) {
+            return '';
+        }
+        const creationDate = new Date(creationDateStr);
+        const formattedCreationDate = creationDate.toLocaleDateString('sk-SK');
+        return formattedCreationDate;
+    };
 
     return (
         <KeyboardAvoidingView
@@ -168,9 +171,10 @@ function RegisterForm({navigation}: Props) {
                         navigation={navigation}
                         user={user}
                         updateUser={updateUser}
-                        nextStep={nextStep}
                         prevStep={prevStep}
                         register={register}
+                        error={error}
+                        setError={setError}
                     />
                 )}
             </ScrollView>

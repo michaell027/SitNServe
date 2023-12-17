@@ -47,6 +47,7 @@ import {RestaurantProvider} from "./src/services/FavouriteRestaurantContext";
 import OrdersScreen from "./src/views/OrdersScreen";
 import ReservationsScreen from "./src/views/ReservationsScreen";
 import CartScreen from "./src/views/CartScreen";
+import ScanQRScreen from "./src/views/ScanQRScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -305,6 +306,7 @@ function App() {
                     <Stack.Screen name="OrdersScreen" component={OrdersScreen}/>
                     <Stack.Screen name="ReservationsScreen" component={ReservationsScreen}/>
                     <Stack.Screen name="CartScreen" component={CartScreen}/>
+                    <Stack.Screen name="ScanQRScreen" component={ScanQRScreen}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </DrawerLayoutAndroid>

@@ -1,16 +1,19 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, Button, ActivityIndicator} from 'react-native';
+import {View, Text, Button, ActivityIndicator, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
 import LoginForm from '../components/LoginForm';
 import ProfileCard from '../components/ProfileCard';
-import {FirebaseUser} from '../models/FirebaseUser';
 import {User} from '../models/User';
 import firestore from '@react-native-firebase/firestore';
 
-function ProfileScreen({navigation, route}) {
-    const [user, setUser] = useState<FirebaseUser | null>(null);
-    const [userInfo, setUserInfo] = useState<User | null>(null);
+interface ProfileScreenProps {
+    navigation: any;
+    route: any;
+}
+
+const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -23,16 +26,17 @@ function ProfileScreen({navigation, route}) {
                             .collection('users')
                             .doc(authenticatedUser.uid);
                         const document = await userRef.get();
-                        const userInfo = document.data() as User;
-                        setUserInfo(userInfo);
-                        setUser(authenticatedUser.toJSON() as FirebaseUser);
+                        const user = document.data() as User;
+                        setUser(user);
                     } else {
-                        await AsyncStorage.removeItem('user');
-                        await AsyncStorage.removeItem('user_info');
-                        setUser(null);
-                        setUserInfo(null);
+                        AsyncStorage.removeItem('user_uid').then(() => {
+                            setUser(null);
+                        });
                     }
                 } catch (error) {
+                    AsyncStorage.removeItem('user_uid').then(() => {
+                        setUser(null);
+                    });
                     console.error('Failed to handle auth state change:', error);
                 }
                 setLoading(false);
@@ -44,7 +48,7 @@ function ProfileScreen({navigation, route}) {
 
     if (loading) {
         return (
-            <View className="flex-1 justify-center items-center">
+            <View style={styles.container}>
                 <ActivityIndicator size="large" />
             </View>
         );
@@ -55,14 +59,15 @@ function ProfileScreen({navigation, route}) {
     }
 
     return (
-        <ProfileCard
-            user={user}
-            setUser={setUser}
-            userInfo={userInfo}
-            setUserInfo={setUserInfo}
-            navigation={navigation}
-        />
+        <ProfileCard user={user} setUser={setUser} navigation={navigation} />
     );
-}
+};
 
 export default ProfileScreen;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+});

@@ -11,4 +11,5 @@ export interface User {
     lastName: string;
     phone: string;
     favoriteRestaurants?: string[];
+    creationDate?: string;
 }

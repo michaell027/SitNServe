@@ -1,9 +1,12 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text} from 'react-native';
+import React from 'react';
 import LoginForm from '../components/LoginForm';
 
-function LoginScreen({navigation}) {
-    return <LoginForm />;
+interface Props {
+    navigation: any;
 }
+
+const LoginScreen: React.FC<Props> = ({navigation}) => {
+    return <LoginForm navigation={navigation} />;
+};
 
 export default LoginScreen;

@@ -1,23 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import {
     View,
-    Text,
-    Image,
     ScrollView,
-    Pressable,
     ActivityIndicator,
     TextInput,
     StyleSheet,
 } from 'react-native';
-import {styled} from 'nativewind';
 import firestore from '@react-native-firebase/firestore';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
+import RestaurantCard from '../components/RestaurantCard';
+import {Restaurant} from '../models/Restaurant';
 
-function RestaurantsScreen({navigation}) {
-    const [restaurants, setRestaurants] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+interface RestaurantsScreenProps {
+    navigation: any;
+}
+
+const RestaurantsScreen = ({navigation}: RestaurantsScreenProps) => {
+    const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [searchQuery, setSearchQuery] = useState<string>('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,10 +27,18 @@ function RestaurantsScreen({navigation}) {
                 const response = await firestore()
                     .collection('restaurants')
                     .get();
-                const data = response.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
+                const data = response.docs.map(doc => {
+                    const docData = doc.data();
+                    return {
+                        id: doc.id,
+                        name: docData.name,
+                        description: docData.description,
+                        address: docData.address,
+                        imageUrl: docData.imageUrl,
+                        openingHours: docData.openingHours,
+                        menu: docData.menu,
+                    };
+                });
                 setRestaurants(data);
             } catch (error) {
                 console.error('Error fetching documents: ', error);
@@ -36,55 +46,11 @@ function RestaurantsScreen({navigation}) {
             setLoading(false);
         };
 
-        fetchData();
+        fetchData().then();
     }, []);
 
-    const filteredRestaurants = restaurants.filter(restaurant =>
+    const filteredRestaurants: Restaurant[] = restaurants.filter(restaurant =>
         restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
-
-    function truncateDescription(description, wordLimit) {
-        const words = description.split(' ');
-        if (words.length > wordLimit) {
-            return words.slice(0, wordLimit).join(' ') + '...';
-        }
-        return description;
-    }
-
-    const renderRestaurantCard = restaurant => (
-        <Pressable
-            key={restaurant.id}
-            onPress={() =>
-                navigation.navigate('Restaurant', {restaurantId: restaurant.id})
-            }
-            className={
-                'flex flex-row w-full h-fit rounded-3xl mt-2 p-4 bg-gray-400/30 items-center'
-            }>
-            <View
-                className={
-                    'w-1/3 sm:w-1/4 h-44 items-center flex justify-center'
-                }>
-                <Image
-                    source={{uri: restaurant.imageUrl}}
-                    className={'h-full w-full self-center rounded-xl'}
-                    resizeMode="cover"
-                />
-            </View>
-            <View
-                className={
-                    'flex-col w-2/3 sm:w-3/4 justify-between p-4 leading-normal'
-                }>
-                <Text
-                    className={
-                        'mb-2 text-2xl font-bold tracking-tight text-gray-900'
-                    }>
-                    {restaurant.name}
-                </Text>
-                <Text className={'mb-3 font-normal'}>
-                    {truncateDescription(restaurant.description, 20)}
-                </Text>
-            </View>
-        </Pressable>
     );
 
     if (loading) {
@@ -102,12 +68,13 @@ function RestaurantsScreen({navigation}) {
     }
 
     return (
-        <ScrollView>
-            <View className={'flex flex-col w-full h-full px-2'}>
-                <View
-                    className={'px-2 rounded-3xl space-x-2'}
-                    style={styles.searchBar}>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} />
+        <ScrollView style={styles.scrollView}>
+            <View style={styles.container}>
+                <View style={[styles.searchBar, styles.searchBarContainer]}>
+                    <FontAwesomeIcon
+                        icon={faMagnifyingGlass}
+                        style={styles.searchIcon}
+                    />
                     <TextInput
                         value={searchQuery}
                         onChangeText={setSearchQuery}
@@ -115,13 +82,17 @@ function RestaurantsScreen({navigation}) {
                         style={styles.searchInput}
                     />
                 </View>
-                {filteredRestaurants.map(restaurant =>
-                    renderRestaurantCard(restaurant),
-                )}
+                {filteredRestaurants.map(restaurant => (
+                    <RestaurantCard
+                        restaurant={restaurant}
+                        navigation={navigation}
+                        key={restaurant.id}
+                    />
+                ))}
             </View>
         </ScrollView>
     );
-}
+};
 
 const styles = StyleSheet.create({
     searchBar: {
@@ -129,7 +100,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderColor: 'gray',
         borderWidth: 2,
-        margin: 10,
+        marginHorizontal: 15,
+        marginVertical: 20,
+        borderRadius: 20,
+        paddingLeft: 10,
     },
     searchIcon: {
         marginLeft: 5,
@@ -138,6 +112,19 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 40,
         paddingLeft: 5,
+    },
+    searchBarContainer: {
+        marginBottom: 10,
+    },
+    scrollView: {
+        backgroundColor: 'white',
+        paddingHorizontal: 20,
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
     },
 });
 

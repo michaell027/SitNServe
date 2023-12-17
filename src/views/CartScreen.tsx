@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Text, View, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
-import {faMinus, faPlus} from "@fortawesome/free-solid-svg-icons";
+import React, {useState} from 'react';
+import {Text, View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
 
 interface CartItem {
     id: string;
@@ -12,23 +12,23 @@ interface CartItem {
 
 const CartScreen = () => {
     const [cartItems, setCartItems] = useState([
-        { id: '1', name: 'Coffee', price: 2.99, amount: 1 },
-        { id: '2', name: 'Pasta', price: 11.50, amount: 1 },
-        { id: '3', name: 'Pizza', price: 8.99, amount: 1 },
-        { id: '4', name: 'Salad', price: 5.99, amount: 1 },
-        { id: '5', name: 'Burger', price: 7.99, amount: 1 },
-        { id: '6', name: 'Coke', price: 1.99, amount: 1 },
-        { id: '7', name: 'Fries', price: 3.99, amount: 1 },
-        { id: '8', name: 'Tea', price: 2.99, amount: 1 },
-        { id: '9', name: 'Water', price: 1.99, amount: 1 },
-        { id: '10', name: 'Beer', price: 3.99, amount: 1 },
+        {id: '1', name: 'Coffee', price: 2.99, amount: 1},
+        {id: '2', name: 'Pasta', price: 11.5, amount: 1},
+        {id: '3', name: 'Pizza', price: 8.99, amount: 1},
+        {id: '4', name: 'Salad', price: 5.99, amount: 1},
+        {id: '5', name: 'Burger', price: 7.99, amount: 1},
+        {id: '6', name: 'Coke', price: 1.99, amount: 1},
+        {id: '7', name: 'Fries', price: 3.99, amount: 1},
+        {id: '8', name: 'Tea', price: 2.99, amount: 1},
+        {id: '9', name: 'Water', price: 1.99, amount: 1},
+        {id: '10', name: 'Beer', price: 3.99, amount: 1},
         // Add more items here...
     ]);
 
     const increaseAmount = (id: string) => {
         const newCartItems = cartItems.map(item => {
             if (item.id === id) {
-                return { ...item, amount: item.amount + 1 };
+                return {...item, amount: item.amount + 1};
             }
             return item;
         });
@@ -38,35 +38,40 @@ const CartScreen = () => {
     const decreaseAmount = (id: string) => {
         const newCartItems = cartItems.map(item => {
             if (item.id === id && item.amount > 1) {
-                return { ...item, amount: item.amount - 1 };
+                return {...item, amount: item.amount - 1};
             }
             return item;
         });
         setCartItems(newCartItems);
     };
 
-    const renderItem = ({ item }) => (
+    const renderItem = ({item}) => (
         <View style={styles.itemContainer}>
             <Text style={styles.itemName}>{item.name}</Text>
             <View style={styles.amountAndPriceContainer}>
                 <View style={styles.amountContainer}>
-                    <TouchableOpacity onPress={() => decreaseAmount(item.id)} style={styles.amountButton}>
+                    <TouchableOpacity
+                        onPress={() => decreaseAmount(item.id)}
+                        style={styles.amountButton}>
                         <Text style={styles.amountButtonText}>
-                            <FontAwesomeIcon icon={faMinus} size={12}  />
+                            <FontAwesomeIcon icon={faMinus} size={12} />
                         </Text>
                     </TouchableOpacity>
                     <Text style={styles.amountText}>{item.amount}</Text>
-                    <TouchableOpacity onPress={() => increaseAmount(item.id)} style={styles.amountButton}>
+                    <TouchableOpacity
+                        onPress={() => increaseAmount(item.id)}
+                        style={styles.amountButton}>
                         <Text style={styles.amountButtonText}>
-                            <FontAwesomeIcon icon={faPlus} size={12}  />
+                            <FontAwesomeIcon icon={faPlus} size={12} />
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <Text style={styles.itemPrice}>${(item.price * item.amount).toFixed(2)}</Text>
+                <Text style={styles.itemPrice}>
+                    ${(item.price * item.amount).toFixed(2)}
+                </Text>
             </View>
         </View>
     );
-
 
     return (
         <View style={styles.container}>

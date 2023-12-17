@@ -131,8 +131,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     innerContainer: {
-        width: '95%',
-        height: '90%',
+        width: '90%',
+        height: 'auto',
         alignItems: 'center',
         marginTop: 6,
         marginBottom: 6,
@@ -171,9 +171,10 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         marginTop: 10,
         width: '90%',
+        gap: 100,
     },
     button: {
         flexDirection: 'row',

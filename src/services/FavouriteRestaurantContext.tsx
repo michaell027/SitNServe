@@ -47,22 +47,26 @@ export const RestaurantProvider = ({children}: {children: ReactNode}) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const userString = await AsyncStorage.getItem('user_info');
-                if (!userString) {
+                const userUid = await AsyncStorage.getItem('user_uid');
+                if (!userUid) {
                     return;
                 }
-                const userInfo = JSON.parse(userString) as User;
-                console.log('uinfo' + userInfo.favoriteRestaurants);
 
-                if (userInfo && userInfo.favoriteRestaurants) {
+                const userRef = firestore().collection('users').doc(userUid);
+                const document = await userRef.get();
+                const userInfo = document.data() as User;
+
+                if (userUid && userInfo.favoriteRestaurants) {
                     const fetchPromises = userInfo.favoriteRestaurants.map(
                         async restaurantId => {
                             const restaurantRef = firestore()
                                 .collection('restaurants')
                                 .doc(restaurantId);
                             const document = await restaurantRef.get();
-                            console.log(document.data());
-                            return document.data() as Restaurant;
+                            return {
+                                id: restaurantId,
+                                ...document.data(),
+                            } as Restaurant;
                         },
                     );
 
@@ -74,7 +78,7 @@ export const RestaurantProvider = ({children}: {children: ReactNode}) => {
             }
         };
 
-        fetchData();
+        fetchData().then();
     }, []);
 
     const toggleRestaurant = (restaurant: Restaurant) => {
@@ -83,6 +87,7 @@ export const RestaurantProvider = ({children}: {children: ReactNode}) => {
         }
 
         if (isSelected(restaurant)) {
+            console.log('isSelected' + restaurant.id);
             const filtered = selectedRestaurants.filter(
                 rest => rest.id !== restaurant.id,
             );

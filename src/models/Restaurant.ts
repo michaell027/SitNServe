@@ -5,7 +5,7 @@ interface MenuItem {
     price: number;
 }
 
-interface OpeningHours {
+export interface OpeningHours {
     monday?: string;
     tuesday?: string;
     wednesday?: string;
@@ -23,4 +23,5 @@ export interface Restaurant {
     imageUrl: string;
     openingHours: OpeningHours;
     menu?: MenuItem[];
+    rating?: number;
 }

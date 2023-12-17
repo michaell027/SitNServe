@@ -1,5 +1,13 @@
 import React, {useState} from 'react';
-import {View, Text, Image, Pressable, TouchableOpacity} from 'react-native';
+import {
+    View,
+    Text,
+    Image,
+    Pressable,
+    TouchableOpacity,
+    Dimensions,
+    StyleSheet,
+} from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,6 +17,9 @@ import {FloatingLabelInput} from 'react-native-floating-label-input';
 import {FirebaseUser} from '../models/FirebaseUser';
 import firestore from '@react-native-firebase/firestore';
 import {User} from '../models/User';
+import {setUserUid} from '../functions/authFunctions';
+
+const height = Dimensions.get('window').height;
 
 interface LoginFormProps {
     navigation: any;
@@ -39,8 +50,7 @@ const LoginForm = ({navigation}: LoginFormProps) => {
         auth()
             .signInWithEmailAndPassword(username, password)
             .then(async userCredential => {
-                console.log('User signed in!');
-                await storeUser(userCredential.user.toJSON() as FirebaseUser);
+                await setUserUid(userCredential.user.uid);
             })
             .catch(error => {
                 console.log('Error signing in:', error.code);
@@ -61,41 +71,29 @@ const LoginForm = ({navigation}: LoginFormProps) => {
             });
     };
 
-    const storeUser = async (user: FirebaseUser) => {
-        try {
-            await AsyncStorage.setItem('user', JSON.stringify(user));
-            await storeUserInfo(user);
-        } catch (error) {
-            console.log('Error storing user:', error);
-        }
-    };
-
-    const storeUserInfo = async (user: FirebaseUser) => {
-        const query = firestore().collection('users').doc(user.uid);
-        query.onSnapshot(querySnapshot => {
-            const userInfo = querySnapshot.data() as User;
-            AsyncStorage.setItem('user_info', JSON.stringify(userInfo));
-            navigation.navigate('Home');
-        });
-    };
-
     return (
-        <View className="flex w-full items-center justify-center py-10">
-            <View className="w-3/4">
+        <View style={styles.container}>
+            <View style={styles.introductionHolder}>
                 <Image
                     source={require('./../../assets/images/welcome_back.png')}
-                    className="self-center w-full"
-                    resizeMode="contain"
+                    style={{
+                        height: '100%',
+                        width: '100%',
+                        resizeMode: 'contain',
+                    }}
                 />
             </View>
-            <View className="h-48 w-full my-3">
+            <View style={styles.logoHolder}>
                 <Image
                     source={require('./../../assets/images/matus_logo.png')}
-                    className="h-full self-center"
-                    resizeMode="contain"
+                    style={{
+                        height: '100%',
+                        width: '100%',
+                        resizeMode: 'contain',
+                    }}
                 />
             </View>
-            <View className="flex w-full space-y-2 items-center px-10">
+            <View style={styles.labelsHolder}>
                 <FloatingLabelInput
                     label="Username"
                     value={username}
@@ -104,65 +102,48 @@ const LoginForm = ({navigation}: LoginFormProps) => {
                         colorFocused: '#777777',
                         colorBlurred: '#777777',
                     }}
-                    containerStyles={{
-                        borderRadius: 4,
-                        paddingHorizontal: 8,
-                        height: 48,
-                        width: '100%',
-                        borderColor: '#b3b2ae',
-                        borderWidth: 1.5,
-                        marginBottom: 8,
-                    }}
-                    labelStyles={{
-                        paddingHorizontal: 4,
-                    }}
-                    inputStyles={{
-                        paddingHorizontal: 4,
-                        color: '#000',
-                    }}
+                    containerStyles={styles.containerStyles}
+                    labelStyles={styles.labelStyles}
+                    inputStyles={styles.inputStyles}
                 />
                 <FloatingLabelInput
                     label="Password"
                     value={password}
                     onChangeText={setPassword}
-                    width={200}
                     customLabelStyles={{
                         colorFocused: '#777777',
                         colorBlurred: '#777777',
                     }}
-                    containerStyles={{
-                        borderRadius: 4,
-                        paddingHorizontal: 8,
-                        height: 48,
-                        width: '80%',
-                        borderColor: '#b3b2ae',
-                        borderWidth: 1.5,
-                    }}
-                    labelStyles={{
-                        paddingHorizontal: 4,
-                    }}
-                    inputStyles={{
-                        paddingHorizontal: 4,
-                        color: '#000',
-                    }}
-                    secureTextEntry={!showPassword}
-                    rightComponent={
+                    containerStyles={styles.containerStyles}
+                    labelStyles={styles.labelStyles}
+                    inputStyles={styles.inputStyles}
+                    isPassword={true}
+                    customShowPasswordComponent={
                         <Pressable
                             onPress={toggleShowPassword}
-                            className="flex items-center justify-center">
-                            {showPassword ? (
-                                <FontAwesomeIcon
-                                    icon={faEyeSlash}
-                                    color="#1FAFBF"
-                                />
-                            ) : (
-                                <FontAwesomeIcon icon={faEye} color="#1FAFBF" />
-                            )}
+                            style={styles.pressable}>
+                            <FontAwesomeIcon
+                                icon={faEye}
+                                color="#1FAFBF"
+                                size={20}
+                            />
                         </Pressable>
                     }
+                    customHidePasswordComponent={
+                        <Pressable
+                            onPress={toggleShowPassword}
+                            style={styles.pressable}>
+                            <FontAwesomeIcon
+                                icon={faEyeSlash}
+                                color="#1FAFBF"
+                                size={20}
+                            />
+                        </Pressable>
+                    }
+                    togglePassword={showPassword}
                 />
-                <View className="flex flex-row justify-between w-full items-center">
-                    <View className="flex flex-row items-center justify-left">
+                <View style={styles.optionsHolder}>
+                    <View style={styles.checkBox}>
                         <CheckBox
                             disabled={false}
                             value={toggleCheckBox}
@@ -173,19 +154,17 @@ const LoginForm = ({navigation}: LoginFormProps) => {
                         />
                         <Text>Remember me</Text>
                     </View>
-                    <Text className="text-[#1FAFBF]">Forgot password?</Text>
+                    <Text style={styles.forgotPass}>Forgot password?</Text>
                 </View>
-                <Pressable
-                    className="w-3/4 h-10 bg-[#1FAFBF] rounded-md flex items-center justify-center shadow-lg"
-                    onPress={signIn}>
-                    <Text className="text-white text-xl font-bold">Login</Text>
+                <Pressable style={styles.button} onPress={signIn}>
+                    <Text style={styles.login}>Login</Text>
                 </Pressable>
-                {error !== '' && <Text className="text-red-500">{error}</Text>}
-                <View className="flex flex-row items-center justify-center">
+                {error !== '' && <Text style={styles.error}>{error}</Text>}
+                <View style={styles.singUpHolder}>
                     <Text>Don't have an account? </Text>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('RegisterScreen')}>
-                        <Text className="text-[#1FAFBF]">Sign up</Text>
+                        <Text style={styles.signUp}>Sign up</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -194,3 +173,86 @@ const LoginForm = ({navigation}: LoginFormProps) => {
 };
 
 export default LoginForm;
+
+const styles = StyleSheet.create({
+    container: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        height: height * 0.9,
+    },
+    introductionHolder: {
+        height: height * 0.1,
+        width: '75%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    logoHolder: {
+        height: height * 0.25,
+        width: '75%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 15,
+    },
+    labelsHolder: {
+        width: '75%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    containerStyles: {
+        borderRadius: 4,
+        paddingHorizontal: 8,
+        height: 48,
+        width: '80%',
+        borderColor: '#b3b2ae',
+        borderWidth: 1.5,
+        marginBottom: 6,
+    },
+    labelStyles: {
+        paddingHorizontal: 4,
+    },
+    inputStyles: {
+        paddingHorizontal: 6,
+        color: '#000',
+    },
+    pressable: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    optionsHolder: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 6,
+    },
+    checkBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    forgotPass: {
+        color: '#1FAFBF',
+    },
+    button: {
+        backgroundColor: '#1FAFBF',
+        height: 48,
+        width: '80%',
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 6,
+    },
+    singUpHolder: {
+        flexDirection: 'row',
+    },
+    signUp: {
+        color: '#1FAFBF',
+    },
+    login: {
+        color: '#fff',
+    },
+    error: {
+        color: '#ff0000',
+        marginBottom: 6,
+    },
+});

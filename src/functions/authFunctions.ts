@@ -85,6 +85,21 @@ const fetchUserInfo = async (currentUser: FirebaseUser) => {
     }
 };
 
+const setUserUid = async (uid: string) => {
+    const userUid = await AsyncStorage.getItem('user_uid');
+    if (userUid) {
+        if (userUid !== uid) {
+            AsyncStorage.removeItem('user_uid').then(r => {
+                AsyncStorage.setItem('user_uid', uid);
+            });
+            return;
+        } else {
+            return;
+        }
+    }
+    await AsyncStorage.setItem('user_uid', uid);
+};
+
 export {
     isLoggedIn,
     isVerified,
@@ -93,4 +108,5 @@ export {
     getUserInfo,
     setUserInfo,
     setUser,
+    setUserUid,
 };

@@ -14,42 +14,16 @@ import {
     faChair,
     faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons';
-import {styled, StyledComponent} from 'nativewind';
-import {Dimensions} from 'react-native';
 
-const StyledView = styled(View);
-const StyledText = styled(Text);
+interface RestaurantScreenProps {
+    navigation: any;
+    route: any;
+}
 
-const getOrientation = () => {
-    const {width, height} = Dimensions.get('window');
-    return width > height ? 'LANDSCAPE' : 'PORTRAIT';
-};
-
-function RestaurantScreen({navigation, route}) {
+function RestaurantScreen({navigation, route}: RestaurantScreenProps) {
     const {restaurantId} = route.params;
-    const [imageUrl, setImageUrl] = useState(null);
-    const [restaurantName, setRestaurantName] = useState(null);
-    const [orientation, setOrientation] = useState(getOrientation());
-
-    useEffect(() => {
-        const handleOrientationChange = () => {
-            setOrientation(getOrientation());
-            console.log(`Current orientation: ${getOrientation()}`);
-        };
-
-        Dimensions.addEventListener('change', handleOrientationChange);
-
-        console.log(`Current orientation: ${getOrientation()}`);
-
-        return () => {
-            if (Dimensions.removeEventListener) {
-                Dimensions.removeEventListener(
-                    'change',
-                    handleOrientationChange,
-                );
-            }
-        };
-    }, []);
+    const [imageUrl, setImageUrl] = useState<string>('');
+    const [restaurantName, setRestaurantName] = useState<string>('');
 
     useEffect(() => {
         const fetchRestaurantData = async () => {
@@ -58,110 +32,128 @@ function RestaurantScreen({navigation, route}) {
                     .collection('restaurants')
                     .doc(restaurantId)
                     .get();
-                if (doc.exists && doc.data().imageUrl) {
-                    setImageUrl(doc.data().imageUrl);
-                }
-                // Získanie názvu reštaurácie
-                if (doc.exists && doc.data().name) {
-                    setRestaurantName(doc.data().name);
+
+                const docData = doc.data();
+                if (doc.exists && docData) {
+                    if (docData.imageUrl) {
+                        setImageUrl(docData.imageUrl);
+                    }
+                    if (docData.name) {
+                        setRestaurantName(docData.name);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
 
-        fetchRestaurantData();
+        fetchRestaurantData().then();
     }, [restaurantId]);
 
     const handleScanQR = () => {
         navigation.navigate('ScanScreen', {restaurantId});
-        console.log(`Scanning QR for restaurant with ID: ${restaurantId}`);
     };
 
     const handleReserveSeat = () => {
         navigation.navigate('ReserveSeatScreen', {restaurantId});
-        console.log(`Reserving a seat for restaurant with ID: ${restaurantId}`);
     };
 
     const handleViewInfo = () => {
         navigation.navigate('RestaurantInfoScreen', {restaurantId});
-        console.log(`Viewing info for restaurant with ID: ${restaurantId}`);
     };
 
     return imageUrl ? (
-        <StyledComponent
-            component={ImageBackground}
+        <ImageBackground
             source={{uri: imageUrl}}
-            className={'flex h-[96vh] justify-center items-center'}>
-            <StyledView
-                className={
-                    orientation === 'LANDSCAPE'
-                        ? 'flex flex-row items-center bg-gray-300/80 w-fit py-6 px-10 rounded-xl space-x-2'
-                        : 'flex flex-col items-center bg-gray-300/80 w-fit py-6 px-10 rounded-xl space-y-6'
-                }>
-                <StyledText
-                    style={{
-                        textShadowColor: 'black',
-                        textShadowRadius: 4,
-                        textShadowOffset: {width: 2, height: 2},
-                    }}
-                    className={
-                        'font-bold text-2xl text-center text-white truncate'
-                    }>
-                    {restaurantName}
-                </StyledText>
-                <StyledComponent
-                    component={Pressable}
-                    onPress={handleScanQR}
-                    className={
-                        'bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3'
-                    }>
-                    <FontAwesomeIcon
-                        icon={faQrcode}
-                        color="#ffffff"
-                        size={20}
-                    />
-                    <StyledText className={'text-xl text-white font-bold'}>
-                        Scan QR Code
-                    </StyledText>
-                </StyledComponent>
+            style={styles.backgroundImage}>
+            <View style={styles.container}>
+                <View style={styles.content}>
+                    <Text style={styles.title}>{restaurantName}</Text>
+                    <Pressable onPress={handleScanQR} style={styles.pressable}>
+                        <FontAwesomeIcon
+                            icon={faQrcode}
+                            color="#ffffff"
+                            size={20}
+                        />
+                        <Text style={styles.pressableText}>Scan QR Code</Text>
+                    </Pressable>
 
-                <StyledComponent
-                    component={Pressable}
-                    onPress={handleReserveSeat}
-                    className={
-                        'bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3'
-                    }>
-                    <FontAwesomeIcon icon={faChair} color="#ffffff" size={20} />
-                    <StyledText className={'text-xl text-white font-bold'}>
-                        Reserve a seat
-                    </StyledText>
-                </StyledComponent>
+                    <Pressable
+                        onPress={handleReserveSeat}
+                        style={styles.pressable}>
+                        <FontAwesomeIcon
+                            icon={faChair}
+                            color="#ffffff"
+                            size={20}
+                        />
+                        <Text style={styles.pressableText}>Reserve a seat</Text>
+                    </Pressable>
 
-                <StyledComponent
-                    component={Pressable}
-                    onPress={handleViewInfo}
-                    className={
-                        'bg-gray-800 py-3 px-6 rounded-xl flex flex-row items-center space-x-3'
-                    }>
-                    <FontAwesomeIcon
-                        icon={faCircleInfo}
-                        color="#ffffff"
-                        size={20}
-                    />
-                    <StyledText className={'text-xl text-white font-bold'}>
-                        View Info
-                    </StyledText>
-                </StyledComponent>
-            </StyledView>
-        </StyledComponent>
+                    <Pressable
+                        onPress={handleViewInfo}
+                        style={styles.pressable}>
+                        <FontAwesomeIcon
+                            icon={faCircleInfo}
+                            color="#ffffff"
+                            size={20}
+                        />
+                        <Text style={styles.pressableText}>View Info</Text>
+                    </Pressable>
+                </View>
+            </View>
+        </ImageBackground>
     ) : (
-        <StyledComponent
-            component={View}
-            className={' flex h-[90vh] justify-center items-center '}>
+        <View style={styles.container}>
             <ActivityIndicator size="large" color="#0000ff" />
-        </StyledComponent>
+        </View>
     );
 }
 
 export default RestaurantScreen;
+
+const styles = StyleSheet.create({
+    backgroundImage: {
+        flex: 1,
+        resizeMode: 'cover',
+        justifyContent: 'center',
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,.5)',
+    },
+    content: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,.3)',
+        paddingHorizontal: 100,
+        paddingVertical: 50,
+        borderRadius: 20,
+    },
+    title: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        color: 'white',
+        marginBottom: 40,
+        textShadowColor: 'black',
+        textShadowRadius: 4,
+        textShadowOffset: {width: 2, height: 2},
+    },
+    pressable: {
+        backgroundColor: '#1f2937',
+        paddingVertical: 18,
+        paddingHorizontal: 25,
+        borderRadius: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
+        gap: 15,
+    },
+    pressableText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+});

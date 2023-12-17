@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
+import {
+    View,
+    Text,
+    Image,
+    TouchableOpacity,
+    ScrollView,
+    StyleSheet,
+} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -15,176 +22,290 @@ import {
     faRightFromBracket,
     faStar,
 } from '@fortawesome/free-solid-svg-icons';
-import {styled} from 'nativewind';
-import {FirebaseUser} from '../models/FirebaseUser';
 import {User} from '../models/User';
 
 interface ProfileCardProps {
-    user: FirebaseUser;
+    user: User;
     setUser: any;
-    userInfo: User;
-    setUserInfo: any;
     navigation: any;
 }
 
-const StyledView = styled(View);
-const StyledText = styled(Text);
-const StyledImage = styled(Image);
-const StyledTouchableOpacity = styled(TouchableOpacity);
-
-const ProfileCard = ({
-    user,
-    setUser,
-    userInfo,
-    setUserInfo,
-    navigation,
-}: ProfileCardProps) => {
-    const [creationDate, setCreationDate] = useState<string>('');
+const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
     const [structuredAddress, setStructuredAddress] = useState<string>('');
-    useEffect(() => {
-        const creationDate = new Date(user.metadata.creationTime);
-        const formattedCreationDate = creationDate.toLocaleDateString('sk-SK');
-        setCreationDate(formattedCreationDate);
 
-        const address = userInfo.address;
+    useEffect(() => {
+        const address = user.address;
         const structuredAddress = `${address.street} ${address.number}, ${address.city}, ${address.state}, ${address.zip}`;
         setStructuredAddress(structuredAddress);
     }, [user]);
-
-    useEffect(() => {
-        console.log(userInfo);
-    }, [userInfo]);
 
     function signOut() {
         auth()
             .signOut()
             .then(async () => {
-                console.log('User signed out!');
-                await AsyncStorage.removeItem('user');
+                await AsyncStorage.removeItem('user_uid');
                 setUser(null);
-                await AsyncStorage.removeItem('user_info');
-                setUserInfo(null);
             });
     }
 
     return (
         <ScrollView>
-            <StyledView className="flex-1 p-5 bg-gray-200">
-                <StyledView className="p-5 bg-white rounded-2xl shadow-md">
-                    <StyledView className="flex flex-row w-full items-center space-x-4">
-                        <StyledImage
+            <View style={styles.container}>
+                <View style={styles.profileCard}>
+                    <View style={styles.header}>
+                        <Image
                             source={require('../../assets/images/avatar.png')}
-                            className="w-20 h-20 rounded-full"
+                            style={styles.avatar}
                         />
                         <View>
-                            <StyledText className="mt-2 text-2xl font-bold">
-                                {userInfo?.firstName} {userInfo?.lastName}
-                            </StyledText>
-                            <StyledText className="mt-1 text-sm text-gray-500">
-                                @{userInfo.username}
-                            </StyledText>
+                            <Text style={styles.name}>
+                                {user?.firstName} {user?.lastName}
+                            </Text>
+                            <Text style={styles.username}>
+                                @{user.firstName.toLowerCase()}
+                                {user.lastName.toLowerCase()}
+                            </Text>
                         </View>
-                    </StyledView>
-                    <StyledView className="mt-4 flex flex-row space-x-2 items-center">
+                    </View>
+                    <View style={styles.information}>
                         <FontAwesomeIcon icon={faPhone} size={20} />
-                        <Text>{userInfo.phone}</Text>
-                    </StyledView>
-                    <StyledView className="mt-4 flex flex-row space-x-2 items-center">
+                        <Text>{user.phone}</Text>
+                    </View>
+                    <View style={styles.information}>
                         <FontAwesomeIcon icon={faAt} size={20} />
-                        <Text>{userInfo.email}</Text>
-                    </StyledView>
-                    <StyledView className="mt-4 flex flex-row space-x-2 items-center">
+                        <Text>{user.email}</Text>
+                    </View>
+                    <View style={styles.information}>
                         <FontAwesomeIcon icon={faLocationDot} size={20} />
                         <Text>{structuredAddress}</Text>
-                    </StyledView>
+                    </View>
 
-                    <StyledView className="flex flex-row justify-between border-gray-300 border-t-2 border-b-2 mt-6">
-                        <StyledView className="flex flex-col border-r-2 border-gray-300 items-center w-1/2 p-1">
-                            <StyledText className="text-sm text-gray-500">
+                    <View style={styles.dividerHolder}>
+                        <View style={styles.firstColumn}>
+                            <Text style={styles.dividerTitle}>
                                 Member since
-                            </StyledText>
-                            <StyledText className="text-lg font-bold">
-                                {creationDate}
-                            </StyledText>
-                        </StyledView>
-                        <StyledView className="flex flex-col items-center w-1/2 p-1">
-                            <StyledText className="text-sm text-gray-500">
-                                Orders
-                            </StyledText>
-                            <StyledText className="text-lg font-bold">
-                                12
-                            </StyledText>
-                        </StyledView>
-                    </StyledView>
+                            </Text>
+                            <Text style={styles.dividerText}>
+                                {user.creationDate}
+                            </Text>
+                        </View>
+                        <View style={styles.secondColumn}>
+                            <Text style={styles.dividerTitle}>Orders</Text>
+                            <Text style={styles.dividerText}>12</Text>
+                        </View>
+                    </View>
 
-                    <StyledTouchableOpacity
-                        className="flex flex-row mt-6 items-center space-x-4"
+                    <TouchableOpacity
+                        style={styles.touchable}
                         onPress={() =>
                             navigation.navigate('FavoriteRestaurantsScreen')
                         }>
                         <FontAwesomeIcon icon={faHeart} size={20} />
-                        <StyledText className="text-lg text-gray-500 ml-2">
-                            Favourite
-                        </StyledText>
-                    </StyledTouchableOpacity>
-                    <StyledTouchableOpacity className="flex flex-row mt-6 items-center space-x-4">
+                        <Text style={styles.touchableText}>Favourite</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.touchable}>
                         <FontAwesomeIcon icon={faCreditCard} size={20} />
-                        <StyledText className="text-lg text-gray-500 ml-2">
+                        <Text style={styles.touchableText}>
                             Payment methods
-                        </StyledText>
-                    </StyledTouchableOpacity>
-                    <StyledTouchableOpacity
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
                         onPress={() => navigation.navigate('OrdersScreen')}
-                        className="flex flex-row mt-6 items-center space-x-4">
+                        style={styles.touchable}>
                         <FontAwesomeIcon icon={faBagShopping} size={20} />
-                        <StyledText className="text-lg text-gray-500 ml-2">
-                            My orders
-                        </StyledText>
-                    </StyledTouchableOpacity>
-                    <StyledTouchableOpacity
+                        <Text style={styles.touchableText}>My orders</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
                         onPress={() =>
-                            navigation.navigate('ReservationsScreen')
+                            navigation.navigate('ReservationsScreen', {
+                                userUid: user.uid,
+                            })
                         }
-                        className="flex flex-row mt-6 items-center space-x-4">
+                        style={styles.touchable}>
                         <FontAwesomeIcon icon={faChair} size={20} />
-                        <StyledText className="text-lg text-gray-500 ml-2">
+                        <Text style={styles.touchableText}>
                             My reservations
-                        </StyledText>
-                    </StyledTouchableOpacity>
-                    <StyledTouchableOpacity className="flex flex-row mt-6 items-center space-x-4">
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.touchable}>
                         <FontAwesomeIcon icon={faStar} size={20} />
-                        <StyledText className="text-lg text-gray-500 ml-2">
-                            Reviews
-                        </StyledText>
-                    </StyledTouchableOpacity>
-                    <StyledView className="border-t-2 border-gray-300 mt-6">
-                        <StyledTouchableOpacity className="mt-4 px-4 py-2 bg-[#66b7b7] rounded-lg flex flex-row space-x-2 items-center">
+                        <Text style={styles.touchableText}>Reviews</Text>
+                    </TouchableOpacity>
+                    <View style={styles.bottomSection}>
+                        <TouchableOpacity style={styles.editProfileButton}>
                             <FontAwesomeIcon
                                 icon={faGears}
                                 color="#fff"
                                 size={20}
                             />
-                            <StyledText className="text-white font-bold">
+                            <Text style={styles.editProfileButtonText}>
                                 Edit Profile
-                            </StyledText>
-                        </StyledTouchableOpacity>
-                        <StyledTouchableOpacity
-                            className="mt-4 px-4 py-2 bg-red-400 rounded-lg flex flex-row space-x-2 items-center"
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.signoutButton}
                             onPress={signOut}>
                             <FontAwesomeIcon
                                 icon={faRightFromBracket}
                                 color={'#fff'}
                                 size={20}
                             />
-                            <StyledText className="text-white font-bold">
+                            <Text style={styles.signoutButtonText}>
                                 Sign Out
-                            </StyledText>
-                        </StyledTouchableOpacity>
-                    </StyledView>
-                </StyledView>
-            </StyledView>
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
         </ScrollView>
     );
 };
 
 export default ProfileCard;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+        padding: 20,
+    },
+    profileCard: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 2,
+            height: 4,
+        },
+        shadowOpacity: 0,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    header: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        gap: 10,
+    },
+    avatar: {
+        width: 80,
+        height: 80,
+        borderRadius: 50,
+    },
+    name: {
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    username: {
+        fontSize: 14,
+        color: '#666',
+    },
+    information: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        gap: 10,
+        marginTop: 15,
+    },
+    dividerHolder: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 15,
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 2,
+        paddingBottom: 5,
+        borderTopColor: '#ccc',
+        borderTopWidth: 2,
+        paddingTop: 5,
+    },
+    firstColumn: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 5,
+        borderRightColor: '#ccc',
+        borderRightWidth: 1,
+        paddingRight: 5,
+    },
+    dividerTitle: {
+        fontSize: 14,
+        color: '#666',
+    },
+    dividerText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    secondColumn: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 5,
+        paddingLeft: 5,
+        borderLeftColor: '#ccc',
+        borderLeftWidth: 1,
+    },
+    touchable: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        gap: 10,
+        marginTop: 25,
+    },
+    touchableText: {
+        fontSize: 18,
+        fontWeight: '400',
+        paddingLeft: 5,
+    },
+    bottomSection: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 30,
+        borderTopColor: '#ccc',
+        borderTopWidth: 2,
+        paddingTop: 5,
+    },
+    editProfileButton: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#66b7b7',
+        borderRadius: 10,
+        padding: 10,
+        marginTop: 10,
+        gap: 10,
+        width: '100%',
+    },
+    editProfileButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    signoutButton: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#e74c3c',
+        borderRadius: 10,
+        padding: 10,
+        marginTop: 10,
+        gap: 10,
+        width: '100%',
+    },
+    signoutButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+});

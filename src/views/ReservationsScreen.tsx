@@ -1,46 +1,109 @@
-import React from 'react';
-import {View, Text, ScrollView, Image, StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+    View,
+    Text,
+    ScrollView,
+    Image,
+    StyleSheet,
+    ActivityIndicator,
+} from 'react-native';
+import {Reservation} from '../models/Reservation';
+import firestore from '@react-native-firebase/firestore';
 
-const ReservationsScreen = () => {
-    // Mock data for demonstration purposes
-    const reservations = [
-        {
-            id: 1,
-            restaurant: 'The Gourmet Spot',
-            date: '2023-12-08',
-            time: '7:00 PM - 10:00 PM',
-            tableId: 'A12',
-            imageUrl:
-                'https://firebasestorage.googleapis.com/v0/b/sitnserve-fbaed.appspot.com/o/restaurants%2Frestaurant_1.jpg?alt=media&token=62c1668f-4a43-43f9-ac1e-e97cfe7eb3a3',
-        },
-        {
-            id: 2,
-            restaurant: 'The Gourmet Spot',
-            date: '2023-12-08',
-            time: '7:00 PM - 10:00 PM',
-            tableId: 'A12',
-            imageUrl:
-                'https://firebasestorage.googleapis.com/v0/b/sitnserve-fbaed.appspot.com/o/restaurants%2Frestaurant_1.jpg?alt=media&token=62c1668f-4a43-43f9-ac1e-e97cfe7eb3a3',
-        },
-        {
-            id: 3,
-            restaurant: 'The Gourmet Spot',
-            date: '2023-12-08',
-            time: '7:00 PM - 10:00 PM',
-            tableId: 'A12',
-            imageUrl:
-                'https://firebasestorage.googleapis.com/v0/b/sitnserve-fbaed.appspot.com/o/restaurants%2Frestaurant_1.jpg?alt=media&token=62c1668f-4a43-43f9-ac1e-e97cfe7eb3a3',
-        },
-        {
-            id: 4,
-            restaurant: 'The Gourmet Spot',
-            date: '2023-12-08',
-            time: '7:00 PM - 10:00 PM',
-            tableId: 'A12',
-            imageUrl:
-                'https://firebasestorage.googleapis.com/v0/b/sitnserve-fbaed.appspot.com/o/restaurants%2Frestaurant_1.jpg?alt=media&token=62c1668f-4a43-43f9-ac1e-e97cfe7eb3a3',
-        },
-    ];
+interface ReservationsScreenProps {
+    route: any;
+    navigation: any;
+}
+
+const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
+    route,
+    navigation,
+}) => {
+    const {userUid} = route.params;
+    const [reservations, setReservations] = useState<Reservation[]>([]);
+    let isMounted = true;
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const getImageUrl = async (restaurantId: string) => {
+            try {
+                const snapshot = await firestore()
+                    .collection('restaurants')
+                    .doc(restaurantId)
+                    .get();
+                return snapshot.data()?.imageUrl;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getName = async (restaurantId: string) => {
+            try {
+                const snapshot = await firestore()
+                    .collection('restaurants')
+                    .doc(restaurantId)
+                    .get();
+                return snapshot.data()?.name;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const fetchReservations = async () => {
+            setIsLoading(true);
+            try {
+                const snapshot = await firestore()
+                    .collection('users')
+                    .doc(userUid)
+                    .collection('reservations')
+                    .get();
+
+                const reservationsPromises = snapshot.docs.map(async doc => {
+                    const imageUrl = await getImageUrl(doc.data().restaurantId);
+                    const name = await getName(doc.data().restaurantId);
+                    console.log(doc.data().times);
+                    return {
+                        id: doc.id,
+                        restaurant: name,
+                        date: doc.data().date,
+                        times: doc.data().times,
+                        tableId: doc.data().table,
+                        imageUrl: imageUrl,
+                    };
+                });
+
+                const resolvedReservations = await Promise.all(
+                    reservationsPromises,
+                );
+                if (isMounted) {
+                    setReservations(resolvedReservations);
+                }
+                setIsLoading(false);
+            } catch (e) {
+                console.error(e);
+                setIsLoading(false);
+            }
+        };
+
+        fetchReservations().then();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    if (isLoading) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -56,7 +119,8 @@ const ReservationsScreen = () => {
                                 {reservation.restaurant}
                             </Text>
                             <Text style={styles.reservationDetails}>
-                                {reservation.date} | {reservation.time}
+                                {reservation.date} |{' '}
+                                {reservation.times.join(', ')}
                             </Text>
                             <Text style={styles.tableId}>
                                 Table ID: {reservation.tableId}

@@ -1,33 +1,35 @@
 import React, {useState, useEffect} from 'react';
-import {
-    View,
-    Text,
-    Pressable,
-    TextInput,
-    KeyboardAvoidingView,
-} from 'react-native';
+import {View, Text, Pressable, TextInput, StyleSheet} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Picker} from '@react-native-picker/picker';
 import {getCountries} from '../services/countryService';
 import {Country} from '../models/Country';
 import {faAngleLeft} from '@fortawesome/free-solid-svg-icons';
 
-function SecondRegisterStep({
+interface SecondRegisterStepProps {
+    navigation: any;
+    user: any;
+    updateUser: any;
+    nextStep: any;
+    prevStep: any;
+    updateUserAddress: any;
+}
+
+const SecondRegisterStep: React.FC<SecondRegisterStepProps> = ({
     navigation,
     user,
     updateUser,
     nextStep,
     prevStep,
     updateUserAddress,
-}) {
-    const [country, setCountry] = useState(
+}) => {
+    const [country, setCountry] = useState<string>(
         user.address.country || 'placeholder',
     );
-    const [countries, setCountries] = useState<Country[]>([]);
+    const [countries, setCountries] = useState<string[]>([]);
     const [error, setError] = useState<string>('');
 
     useEffect(() => {
-        console.log('aaa' + user.address.state);
         if (user.address.state !== '' && user.address.state !== undefined) {
             setCountry(user.address.state);
         }
@@ -45,26 +47,28 @@ function SecondRegisterStep({
         const fetchCountries = async () => {
             try {
                 const data: Country[] = await getCountries();
-                const countries = [];
+                const countries: string[] = [];
                 data.forEach(country => {
                     countries.push(country.name);
                 });
                 setCountries(countries);
             } catch (error) {
-                console.error(error.message);
+                console.log(error);
             }
         };
 
-        fetchCountries();
+        fetchCountries().catch(error => {
+            setError("Couldn't fetch countries");
+        });
     }, []);
 
     const handleNextStep = () => {
         if (
-            (country === 'placeholder',
-            user.address.city === '',
-            user.address.street === '',
-            user.address.number === '',
-            user.address.zip === '')
+            country === 'placeholder' ||
+            user.address.city === '' ||
+            user.address.street === '' ||
+            user.address.number === '' ||
+            user.address.zip === ''
         ) {
             setError('Please fill all fields');
             return;
@@ -74,9 +78,11 @@ function SecondRegisterStep({
 
     return (
         <View>
-            <Text className={`mb-6 text-lg`}>Please enter your address</Text>
-            <Text className={`mb-2 font-[900] text-lg`}>Your address:</Text>
-            <View className={`border-2 border-gray-400 rounded-lg mb-4`}>
+            <Text style={styles.infoText}>Please enter your address</Text>
+            <Text style={styles.inputText}>
+                <Text style={styles.required}>*</Text> Your address:
+            </Text>
+            <View style={styles.pickerHolder}>
                 <Picker
                     selectedValue={country}
                     onValueChange={(itemValue, itemIndex) => {
@@ -98,7 +104,7 @@ function SecondRegisterStep({
                 </Picker>
             </View>
 
-            <View className={`border-2 rounded-lg mb-4 pl-2 border-gray-400`}>
+            <View style={styles.inputHolder}>
                 <TextInput
                     onChangeText={text => updateUserAddress('city', text)}
                     value={user.address.city}
@@ -110,7 +116,7 @@ function SecondRegisterStep({
                 />
             </View>
 
-            <View className={`border-2 rounded-lg mb-4 pl-2 border-gray-400`}>
+            <View style={styles.inputHolder}>
                 <TextInput
                     onChangeText={text => updateUserAddress('address', text)}
                     value={user.address.address || ''}
@@ -122,10 +128,9 @@ function SecondRegisterStep({
                 />
             </View>
 
-            <View
-                className={`flex-row border-2 border-gray-400 rounded-lg mb-4 pl-2`}>
+            <View style={styles.twoInputsHolder}>
                 <TextInput
-                    className={`w-2/3 border-r-2`}
+                    style={styles.firstInput}
                     onChangeText={text => updateUserAddress('street', text)}
                     value={user.address.street}
                     placeholder="*Street"
@@ -135,7 +140,7 @@ function SecondRegisterStep({
                     }
                 />
                 <TextInput
-                    className={`pl-3`}
+                    style={styles.secondInput}
                     onChangeText={text => updateUserAddress('number', text)}
                     value={user.address.number}
                     placeholder="*Number"
@@ -146,8 +151,7 @@ function SecondRegisterStep({
                 />
             </View>
 
-            <View
-                className={`flex-row border-2 border-gray-400 rounded-lg mb-2 pl-2`}>
+            <View style={styles.inputHolder}>
                 <TextInput
                     onChangeText={text => updateUserAddress('zip', text)}
                     value={user.address.zip}
@@ -159,16 +163,9 @@ function SecondRegisterStep({
                     }
                 />
             </View>
-            {error !== '' && (
-                <Text className={`text-red-500 text-center text-[16px] my-2`}>
-                    {error}
-                </Text>
-            )}
-            <View
-                className={`justify-between w-full flex-row w-full items-center`}>
-                <Pressable
-                    className={`bg-gray-500 rounded-lg w-1/6 py-3 px-4 mb-4 mt-2 items-center justify-center`}
-                    onPress={prevStep}>
+            {error !== '' && <Text style={styles.error}>{error}</Text>}
+            <View style={styles.buttonsHolder}>
+                <Pressable style={styles.prevStepButton} onPress={prevStep}>
                     <FontAwesomeIcon
                         icon={faAngleLeft}
                         color={'#fff'}
@@ -176,15 +173,86 @@ function SecondRegisterStep({
                     />
                 </Pressable>
                 <Pressable
-                    className={`bg-[#1FAFBF] w-4/6 rounded-lg py-2 px-4 mb-4 mt-2`}
+                    style={styles.nextStepButton}
                     onPress={handleNextStep}>
-                    <Text
-                        className={`text-center font-[800] text-lg text-white`}>
-                        Next step
-                    </Text>
+                    <Text style={styles.buttonText}>Next step</Text>
                 </Pressable>
             </View>
         </View>
     );
-}
+};
 export default SecondRegisterStep;
+
+const styles = StyleSheet.create({
+    infoText: {
+        fontSize: 18,
+        fontWeight: '500',
+        marginBottom: 15,
+    },
+    inputText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    pickerHolder: {
+        borderWidth: 2,
+        borderColor: '#ccc',
+        borderRadius: 10,
+        marginBottom: 10,
+    },
+    inputHolder: {
+        borderWidth: 2,
+        borderColor: '#ccc',
+        borderRadius: 10,
+        marginBottom: 10,
+        paddingLeft: 10,
+    },
+    twoInputsHolder: {
+        borderWidth: 2,
+        borderColor: '#ccc',
+        borderRadius: 10,
+        marginBottom: 10,
+        paddingLeft: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    firstInput: {
+        width: '70%',
+        borderRightColor: '#ccc',
+        borderRightWidth: 2,
+    },
+    secondInput: {
+        paddingLeft: 10,
+        width: '30%',
+    },
+    buttonsHolder: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    prevStepButton: {
+        backgroundColor: 'gray',
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        paddingVertical: 10,
+    },
+    nextStepButton: {
+        backgroundColor: '#1FAFBF',
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 50,
+    },
+    buttonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 18,
+    },
+    error: {
+        color: 'red',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 10,
+    },
+    required: {
+        color: 'red',
+    },
+});

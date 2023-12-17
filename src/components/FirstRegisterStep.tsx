@@ -1,10 +1,28 @@
 import React, {useState} from 'react';
-import {View, Text, TextInput, TouchableOpacity, Pressable} from 'react-native';
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    Pressable,
+    StyleSheet,
+} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faEnvelope, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
-import auth from '@react-native-firebase/auth';
 
-function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
+interface FirstRegisterStepProps {
+    navigation: any;
+    user: any;
+    updateUser: any;
+    nextStep: any;
+}
+
+const FirstRegisterStep: React.FC<FirstRegisterStepProps> = ({
+    navigation,
+    user,
+    updateUser,
+    nextStep,
+}) => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [repeatPasswordVisible, setRepeatPasswordVisible] = useState(false);
     const [error, setError] = useState('');
@@ -35,16 +53,15 @@ function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
 
     return (
         <View>
-            <Text className={`mb-6 text-lg`}>
+            <Text style={styles.infoText}>
                 Please enter your email and password
             </Text>
-            <Text className={`mb-2 font-[900] text-lg`}>
-                <Text className="text-red-400">* </Text>
+            <Text style={styles.inputText}>
+                <Text style={styles.required}>* </Text>
                 Your email:
             </Text>
 
-            <View
-                className={`flex flex-row w-full items-center border-2 border-gray-400 pl-2 pr-4 rounded-lg mb-4 justify-between`}>
+            <View style={styles.inputHolder}>
                 <TextInput
                     onChangeText={value => updateUser('email', value)}
                     value={user.email}
@@ -54,12 +71,11 @@ function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
                 />
                 <FontAwesomeIcon icon={faEnvelope} size={20} />
             </View>
-            <Text className={`mb-2 font-[900] text-lg`}>
-                <Text className="text-red-400">* </Text>
+            <Text style={styles.inputText}>
+                <Text style={styles.required}>* </Text>
                 Password:
             </Text>
-            <View
-                className={`flex flex-row w-full items-center border-2 border-gray-400 pl-2 pr-4 rounded-lg mb-4 justify-between`}>
+            <View style={styles.inputHolder}>
                 <TextInput
                     onChangeText={value => updateUser('password', value)}
                     value={user.password}
@@ -73,12 +89,11 @@ function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
                     />
                 </TouchableOpacity>
             </View>
-            <Text className={`mb-2 font-[900] text-lg`}>
-                <Text className="text-red-400">* </Text>
+            <Text style={styles.inputText}>
+                <Text style={styles.required}>* </Text>
                 Repeat password:
             </Text>
-            <View
-                className={`flex flex-row w-full items-center border-2 border-gray-400 pl-2 pr-4 rounded-lg mb-4 justify-between`}>
+            <View style={styles.inputHolder}>
                 <TextInput
                     onChangeText={value => updateUser('repeatPassword', value)}
                     value={user.repeatPassword}
@@ -92,41 +107,101 @@ function FirstRegisterStep({navigation, user, updateUser, nextStep}) {
                     />
                 </TouchableOpacity>
             </View>
-            {error && (
-                <Text
-                    className={`text-red-500 mb-2 text-center text-[16px] font-bold`}>
-                    {error}
-                </Text>
-            )}
-            <Pressable
-                className={`bg-[#1FAFBF] rounded-lg py-2 px-4 mb-4 mt-2`}
-                onPress={handleNextStep}>
-                <Text className={`text-center font-[800] text-lg text-white`}>
-                    Next step
-                </Text>
+            {error && <Text style={styles.errorText}>{error}</Text>}
+            <Pressable style={styles.button} onPress={handleNextStep}>
+                <Text style={styles.buttonText}>Next step</Text>
             </Pressable>
-            <View className={`flex flex-row items-center justify-center mb-2`}>
-                <View className={`h-[1px] w-1/3 bg-gray-400`}></View>
-                <Text className={`mx-4 text-gray-400`}>OR</Text>
-                <View className={`h-[1px] w-1/3 bg-gray-400`}></View>
+            <View style={styles.dividerHolder}>
+                <View style={styles.separator}></View>
+                <Text style={styles.separatorText}>OR</Text>
+                <View style={styles.separator}></View>
             </View>
-            <View
-                className={`flex flex-row items-center justify-center mb-4 items-center`}>
-                <Text className={`text-center text-[16px] text-gray-600`}>
-                    Already have an account?{' '}
-                </Text>
+            <View style={styles.loginHolder}>
+                <Text style={styles.loginText}>Already have an account? </Text>
 
                 <TouchableOpacity
                     onPress={() => {
                         navigation.navigate('ProfileScreen');
                     }}>
-                    <Text className={`text-center text-[16px] text-[#1FAFBF]`}>
-                        Login
-                    </Text>
+                    <Text style={styles.loginLink}>Login</Text>
                 </TouchableOpacity>
             </View>
         </View>
     );
-}
+};
 
 export default FirstRegisterStep;
+
+const styles = StyleSheet.create({
+    infoText: {
+        fontSize: 18,
+        fontWeight: '500',
+        marginBottom: 15,
+    },
+    inputText: {
+        fontSize: 17,
+        fontWeight: '800',
+        marginBottom: 5,
+    },
+    required: {
+        color: 'red',
+    },
+    inputHolder: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#ccc',
+        paddingLeft: 10,
+        paddingRight: 14,
+        borderRadius: 10,
+        marginBottom: 10,
+        justifyContent: 'space-between',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 16,
+        marginBottom: 10,
+    },
+    button: {
+        backgroundColor: '#1FAFBF',
+        borderRadius: 10,
+        padding: 10,
+        marginVertical: 10,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: '800',
+        textAlign: 'center',
+    },
+    dividerHolder: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    separator: {
+        flex: 1,
+        height: 1,
+        backgroundColor: '#ccc',
+    },
+    separatorText: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#ccc',
+        marginHorizontal: 10,
+    },
+    loginHolder: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loginText: {
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    loginLink: {
+        fontSize: 16,
+        fontWeight: '800',
+        color: '#1FAFBF',
+    },
+});

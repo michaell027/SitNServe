@@ -1,6 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import {Address} from '../models/Address';
 import {Restaurant} from '../models/Restaurant';
+import {RestaurantCoordinates} from '../views/MapScreen';
 
 interface Coordinates {
     latitude: number;
@@ -23,7 +24,7 @@ export const getRestaurants = async (): Promise<Restaurant[]> => {
 
 export const getCoordinatesFromRestaurants = async (
     restaurants: Restaurant[],
-) => {
+): Promise<RestaurantCoordinates[]> => {
     const promises = restaurants.map(async restaurant => {
         const {address} = restaurant;
         const {street, number, city, country, ZIPcode} = address;
@@ -31,10 +32,13 @@ export const getCoordinatesFromRestaurants = async (
 
         try {
             const location = await getCoordinatesFromAddress(fullAddress);
-            //console.log('locationnnnn', location);
+            console.log('location', location);
             return {
                 restaurant: restaurant,
-                coordinates: location,
+                coordinates: {
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                },
                 addressString: fullAddress,
             };
         } catch (error) {
@@ -44,8 +48,9 @@ export const getCoordinatesFromRestaurants = async (
     });
 
     const restaurantsWithCoordinates = await Promise.all(promises);
-    //console.log('restaurantsWithCoordinates', restaurantsWithCoordinates);
-    return restaurantsWithCoordinates.filter(item => item !== null);
+    return restaurantsWithCoordinates.filter(
+        item => item !== null,
+    ) as RestaurantCoordinates[];
 };
 
 const fetch = require('node-fetch');

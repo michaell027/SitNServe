@@ -2,42 +2,73 @@ import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
-    Platform,
-    PermissionsAndroid,
     ActivityIndicator,
     ScrollView,
     Pressable,
     Image,
+    StyleSheet,
 } from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
-import Geolocation from 'react-native-geolocation-service';
 import {getCurrentPosition} from '../services/locationService';
 import {
     getRestaurants,
     getCoordinatesFromRestaurants,
 } from '../services/restaurantsService';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faUtensils} from '@fortawesome/free-solid-svg-icons';
+import {Restaurant} from '../models/Restaurant';
 
-function MapScreen({navigation, route}) {
-    const [position, setPosition] = useState(null);
-    const [permissionStatus, setPermissionStatus] = useState(null);
-    const [restaurants, setRestaurants] = useState([]);
-    const [restaurantCoordinates, setRestaurantCoordinates] = useState([]);
-    const [region, setRegion] = useState({
+interface MapScreenProps {
+    navigation: any;
+    route: any;
+}
+
+interface Region {
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+}
+
+export interface RestaurantCoordinates {
+    restaurant: Restaurant;
+    coordinates: {
+        latitude: number;
+        longitude: number;
+    };
+    addressString: string;
+}
+
+interface Position {
+    coords: {
+        latitude: number;
+        longitude: number;
+    };
+}
+
+function MapScreen({navigation, route}: MapScreenProps) {
+    const [position, setPosition] = useState<Position | null>(null);
+    const [permissionStatus, setPermissionStatus] = useState<string | null>(
+        null,
+    );
+    const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+    const [restaurantCoordinates, setRestaurantCoordinates] = useState<
+        RestaurantCoordinates[]
+    >([]);
+    const [region, setRegion] = useState<Region>({
         latitude: 0,
         longitude: 0,
         latitudeDelta: 0.04,
         longitudeDelta: 0.02,
     });
-    const [nearbyRestaurants, setNearbyRestaurants] = useState([]);
+    const [nearbyRestaurants, setNearbyRestaurants] = useState<
+        RestaurantCoordinates[]
+    >([]);
 
-    const handleRegionChange = newRegion => {
+    const handleRegionChange = (newRegion: Region) => {
         setRegion(newRegion);
         fetchRestaurantsInView(newRegion);
     };
 
-    const truncateDescription = (description, length) => {
+    const truncateDescription = (description: string, length: number) => {
         const splitDescription = description.split(' ');
         if (splitDescription.length > length) {
             return splitDescription.slice(0, length).join(' ') + '...';
@@ -46,19 +77,20 @@ function MapScreen({navigation, route}) {
         }
     };
 
-    const fetchRestaurantsInView = newRegion => {
-        const nearbyRestaurants = restaurantCoordinates.filter(restaurant => {
-            return (
-                restaurant.coordinates.latitude <=
-                    newRegion.latitude + newRegion.latitudeDelta / 2 &&
-                restaurant.coordinates.latitude >=
-                    newRegion.latitude - newRegion.latitudeDelta / 2 &&
-                restaurant.coordinates.longitude <=
-                    newRegion.longitude + newRegion.longitudeDelta / 2 &&
-                restaurant.coordinates.longitude >=
-                    newRegion.longitude - newRegion.longitudeDelta / 2
-            );
-        });
+    const fetchRestaurantsInView = (newRegion: Region) => {
+        const nearbyRestaurants: RestaurantCoordinates[] =
+            restaurantCoordinates.filter(restaurant => {
+                return (
+                    restaurant.coordinates.latitude <=
+                        newRegion.latitude + newRegion.latitudeDelta / 2 &&
+                    restaurant.coordinates.latitude >=
+                        newRegion.latitude - newRegion.latitudeDelta / 2 &&
+                    restaurant.coordinates.longitude <=
+                        newRegion.longitude + newRegion.longitudeDelta / 2 &&
+                    restaurant.coordinates.longitude >=
+                        newRegion.longitude - newRegion.longitudeDelta / 2
+                );
+            });
         setNearbyRestaurants(nearbyRestaurants);
     };
 
@@ -66,16 +98,29 @@ function MapScreen({navigation, route}) {
         try {
             const fetchedRestaurants = await getRestaurants();
             setRestaurants(fetchedRestaurants);
-            const fetchedRestaurantCoordinates =
+            const fetchedRestaurantCoordinates: RestaurantCoordinates[] =
                 await getCoordinatesFromRestaurants(fetchedRestaurants);
+            console.log(
+                'fetchedRestaurantCoordinates: ',
+                fetchedRestaurantCoordinates,
+            );
             setRestaurantCoordinates(fetchedRestaurantCoordinates);
             fetchNearbyRestaurants(fetchedRestaurantCoordinates);
+            console.log(
+                'fetchedRestaurantCoordinates: ',
+                fetchedRestaurantCoordinates,
+            );
         } catch (error) {
             console.error('Error fetching data: ', error);
         }
     };
 
-    const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+    const getDistanceFromLatLonInKm = (
+        lat1: number,
+        lon1: number,
+        lat2: number,
+        lon2: number,
+    ) => {
         const R = 6371;
         const dLat = deg2rad(lat2 - lat1);
         const dLon = deg2rad(lon2 - lon1);
@@ -89,11 +134,16 @@ function MapScreen({navigation, route}) {
         return R * c;
     };
 
-    const deg2rad = deg => {
+    const deg2rad = (deg: number) => {
         return deg * (Math.PI / 180);
     };
 
-    const fetchNearbyRestaurants = fetchedRestaurantCoordinates => {
+    const fetchNearbyRestaurants = (
+        fetchedRestaurantCoordinates: RestaurantCoordinates[],
+    ) => {
+        if (!position || !position.coords) {
+            return;
+        }
         const nearbyRestaurants = fetchedRestaurantCoordinates.filter(
             restaurant => {
                 const distance = getDistanceFromLatLonInKm(
@@ -105,13 +155,12 @@ function MapScreen({navigation, route}) {
                 return distance < 5;
             },
         );
-        //console.log('nearbyRestaurants: ', nearbyRestaurants);
         setNearbyRestaurants(nearbyRestaurants);
     };
 
     useEffect(() => {
         if (position) {
-            fetchRestaurants();
+            fetchRestaurants().then();
         }
     }, [position]);
 
@@ -121,7 +170,7 @@ function MapScreen({navigation, route}) {
 
     const requestPermission = () => {
         getCurrentPosition()
-            .then(response => {
+            .then((response: any) => {
                 if (response.status === 'granted') {
                     setPosition(response.position);
                     setRegion({
@@ -142,43 +191,116 @@ function MapScreen({navigation, route}) {
 
     return (
         <ScrollView>
-            <View className="w-[100%] px-2 pb-4">
-                <View className="h-[450px] items-center">
-                    <View className="flex w-full items-center h-[300px] bg-[#F2BF91]/50 rounded-b-2xl">
-                        <Text className="text-3xl text-center text-black font-bold py-6">
+            <View style={styles.container}>
+                <View style={styles.mapContainer}>
+                    <View style={styles.mapHolder}>
+                        <Text style={styles.mapText}>
                             Discover Nearby Dining Options
                         </Text>
                         {permissionStatus === 'denied' && (
                             <>
                                 <Pressable
-                                    className="mt-3 p-2 rounded bg-[#171E26]"
+                                    style={{
+                                        marginTop: 10,
+                                        padding: 10,
+                                        borderRadius: 10,
+                                        backgroundColor: '#171E26',
+                                    }}
                                     onPress={requestPermission}>
-                                    <Text className="text-white text-[15px] text-center">
+                                    <Text
+                                        style={{
+                                            color: 'white',
+                                            fontSize: 15,
+                                            textAlign: 'center',
+                                        }}
+                                        >
                                         Grant Location Permission
                                     </Text>
                                 </Pressable>
-                                <View className="mt-3 flex flex-row w-1/2 items-center">
-                                    <View className="w-1/3 bg-[#171E26] h-1"></View>
-                                    <Text className="text-[#171E26] text-center w-1/3 font-bold text-center">
+                                <View
+                                style={{
+                                    marginTop: 10,
+                                    flexDirection: 'row',
+                                    width: '50%',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    }    }
+                                >
+                                    <View
+                                        style={{
+                                            width: '33%',
+                                            backgroundColor: '#171E26',
+                                            height: 3,
+                                        }}
+                                    >
+                                    </View>
+                                    <Text
+                                    style={{
+                                        color: '#171E26',
+                                        fontSize: 15,
+                                        textAlign: 'center',
+                                        width: '33%',
+                                        fontWeight: 'bold',
+                                    }
+                                        }
+                                    >
                                         OR
                                     </Text>
 
-                                    <View className="w-1/3 bg-[#171E26] h-1"></View>
+                                    <View
+                                style={{
+                                    width: '33%',
+                                    backgroundColor: '#171E26',
+                                    height: 3,
+                                }}
+                                    >
                                 </View>
-                                <Pressable className="mt-3 p-2 rounded bg-[#171E26]">
-                                    <Text className="text-white text-[15px] text-center">
+                                </View>
+                                <Pressable
+
+                                style={{
+                                    marginTop: 10,
+                                    padding: 10,
+                                    borderRadius: 10,
+                                    backgroundColor: '#171E26',
+                                }}
+
+                                >
+                                    <Text
+                                    style={{
+                                        color: 'white',
+                                        fontSize: 15,
+                                        textAlign: 'center',
+                                    }
+                                        }
+                                    >
                                         Use my address
                                     </Text>
                                 </Pressable>
                             </>
                         )}
                         {!position && permissionStatus != 'denied' && (
-                            <View className="flex flex-col items-center justify-center pt-4">
+                            <View
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                }
+                                }
+                            >
                                 <ActivityIndicator
                                     size="large"
                                     color="#0000ff"
                                 />
-                                <Text className="text-xl text-center text-black font-bold py-6">
+                                <Text
+                                    style={{
+                                        fontSize: 20,
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        color: '#171E26',
+                                    }
+                                    }
+                                >
                                     Loading...
                                 </Text>
                             </View>
@@ -243,13 +365,36 @@ function MapScreen({navigation, route}) {
                         </MapView>
                     )}
                 </View>
-                <View className="flex space-y-2">
+                <View
+                    //className="flex space-y-2"
+                style={{
+                    marginBottom: 20,
+                    }}
+                >
                     {nearbyRestaurants.length > 0 ? (
-                        <Text className="text-3xl text-center text-black font-bold">
+                        <Text
+                        style={{
+                            marginBottom: 10,
+                            fontSize: 30,
+                            fontWeight: '800',
+                            textAlign: 'center',
+                            color: '#171E26',
+
+                            }}
+                        >
                             Nearby Restaurants:{' '}
                         </Text>
                     ) : (
-                        <Text className="text-xl text-center text-black font-bold">
+                        <Text
+                        style={{
+                            marginBottom: 10,
+                            fontSize: 30,
+                            fontWeight: '800',
+                            textAlign: 'center',
+                            color: '#171E26',
+                        }
+                        }
+                        >
                             No Nearby Restaurants...
                         </Text>
                     )}
@@ -261,34 +406,71 @@ function MapScreen({navigation, route}) {
                                 })
                             }
                             key={index}
-                            className={
-                                'flex flex-row w-full h-fit rounded-3xl mt-2 p-4 bg-gray-400/30 items-center'
-                            }>
+                        style={{
+                            flexDirection: 'row',
+                            width: '100%',
+                            marginTop: 10,
+                            padding: 10,
+                            borderRadius: 10,
+                            backgroundColor: 'rgba(200, 200, 200, 0.5)',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            }
+                            }
+                        >
                             <View
-                                className={
-                                    'w-1/3 sm:w-1/4 h-44 items-center flex justify-center'
-                                }>
+                            style={{
+                                width: '30%',
+                                height: 100,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }
+                                }
+                            >
                                 <Image
                                     source={{
                                         uri: restaurant.restaurant.imageUrl,
                                     }}
-                                    className={
-                                        'h-full w-full self-center rounded-xl'
-                                    }
+                                    // className={
+                                    //     'h-full w-full self-center rounded-xl'
+                                    // }
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        borderRadius: 10,
+                                    }}
                                     resizeMode="cover"
                                 />
                             </View>
                             <View
-                                className={
-                                    'flex-col w-2/3 sm:w-3/4 justify-between p-4 leading-normal'
-                                }>
+                                // className={
+                                //     'flex-col w-2/3 sm:w-3/4 justify-between p-4 leading-normal'
+                                // }
+                            style={{
+                                width: '70%',
+                                paddingLeft: 15,
+                            }
+                                }
+                            >
                                 <Text
-                                    className={
-                                        'mb-2 text-2xl font-bold tracking-tight text-gray-900'
-                                    }>
+                                style={{
+                                    fontSize: 24,
+                                    fontWeight: 'bold',
+                                    color: '#171E26',
+                                    marginBottom: 5,
+                                }
+                                    }
+                                >
                                     {restaurant.restaurant.name}
                                 </Text>
-                                <Text className={'mb-3 font-normal'}>
+                                <Text
+                                style={{
+                                    fontSize: 16,
+                                    color: '#171E26',
+                                    marginBottom: 5,
+                                    }
+                                    }
+                                >
                                     {truncateDescription(
                                         restaurant.restaurant.description,
                                         20,
@@ -304,3 +486,24 @@ function MapScreen({navigation, route}) {
 }
 
 export default MapScreen;
+
+const styles = StyleSheet.create({
+    container: {width: '100%', paddingHorizontal: 10},
+    mapContainer: {width: '100%', alignItems: 'center', paddingBottom: 20},
+    mapHolder: {
+        width: '100%',
+        height: 300,
+        marginTop: -5,
+        backgroundColor: 'rgba(242, 191, 145, 0.5)',
+        borderRadius: 20,
+        alignItems: 'center',
+    },
+    mapText: {
+        fontSize: 30,
+        fontWeight: '800',
+        textAlign: 'center',
+        marginTop: 20,
+        marginBottom: 10,
+        color: '#171E26',
+    },
+});

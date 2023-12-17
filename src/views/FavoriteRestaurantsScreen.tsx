@@ -1,14 +1,5 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react';
-import {
-    View,
-    Text,
-    SafeAreaView,
-    ScrollView,
-    Button,
-    Pressable,
-} from 'react-native';
-import {Restaurant} from '../models/Restaurant';
-import {Address} from '../models/Address';
+import React, {useEffect, useLayoutEffect} from 'react';
+import {View, SafeAreaView, ScrollView, Pressable} from 'react-native';
 import {FavouriteRestaurantCard} from '../components/FavouriteRestaurantCard';
 import {useNavigation} from '@react-navigation/native';
 import {useRestaurantContext} from '../services/FavouriteRestaurantContext';
@@ -32,7 +23,7 @@ const FavoriteRestaurantsScreen = () => {
         navigation.setOptions({
             headerRight: () =>
                 multipleSelect ? (
-                    <View className={'flex flex-row space-x-2'}>
+                    <View style={{flexDirection: 'row'}}>
                         <Pressable onPress={deleteSelectedRestaurants}>
                             <FontAwesomeIcon
                                 icon={faTrash}
@@ -74,7 +65,7 @@ const FavoriteRestaurantsScreen = () => {
     return (
         <ScrollView>
             <SafeAreaView>
-                <View className={'m-2'}>
+                <View style={{padding: 15}}>
                     {favoriteRestaurants.map(rest => (
                         <FavouriteRestaurantCard
                             key={rest.id}

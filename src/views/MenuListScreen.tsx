@@ -4,7 +4,6 @@ import {
     Text,
     ScrollView,
     Pressable,
-    Image,
     ActivityIndicator,
     Alert,
     StyleSheet,
@@ -37,7 +36,7 @@ interface Props {
     route: Route;
 }
 
-const CartIconWithBadge = ({count}) => {
+const CartIconWithBadge = ({count}: {count: number}) => {
     return (
         <View style={styles.container}>
             <FontAwesomeIcon icon={faCartShopping} size={30} />
@@ -98,20 +97,20 @@ const MenuListScreen: React.FC<Props> = ({navigation, route}) => {
     }, [restaurantIdAndSeat]);
 
     return (
-        <ScrollView className="bg-gray-100">
+        <ScrollView style={styles.scrollView}>
             {loading ? (
-                <View className="flex-1 justify-center items-center">
+                <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" />
                 </View>
             ) : (
-                <View className="space-y-2 p-4">
+                <View style={styles.menuItemsContainer}>
                     {menuItems.map((item, index) => (
                         <MenuItemCard key={index} item={item} />
                     ))}
-                    <Text className="text-center text-lg">
+                    <Text style={styles.menuItemText}>
                         {restaurantIdAndSeat.restaurant_id}
                     </Text>
-                    <Text className="text-center text-lg">
+                    <Text style={styles.menuItemText}>
                         {restaurantIdAndSeat.seat}
                     </Text>
                 </View>
@@ -141,5 +140,22 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 12,
         fontWeight: 'bold',
+    },
+    // New Styles
+    scrollView: {
+        backgroundColor: '#f3f4f6',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    menuItemsContainer: {
+        padding: 16,
+        spaceY: 8,
+    },
+    menuItemText: {
+        textAlign: 'center',
+        fontSize: 18,
     },
 });

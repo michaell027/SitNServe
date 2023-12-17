@@ -1,110 +1,22 @@
-// import React from 'react';
-// import {
-//   Button,
-//   PermissionsAndroid,
-//   StatusBar,
-//   StyleSheet,
-//   Text,
-//   View,
-// } from 'react-native';
-//
-// const requestCameraPermission = async () => {
-//   try {
-//     const granted = await PermissionsAndroid.request(
-//       PermissionsAndroid.PERMISSIONS.CAMERA,
-//       {
-//         title: 'Cool Photo App Camera Permission',
-//         message:
-//           'Cool Photo App needs access to your camera ' +
-//           'so you can take awesome pictures.',
-//         buttonNeutral: 'Ask Me Later',
-//         buttonNegative: 'Cancel',
-//         buttonPositive: 'OK',
-//       },
-//     );
-//     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-//       console.log('You can use the camera');
-//     } else {
-//       console.log('Camera permission denied');
-//     }
-//   } catch (err) {
-//     console.warn(err);
-//   }
-// };
-//
-// const App = () => (
-//   <View style={styles.container}>
-//     <Text style={styles.item}>Try permissions</Text>
-//     <Button title="request permissions" onPress={requestCameraPermission} />
-//   </View>
-// );
-//
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     paddingTop: StatusBar.currentHeight,
-//     backgroundColor: '#ecf0f1',
-//     padding: 8,
-//   },
-//   item: {
-//     margin: 24,
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//     textAlign: 'center',
-//   },
-// });
-//
-// export default App;
-
-'use strict';
-
+import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback, useState} from 'react';
-import {
-    View,
-    AppRegistry,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    Linking,
-    Alert,
-} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
 
-interface ScanScreenProps {
-    navigation: any;
-    route: any;
-}
+const ScanQRScreen = ({navigation}) => {
+    const [restaurantIdAndSeat, setRestaurantIdAndSeat] = useState(null);
 
-interface RestaurantIdAndSeat {
-    restaurant_id: string;
-    seat_id: string;
-}
-
-function ScanScreen({navigation, route}: ScanScreenProps) {
-    const {restaurantId} = route.params;
-    const [restaurantIdAndSeat, setRestaurantIdAndSeat] = useState<
-        RestaurantIdAndSeat | null
-    >(null);
-
-    const onSuccess = useCallback((e: any) => {
+    const onSuccess = useCallback(e => {
         const data = JSON.parse(e.data);
         setRestaurantIdAndSeat(data);
         checkData(data);
     }, []);
 
-    const checkData = useCallback((restaurantIdAndSeat: RestaurantIdAndSeat) => {
-        if (
-            restaurantIdAndSeat &&
-            restaurantIdAndSeat.restaurant_id === restaurantId
-        ) {
+    const checkData = useCallback(restaurantIdAndSeat => {
+        if (restaurantIdAndSeat) {
             console.log(restaurantIdAndSeat);
             navigation.navigate('MenuListScreen', {restaurantIdAndSeat});
-        } else if (
-            restaurantIdAndSeat &&
-            restaurantIdAndSeat.restaurant_id !== restaurantId
-        ) {
+        } else if (restaurantIdAndSeat) {
             Alert.alert(
                 'Wrong QR code',
                 'This QR code is not for this restaurant. Please scan the QR code on your table.',
@@ -157,18 +69,9 @@ function ScanScreen({navigation, route}: ScanScreenProps) {
                     }}
                 />
                 <TouchableOpacity
+                    style={styles.buttonTouchable}
                     onPress={handleScanIssue}
-                    style={{
-                        backgroundColor: '#000',
-                        alignSelf: 'center',
-                        marginTop: 10,
-                        marginBottom: 10,
-                        padding: 20,
-                        width: '80%',
-                        alignItems: 'center',
-                        borderRadius: 25,
-                        justifyContent: 'center',
-                    }}>
+                    className="bg-gray-500">
                     <Text style={styles.buttonText}>
                         I have trouble with scanning
                     </Text>
@@ -176,7 +79,9 @@ function ScanScreen({navigation, route}: ScanScreenProps) {
             </View>
         </View>
     );
-}
+};
+
+export default ScanQRScreen;
 
 const styles = StyleSheet.create({
     centerText: {
@@ -215,5 +120,3 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
     },
 });
-
-export default ScanScreen;

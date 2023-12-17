@@ -8,9 +8,10 @@ import {
     faUser,
     faUtensils,
 } from '@fortawesome/free-solid-svg-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoggedInHome from '../components/LoggedInHome';
 import NotLoggedHome from '../components/NotLoggedHome';
+import {setUserUid} from '../functions/authFunctions';
+import firebase from '@react-native-firebase/app';
 
 interface HomeScreenProps {
     navigation: any;
@@ -32,33 +33,26 @@ const buttonDataAfterLogin = [
     {icon: faInfo, text: 'About', navigate: 'AboutScreen'},
     {icon: faUtensils, text: 'Restaurants', navigate: 'Restaurants'},
     {icon: faMap, text: 'Map', navigate: 'MapScreen'},
-    {icon: faQrcode, text: 'Scan', navigate: 'ChangeThemeSecond'},
+    {icon: faQrcode, text: 'Scan', navigate: 'ScanQRScreen'},
     {icon: faGear, text: 'Settings'},
     {icon: faUser, text: 'My profile', navigate: 'ProfileScreen'},
 ];
 
 function HomeScreen({navigation}: HomeScreenProps) {
     const [isLogged, setIsLogged] = useState(false);
-    const [user, setUser] = useState(null);
 
     useEffect(() => {
-        return navigation.addListener('focus', () => {
-            AsyncStorage.getItem('user').then(user => {
-                if (user) {
-                    setUser(JSON.parse(user));
-                    AsyncStorage.getItem('user_info').then(userInfo => {
-                        if (userInfo) {
-                            setIsLogged(true);
-                        } else {
-                            setIsLogged(false);
-                        }
-                    });
-                } else {
-                    setIsLogged(false);
-                }
-            });
+        const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
+            if (user) {
+                await setUserUid(user.uid);
+                setIsLogged(true);
+            } else {
+                setIsLogged(false);
+            }
         });
-    }, [navigation]);
+
+        return () => unsubscribe();
+    }, []);
 
     return (
         <ScrollView>
