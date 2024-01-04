@@ -46,18 +46,36 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
         )
         .ref(`/restaurant_id/${restaurantId}/tables`);
 
-    useEffect(() => {
-        const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
-            if (user) {
-                setUserUid(user.uid);
-            } else {
-                setUserUid(null);
-                navigation.navigate('LoginScreen');
-            }
-        });
+    const fetchUserUid = async () => {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            setUserUid(user.uid);
+        } else {
+            setUserUid(null);
+            navigation.navigate('LoginScreen');
+        }
+    };
 
-        return () => unsubscribe();
+    useEffect(() => {
+        fetchUserUid().then();
     }, []);
+
+    const isTimeInFuture = (timeSlot: string) => {
+        const today = new Date();
+        const selectedDate = date.toISOString().split('T')[0];
+        const todayString = today.toISOString().split('T')[0];
+
+        if (selectedDate !== todayString) {
+            return true;
+        }
+
+        const [hours, minutes] = timeSlot.split(':').map(Number);
+        const timeSlotDate = new Date(date);
+        timeSlotDate.setHours(hours, minutes, 0, 0);
+
+        return timeSlotDate > today;
+    };
+
 
     const fetchRealTimeData = () => {
         reference.on('value', snapshot => {
@@ -198,7 +216,9 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
                         table: selectedSeatId,
                     })
                     .then(() => {
-                        navigation.navigate('ReservationsScreen');
+                        navigation.navigate('ReservationsScreen', {
+                            userUid: userUid,
+                        });
                     })
                     .catch(error => {
                         console.log('Error adding reservation to user:', error);
@@ -251,16 +271,15 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
                             key={time}
                             style={[
                                 timesStyles.timeButton,
-                                times[time].occupied && timesStyles.occupied,
-                                selectedTimes.includes(time) &&
-                                    timesStyles.selected,
+                                (times[time].occupied || !isTimeInFuture(time)) && timesStyles.occupied,
+                                selectedTimes.includes(time) && timesStyles.selected,
                             ]}
                             onPress={() => {
-                                if (!times[time].occupied) {
+                                if (!times[time].occupied && isTimeInFuture(time)) {
                                     handleTimeSelect(time);
                                 }
                             }}
-                            disabled={times[time].occupied}>
+                            disabled={times[time].occupied || !isTimeInFuture(time)}>
                             {selectedTimes.includes(time) ? (
                                 <FontAwesomeIcon icon={faCircleCheck} />
                             ) : (

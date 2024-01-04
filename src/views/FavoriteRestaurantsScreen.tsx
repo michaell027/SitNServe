@@ -2,7 +2,7 @@ import React, {useEffect, useLayoutEffect} from 'react';
 import {View, SafeAreaView, ScrollView, Pressable} from 'react-native';
 import {FavouriteRestaurantCard} from '../components/FavouriteRestaurantCard';
 import {useNavigation} from '@react-navigation/native';
-import {useRestaurantContext} from '../services/FavouriteRestaurantContext';
+import {useRestaurantContext} from '../providers/FavouriteRestaurantContext';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faTrash} from '@fortawesome/free-solid-svg-icons';
 

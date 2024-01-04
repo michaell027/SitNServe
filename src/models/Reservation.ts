@@ -23,6 +23,7 @@ export interface Table {
 export interface Reservation {
     id: string;
     restaurant: string;
+    restaurantId: string;
     date: string;
     times: string[];
     tableId: string;

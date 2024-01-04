@@ -84,9 +84,8 @@ interface RestaurantIdAndSeat {
 
 function ScanScreen({navigation, route}: ScanScreenProps) {
     const {restaurantId} = route.params;
-    const [restaurantIdAndSeat, setRestaurantIdAndSeat] = useState<
-        RestaurantIdAndSeat | null
-    >(null);
+    const [restaurantIdAndSeat, setRestaurantIdAndSeat] =
+        useState<RestaurantIdAndSeat | null>(null);
 
     const onSuccess = useCallback((e: any) => {
         const data = JSON.parse(e.data);
@@ -94,30 +93,33 @@ function ScanScreen({navigation, route}: ScanScreenProps) {
         checkData(data);
     }, []);
 
-    const checkData = useCallback((restaurantIdAndSeat: RestaurantIdAndSeat) => {
-        if (
-            restaurantIdAndSeat &&
-            restaurantIdAndSeat.restaurant_id === restaurantId
-        ) {
-            console.log(restaurantIdAndSeat);
-            navigation.navigate('MenuListScreen', {restaurantIdAndSeat});
-        } else if (
-            restaurantIdAndSeat &&
-            restaurantIdAndSeat.restaurant_id !== restaurantId
-        ) {
-            Alert.alert(
-                'Wrong QR code',
-                'This QR code is not for this restaurant. Please scan the QR code on your table.',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () =>
-                            console.log('Wrong QR code alert closed.'),
-                    },
-                ],
-            );
-        }
-    }, []);
+    const checkData = useCallback(
+        (restaurantIdAndSeat: RestaurantIdAndSeat) => {
+            if (
+                restaurantIdAndSeat &&
+                restaurantIdAndSeat.restaurant_id === restaurantId
+            ) {
+                console.log(restaurantIdAndSeat);
+                navigation.navigate('MenuListScreen', {restaurantIdAndSeat});
+            } else if (
+                restaurantIdAndSeat &&
+                restaurantIdAndSeat.restaurant_id !== restaurantId
+            ) {
+                Alert.alert(
+                    'Wrong QR code',
+                    'This QR code is not for this restaurant. Please scan the QR code on your table.',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () =>
+                                console.log('Wrong QR code alert closed.'),
+                        },
+                    ],
+                );
+            }
+        },
+        [],
+    );
 
     const handleScanIssue = useCallback(() => {
         Alert.alert(

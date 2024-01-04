@@ -43,11 +43,15 @@ import AboutScreen from './src/views/AboutScreen';
 import ProfileScreen from './src/views/ProfileScreen';
 import LoginScreen from './src/views/LoginScreen';
 import FavoriteRestaurantsScreen from './src/views/FavoriteRestaurantsScreen';
-import {RestaurantProvider} from "./src/services/FavouriteRestaurantContext";
+import {RestaurantProvider} from "./src/providers/FavouriteRestaurantContext";
 import OrdersScreen from "./src/views/OrdersScreen";
 import ReservationsScreen from "./src/views/ReservationsScreen";
 import CartScreen from "./src/views/CartScreen";
 import ScanQRScreen from "./src/views/ScanQRScreen";
+
+// Context Imports
+import {SelectedItemsProvider} from './src/providers/SelectedItemsContext';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -196,7 +200,8 @@ function App() {
 
     return (
         <RestaurantProvider>
-        <DrawerLayoutAndroid
+            <SelectedItemsProvider>
+            <DrawerLayoutAndroid
             ref={drawerRef}
             drawerWidth={300}
             drawerPosition="left"
@@ -310,6 +315,7 @@ function App() {
                 </Stack.Navigator>
             </NavigationContainer>
         </DrawerLayoutAndroid>
+            </SelectedItemsProvider>
         </RestaurantProvider>
     );
 }

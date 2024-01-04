@@ -1,51 +1,63 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Text, View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
-
-interface CartItem {
-    id: string;
-    name: string;
-    price: number;
-    amount: number;
-}
+import {SelectedItemsContext} from '../providers/SelectedItemsContext';
+import {MenuItem} from './MenuListScreen';
 
 const CartScreen = () => {
-    const [cartItems, setCartItems] = useState([
-        {id: '1', name: 'Coffee', price: 2.99, amount: 1},
-        {id: '2', name: 'Pasta', price: 11.5, amount: 1},
-        {id: '3', name: 'Pizza', price: 8.99, amount: 1},
-        {id: '4', name: 'Salad', price: 5.99, amount: 1},
-        {id: '5', name: 'Burger', price: 7.99, amount: 1},
-        {id: '6', name: 'Coke', price: 1.99, amount: 1},
-        {id: '7', name: 'Fries', price: 3.99, amount: 1},
-        {id: '8', name: 'Tea', price: 2.99, amount: 1},
-        {id: '9', name: 'Water', price: 1.99, amount: 1},
-        {id: '10', name: 'Beer', price: 3.99, amount: 1},
-        // Add more items here...
-    ]);
+    const {selectedItems, updateSelectedItems} =
+        useContext(SelectedItemsContext);
+
+    const getTotalAmount = () => {
+        return selectedItems
+            .reduce((total, item) => {
+                return total + item.price * (item.quantity || 0);
+            }, 0)
+            .toFixed(2);
+    };
 
     const increaseAmount = (id: string) => {
-        const newCartItems = cartItems.map(item => {
-            if (item.id === id) {
-                return {...item, amount: item.amount + 1};
-            }
-            return item;
-        });
-        setCartItems(newCartItems);
+        if (!selectedItems) {
+            return;
+        }
+
+        const newSelectedItems: MenuItem[] = [...selectedItems];
+        const index = newSelectedItems.findIndex(i => i.id === id);
+
+        if (index !== -1 && newSelectedItems[index]) {
+            newSelectedItems[index].quantity =
+                (newSelectedItems[index].quantity || 0) + 1;
+        }
+
+        updateSelectedItems(newSelectedItems);
     };
 
     const decreaseAmount = (id: string) => {
-        const newCartItems = cartItems.map(item => {
-            if (item.id === id && item.amount > 1) {
-                return {...item, amount: item.amount - 1};
+        if (!selectedItems) {
+            return;
+        }
+
+        const newSelectedItems: MenuItem[] = [...selectedItems];
+        const index = newSelectedItems.findIndex(i => i.id === id);
+
+        if (
+            index !== -1 &&
+            newSelectedItems[index] &&
+            newSelectedItems[index].quantity
+        ) {
+            newSelectedItems[index].quantity =
+                (newSelectedItems[index].quantity || 0) - 1;
+
+            if (newSelectedItems[index].quantity === 0) {
+                newSelectedItems.splice(index, 1);
             }
-            return item;
-        });
-        setCartItems(newCartItems);
+        }
+
+        updateSelectedItems(newSelectedItems);
     };
 
-    const renderItem = ({item}) => (
+    const renderItem = ({item}: {item: MenuItem}) => (
         <View style={styles.itemContainer}>
             <Text style={styles.itemName}>{item.name}</Text>
             <View style={styles.amountAndPriceContainer}>
@@ -57,7 +69,7 @@ const CartScreen = () => {
                             <FontAwesomeIcon icon={faMinus} size={12} />
                         </Text>
                     </TouchableOpacity>
-                    <Text style={styles.amountText}>{item.amount}</Text>
+                    <Text style={styles.amountText}>{item.quantity}</Text>
                     <TouchableOpacity
                         onPress={() => increaseAmount(item.id)}
                         style={styles.amountButton}>
@@ -67,7 +79,7 @@ const CartScreen = () => {
                     </TouchableOpacity>
                 </View>
                 <Text style={styles.itemPrice}>
-                    ${(item.price * item.amount).toFixed(2)}
+                    ${(item.price * (item.quantity || 1)).toFixed(2)}
                 </Text>
             </View>
         </View>
@@ -76,10 +88,13 @@ const CartScreen = () => {
     return (
         <View style={styles.container}>
             <FlatList
-                data={cartItems}
+                data={selectedItems}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
             />
+            <Text style={styles.totalAmountText}>
+                Total: ${getTotalAmount()}
+            </Text>
             <TouchableOpacity style={styles.orderButton}>
                 <Text style={styles.orderButtonText}>Order</Text>
             </TouchableOpacity>
@@ -143,6 +158,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 5,
+    },
+    totalAmountText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

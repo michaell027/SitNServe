@@ -5,10 +5,11 @@ import {
     ScrollView,
     Image,
     StyleSheet,
-    ActivityIndicator,
+    ActivityIndicator, TouchableOpacity,
 } from 'react-native';
 import {Reservation} from '../models/Reservation';
 import firestore from '@react-native-firebase/firestore';
+import {firebase} from "@react-native-firebase/database";
 
 interface ReservationsScreenProps {
     route: any;
@@ -21,6 +22,12 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
 }) => {
     const {userUid} = route.params;
     const [reservations, setReservations] = useState<Reservation[]>([]);
+    const [upcomingReservations, setUpcomingReservations] = useState<
+        Reservation[]
+    >([]);
+    const [pastReservations, setPastReservations] = useState<Reservation[]>(
+        [],
+    );
     let isMounted = true;
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -61,10 +68,11 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
                 const reservationsPromises = snapshot.docs.map(async doc => {
                     const imageUrl = await getImageUrl(doc.data().restaurantId);
                     const name = await getName(doc.data().restaurantId);
-                    console.log(doc.data().times);
+                    console.log(doc.data());
                     return {
                         id: doc.id,
                         restaurant: name,
+                        restaurantId: doc.data().restaurantId,
                         date: doc.data().date,
                         times: doc.data().times,
                         tableId: doc.data().table,
@@ -76,6 +84,34 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
                     reservationsPromises,
                 );
                 if (isMounted) {
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const date = `${year}-${month}-${day}`;
+                    const hours = String(today.getHours()).padStart(2, '0');
+                    const minutes = String(today.getMinutes()).padStart(2, '0');
+                    const time = `${hours}:${minutes}`;
+                    const upcomingReservations = resolvedReservations.filter(
+                        reservation =>
+                            reservation.date > date ||
+                            (reservation.date === date &&
+                                reservation.times.some(
+                                    (reservationTime : string) =>
+                                        reservationTime > time,
+                                )),
+                    );
+                    setUpcomingReservations(upcomingReservations);
+                    const pastReservations = resolvedReservations.filter(
+                        reservation =>
+                            reservation.date < date ||
+                            (reservation.date === date &&
+                                reservation.times.every(
+                                    (reservationTime : string) =>
+                                        reservationTime < time,
+                                )),
+                    );
+                    setPastReservations(pastReservations);
                     setReservations(resolvedReservations);
                 }
                 setIsLoading(false);
@@ -105,10 +141,95 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
         );
     }
 
+    function handleCancelReservation(reservationId: string, restaurantId: string, tableId: string, times: string[], date: string) {
+        console.log("Cancelling reservation with id", reservationId);
+        const firestoreRef = firestore()
+            .collection('users')
+            .doc(userUid)
+            .collection('reservations')
+            .doc(reservationId);
+
+        const dbUrl = 'https://sitnserve-fbaed-default-rtdb.europe-west1.firebasedatabase.app/';
+        const firebaseRef = firebase
+            .app()
+            .database(dbUrl)
+            .ref(`/restaurant_id/${restaurantId}/tables/${tableId}/reserved/${date}`);
+
+        firestoreRef.delete()
+            .then(() => {
+                return firebaseRef.once('value');
+            })
+            .then(snapshot => {
+                let reservationData = snapshot.val();
+                if (reservationData) {
+                    times.forEach(time => {
+                        if (reservationData[time] && reservationData[time].occupied) {
+                            reservationData[time].occupied = false;
+                            reservationData[time].user = "";
+                        }
+                    });
+                    return firebaseRef.update(reservationData);
+                } else {
+                    throw new Error("No reservation data found for the specified time");
+                }
+            })
+            .then(() => {
+                console.log("Reservation cancelled successfully");
+                setReservations(prevReservations => prevReservations.filter(reservation => reservation.id !== reservationId));
+                setUpcomingReservations(prevUpcoming => prevUpcoming.filter(reservation => reservation.id !== reservationId));
+            })
+            .catch(error => {
+                console.error("Error during reservation cancellation:", error);
+            });
+    }
+
+
     return (
         <View style={styles.container}>
             <ScrollView>
-                {reservations.map(reservation => (
+                <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+                    Upcoming Reservations
+                </Text>
+                {upcomingReservations.length === 0 && (
+                    <Text style={{marginTop: 10}}>
+                        You have no upcoming reservations.
+                    </Text>
+                )}
+                {upcomingReservations.map(reservation => (
+                    <View key={reservation.id} style={styles.reservationCard}>
+                        <Image
+                            source={{uri: reservation.imageUrl}}
+                            style={styles.image}
+                        />
+                        <View style={styles.details}>
+                            <Text style={styles.restaurantName}>
+                                {reservation.restaurant}
+                            </Text>
+                            <Text style={styles.reservationDetails}>
+                                {reservation.date} |{' '}
+                                {reservation.times.join(', ')}
+                            </Text>
+                            <Text style={styles.tableId}>
+                                Table ID: {reservation.tableId}
+                            </Text>
+                            <TouchableOpacity
+                                style={styles.cancelButton}
+                                onPress={() => handleCancelReservation(reservation.id, reservation.restaurantId, reservation.tableId, reservation.times, reservation.date)}
+                            >
+                                <Text style={styles.cancelButtonText}>Cancel Reservation</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                ))}
+                <Text style={{fontSize: 20, fontWeight: 'bold', marginTop: 10}}>
+                    Past Reservations
+                </Text>
+                {pastReservations.length === 0 && (
+                    <Text style={{marginTop: 10}}>
+                        You have no past reservations.
+                    </Text>
+                )}
+                {pastReservations.map(reservation => (
                     <View key={reservation.id} style={styles.reservationCard}>
                         <Image
                             source={{uri: reservation.imageUrl}}
@@ -176,6 +297,18 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#555',
         marginTop: 5,
+    },
+    cancelButton: {
+        backgroundColor: 'red',
+        padding: 6,
+        borderRadius: 5,
+        marginTop: 5,
+    },
+    cancelButtonText: {
+        color: '#fff',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
 });
 

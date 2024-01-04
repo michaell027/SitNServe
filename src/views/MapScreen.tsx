@@ -212,68 +212,55 @@ function MapScreen({navigation, route}: MapScreenProps) {
                                             color: 'white',
                                             fontSize: 15,
                                             textAlign: 'center',
-                                        }}
-                                        >
+                                        }}>
                                         Grant Location Permission
                                     </Text>
                                 </Pressable>
                                 <View
-                                style={{
-                                    marginTop: 10,
-                                    flexDirection: 'row',
-                                    width: '50%',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    }    }
-                                >
+                                    style={{
+                                        marginTop: 10,
+                                        flexDirection: 'row',
+                                        width: '50%',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}>
                                     <View
                                         style={{
                                             width: '33%',
                                             backgroundColor: '#171E26',
                                             height: 3,
-                                        }}
-                                    >
-                                    </View>
+                                        }}></View>
                                     <Text
-                                    style={{
-                                        color: '#171E26',
-                                        fontSize: 15,
-                                        textAlign: 'center',
-                                        width: '33%',
-                                        fontWeight: 'bold',
-                                    }
-                                        }
-                                    >
+                                        style={{
+                                            color: '#171E26',
+                                            fontSize: 15,
+                                            textAlign: 'center',
+                                            width: '33%',
+                                            fontWeight: 'bold',
+                                        }}>
                                         OR
                                     </Text>
 
                                     <View
-                                style={{
-                                    width: '33%',
-                                    backgroundColor: '#171E26',
-                                    height: 3,
-                                }}
-                                    >
-                                </View>
+                                        style={{
+                                            width: '33%',
+                                            backgroundColor: '#171E26',
+                                            height: 3,
+                                        }}></View>
                                 </View>
                                 <Pressable
-
-                                style={{
-                                    marginTop: 10,
-                                    padding: 10,
-                                    borderRadius: 10,
-                                    backgroundColor: '#171E26',
-                                }}
-
-                                >
-                                    <Text
                                     style={{
-                                        color: 'white',
-                                        fontSize: 15,
-                                        textAlign: 'center',
-                                    }
-                                        }
-                                    >
+                                        marginTop: 10,
+                                        padding: 10,
+                                        borderRadius: 10,
+                                        backgroundColor: '#171E26',
+                                    }}>
+                                    <Text
+                                        style={{
+                                            color: 'white',
+                                            fontSize: 15,
+                                            textAlign: 'center',
+                                        }}>
                                         Use my address
                                     </Text>
                                 </Pressable>
@@ -281,13 +268,11 @@ function MapScreen({navigation, route}: MapScreenProps) {
                         )}
                         {!position && permissionStatus != 'denied' && (
                             <View
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                }
-                                }
-                            >
+                                style={{
+                                    flex: 1,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
                                 <ActivityIndicator
                                     size="large"
                                     color="#0000ff"
@@ -298,9 +283,7 @@ function MapScreen({navigation, route}: MapScreenProps) {
                                         fontWeight: 'bold',
                                         textAlign: 'center',
                                         color: '#171E26',
-                                    }
-                                    }
-                                >
+                                    }}>
                                     Loading...
                                 </Text>
                             </View>
@@ -367,34 +350,29 @@ function MapScreen({navigation, route}: MapScreenProps) {
                 </View>
                 <View
                     //className="flex space-y-2"
-                style={{
-                    marginBottom: 20,
-                    }}
-                >
+                    style={{
+                        marginBottom: 20,
+                    }}>
                     {nearbyRestaurants.length > 0 ? (
                         <Text
-                        style={{
-                            marginBottom: 10,
-                            fontSize: 30,
-                            fontWeight: '800',
-                            textAlign: 'center',
-                            color: '#171E26',
-
-                            }}
-                        >
+                            style={{
+                                marginBottom: 10,
+                                fontSize: 30,
+                                fontWeight: '800',
+                                textAlign: 'center',
+                                color: '#171E26',
+                            }}>
                             Nearby Restaurants:{' '}
                         </Text>
                     ) : (
                         <Text
-                        style={{
-                            marginBottom: 10,
-                            fontSize: 30,
-                            fontWeight: '800',
-                            textAlign: 'center',
-                            color: '#171E26',
-                        }
-                        }
-                        >
+                            style={{
+                                marginBottom: 10,
+                                fontSize: 30,
+                                fontWeight: '800',
+                                textAlign: 'center',
+                                color: '#171E26',
+                            }}>
                             No Nearby Restaurants...
                         </Text>
                     )}
@@ -406,27 +384,23 @@ function MapScreen({navigation, route}: MapScreenProps) {
                                 })
                             }
                             key={index}
-                        style={{
-                            flexDirection: 'row',
-                            width: '100%',
-                            marginTop: 10,
-                            padding: 10,
-                            borderRadius: 10,
-                            backgroundColor: 'rgba(200, 200, 200, 0.5)',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            }
-                            }
-                        >
-                            <View
                             style={{
-                                width: '30%',
-                                height: 100,
+                                flexDirection: 'row',
+                                width: '100%',
+                                marginTop: 10,
+                                padding: 10,
+                                borderRadius: 10,
+                                backgroundColor: 'rgba(200, 200, 200, 0.5)',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                            }
-                                }
-                            >
+                            }}>
+                            <View
+                                style={{
+                                    width: '30%',
+                                    height: 100,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
                                 <Image
                                     source={{
                                         uri: restaurant.restaurant.imageUrl,
@@ -446,31 +420,25 @@ function MapScreen({navigation, route}: MapScreenProps) {
                                 // className={
                                 //     'flex-col w-2/3 sm:w-3/4 justify-between p-4 leading-normal'
                                 // }
-                            style={{
-                                width: '70%',
-                                paddingLeft: 15,
-                            }
-                                }
-                            >
-                                <Text
                                 style={{
-                                    fontSize: 24,
-                                    fontWeight: 'bold',
-                                    color: '#171E26',
-                                    marginBottom: 5,
-                                }
-                                    }
-                                >
+                                    width: '70%',
+                                    paddingLeft: 15,
+                                }}>
+                                <Text
+                                    style={{
+                                        fontSize: 24,
+                                        fontWeight: 'bold',
+                                        color: '#171E26',
+                                        marginBottom: 5,
+                                    }}>
                                     {restaurant.restaurant.name}
                                 </Text>
                                 <Text
-                                style={{
-                                    fontSize: 16,
-                                    color: '#171E26',
-                                    marginBottom: 5,
-                                    }
-                                    }
-                                >
+                                    style={{
+                                        fontSize: 16,
+                                        color: '#171E26',
+                                        marginBottom: 5,
+                                    }}>
                                     {truncateDescription(
                                         restaurant.restaurant.description,
                                         20,

@@ -1,24 +1,101 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useContext, useEffect, useLayoutEffect} from 'react';
 import {View, Image, Text, Pressable, StyleSheet} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faCartPlus} from '@fortawesome/free-solid-svg-icons';
+import {
+    faCartPlus,
+    faCartShopping,
+    faTimes,
+} from '@fortawesome/free-solid-svg-icons';
+import {MenuItem} from '../views/MenuListScreen';
+import {SelectedItemsContext} from '../providers/SelectedItemsContext';
 
-const MenuItemCard = ({item}) => {
+interface MenuItemCardProps {
+    item: MenuItem;
+    onIncrement: () => void;
+    onDecrement: () => void;
+    quantity: number;
+    totalPrice: number;
+    selectedItems: MenuItem[];
+    setSelectedItems: (items: MenuItem[]) => void;
+    count: number;
+    setCount: (count: number) => void;
+    menuItems: MenuItem[];
+    setMenuItems: (items: MenuItem[]) => void;
+}
+
+const MenuItemCard: React.FC<MenuItemCardProps> = ({
+    item,
+    onIncrement,
+    onDecrement,
+    quantity,
+    totalPrice,
+    selectedItems,
+    setSelectedItems,
+    count,
+    setCount,
+    menuItems,
+    setMenuItems,
+}) => {
+    const isItemInCart = selectedItems.some(i => i.id === item.id);
+    const {selectedItems: selectedItemsContext, updateSelectedItems} =
+        useContext(SelectedItemsContext);
+
+    const addToCart = () => {
+        const newSelectedItems = [...selectedItems];
+        const index = newSelectedItems.findIndex(i => i.id === item.id);
+
+        if (index === -1) {
+            newSelectedItems.push({...item, quantity: 1});
+        } else {
+            const currentItem = newSelectedItems[index];
+            if (currentItem && typeof currentItem.quantity === 'number') {
+                newSelectedItems[index] = {
+                    ...currentItem,
+                    quantity: currentItem.quantity + 1,
+                };
+            }
+        }
+
+        setSelectedItems(newSelectedItems);
+        updateSelectedItems(newSelectedItems);
+    };
+
     return (
         <View style={styles.card}>
             <View style={styles.imageContainer}>
                 <Image
-                    source={require('./../../assets/images/menu/coca_cola.png')} // Use dynamic source based on item
+                    source={require('./../../assets/images/menu/coca_cola.png')}
                     style={styles.image}
                     resizeMode="contain"
                 />
             </View>
             <Text style={styles.itemName}>{item.name}</Text>
             <View style={styles.priceContainer}>
-                <Text style={styles.price}>{item.price}€</Text>
-                <Pressable>
-                    <FontAwesomeIcon icon={faCartPlus} size={30} />
-                </Pressable>
+                <View style={styles.topContainer}>
+                    <Text style={styles.price}>{totalPrice.toFixed(2)}€</Text>
+                    <Pressable onPress={addToCart} hitSlop={20}>
+                        <FontAwesomeIcon
+                            icon={faCartPlus}
+                            size={30}
+                            color={'black'}
+                        />
+                    </Pressable>
+                </View>
+                <View style={styles.bottomContainer}>
+                    <View style={styles.quantityContainer}>
+                        <Pressable
+                            style={styles.quantityButton}
+                            onPress={onDecrement}>
+                            <Text style={styles.quantityText}>-</Text>
+                        </Pressable>
+                        <Text style={styles.quantity}>{quantity}</Text>
+                        <Pressable
+                            style={styles.quantityButton}
+                            onPress={onIncrement}>
+                            <Text style={styles.quantityText}>+</Text>
+                        </Pressable>
+                    </View>
+                </View>
             </View>
         </View>
     );
@@ -52,14 +129,39 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
     },
     priceContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
         width: '40%',
     },
     price: {
         paddingRight: 20,
         fontSize: 18,
+    },
+    quantityContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    quantityButton: {
+        padding: 5,
+    },
+    quantityText: {
+        fontSize: 18,
+        color: '#333',
+    },
+    quantity: {
+        fontSize: 16,
+        paddingHorizontal: 8,
+    },
+    topContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    bottomContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
 });
 
