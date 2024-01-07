@@ -28,7 +28,6 @@ import {
 
 // Screen Imports
 import HomeScreen from './src/views/HomeScreen';
-import DetailsScreen from './src/views/DetailsScreen';
 import ChangeTheme from './src/views/ChangeTheme';
 import ChangeThemeSecond from './src/views/ChangeThemeSecond';
 import RestaurantsScreen from './src/views/RestaurantsScreen';
@@ -51,10 +50,17 @@ import ScanQRScreen from "./src/views/ScanQRScreen";
 
 // Context Imports
 import {SelectedItemsProvider} from './src/providers/SelectedItemsContext';
+import {StripeProvider} from "@stripe/stripe-react-native";
+import CheckoutScreen from "./src/views/CheckoutScreen";
+
+// Config Imports
+import Config from "./config/config";
 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const PUBLISHABLE_KEY = Config.PUBLISHABLE_KEY;
 
 const styles = StyleSheet.create({
     iconCircle: {
@@ -88,22 +94,7 @@ function BottomTabNavigator() {
                     null,
                 ],
             }}>
-            <Tab.Screen
-                name="Details"
-                component={DetailsScreen}
-                options={{
-                    headerShown: false,
-                    tabBarIcon: ({color, size}) => (
-                        <View style={styles.iconCircle}>
-                            <FontAwesomeIcon
-                                icon={faInfo}
-                                color={color}
-                                size={size}
-                            />
-                        </View>
-                    ),
-                }}
-            />
+
             <Tab.Screen
                 name="ChangeTheme"
                 component={ChangeTheme}
@@ -201,6 +192,10 @@ function App() {
     return (
         <RestaurantProvider>
             <SelectedItemsProvider>
+                <StripeProvider
+                    publishableKey={PUBLISHABLE_KEY}
+                    urlScheme={'payments-example'}
+                >
             <DrawerLayoutAndroid
             ref={drawerRef}
             drawerWidth={300}
@@ -253,7 +248,7 @@ function App() {
 
                     <Stack.Screen
                         name="Details"
-                        component={(DetailsScreen, BottomTabNavigator)}
+                        component={( BottomTabNavigator)}
                         options={{
                             title: 'Details',
                             headerLeft: () => (
@@ -312,9 +307,11 @@ function App() {
                     <Stack.Screen name="ReservationsScreen" component={ReservationsScreen}/>
                     <Stack.Screen name="CartScreen" component={CartScreen}/>
                     <Stack.Screen name="ScanQRScreen" component={ScanQRScreen}/>
+                    <Stack.Screen name="CheckoutScreen" component={CheckoutScreen}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </DrawerLayoutAndroid>
+                </StripeProvider>
             </SelectedItemsProvider>
         </RestaurantProvider>
     );

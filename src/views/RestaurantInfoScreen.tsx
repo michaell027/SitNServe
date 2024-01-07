@@ -146,7 +146,7 @@ const RestaurantInfoScreen = ({
         const openingHours = restaurant.openingHours || {};
 
         return daysOfWeek.map(day => {
-            const dayKey = day.toLowerCase() as keyof OpeningHours;
+            const dayKey = day as keyof OpeningHours;
             return (
                 <View key={day} style={styles.row}>
                     <Text style={styles.openingHoursText}>{day}</Text>
@@ -178,7 +178,7 @@ const RestaurantInfoScreen = ({
 
         if (!restaurant?.id) {
             console.log('Restaurant ID is undefined');
-            return; // Exit the function if restaurant ID is undefined
+            return;
         }
 
         try {
@@ -287,6 +287,22 @@ const RestaurantInfoScreen = ({
                                     ) : (
                                         <Text>Loading map...</Text>
                                     )}
+                                    <View style={styles.addressHolder}>
+                                        <Text style={styles.addressTitle}>
+                                            Address
+                                        </Text>
+                                        <Text style={styles.addressText}>
+                                            {restaurant.address.street}{' '}
+                                            {restaurant.address.number}
+                                        </Text>
+                                        <Text style={styles.addressText}>
+                                            {restaurant.address.ZIPcode}{' '}
+                                            {restaurant.address.city}
+                                        </Text>
+                                        <Text style={styles.addressText}>
+                                            {restaurant.address.country}
+                                        </Text>
+                                    </View>
                                 </View>
                             )}
                         </View>
@@ -380,7 +396,7 @@ const styles = StyleSheet.create({
     tabsHolder: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: 5,
         marginHorizontal: 20,
     },
     infoContainer: {
@@ -395,6 +411,11 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: 'bold',
         marginBottom: 20,
+        textAlign: 'center',
+        width: '100%',
+        borderBottomColor: '#ddd',
+        borderBottomWidth: 2,
+        paddingBottom: 10,
     },
     infoRating: {
         fontSize: 20,
@@ -434,4 +455,22 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
     },
+    addressHolder: {
+        marginTop: 20,
+        borderColor: '#ddd',
+        borderWidth: 2,
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    addressTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    addressText: {
+        fontSize: 18,
+        lineHeight: 25,
+    },
+
 });

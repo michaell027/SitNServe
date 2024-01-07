@@ -4,7 +4,7 @@ export interface Address {
     number: string;
     city: string;
     state: string;
-    zip: string;
+    ZIPcode: string;
     // restaurant
     postalCode?: string;
     country?: string;

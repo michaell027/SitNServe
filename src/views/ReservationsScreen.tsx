@@ -5,7 +5,7 @@ import {
     ScrollView,
     Image,
     StyleSheet,
-    ActivityIndicator, TouchableOpacity,
+    ActivityIndicator, TouchableOpacity, Alert,
 } from 'react-native';
 import {Reservation} from '../models/Reservation';
 import firestore from '@react-native-firebase/firestore';
@@ -143,6 +143,24 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
 
     function handleCancelReservation(reservationId: string, restaurantId: string, tableId: string, times: string[], date: string) {
         console.log("Cancelling reservation with id", reservationId);
+
+        Alert.alert(
+            "Cancel reservation",
+            "Are you sure you want to cancel this reservation?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel"
+                },
+                {
+                    text: "Yes",
+                    onPress: () => cancelReservation(reservationId, restaurantId, tableId, times, date)
+                }
+            ]
+        );
+    }
+
+    const cancelReservation = async (reservationId: string, restaurantId: string, tableId: string, times: string[], date: string) => {
         const firestoreRef = firestore()
             .collection('users')
             .doc(userUid)
@@ -182,7 +200,6 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
                 console.error("Error during reservation cancellation:", error);
             });
     }
-
 
     return (
         <View style={styles.container}>

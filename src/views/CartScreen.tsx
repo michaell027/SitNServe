@@ -1,13 +1,19 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Text, View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import {Text, View, FlatList, TouchableOpacity, StyleSheet, Alert, Button} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
 import {SelectedItemsContext} from '../providers/SelectedItemsContext';
 import {MenuItem} from './MenuListScreen';
 
-const CartScreen = () => {
+
+const CartScreen = ({navigation, route}: {navigation: any; route: any}) => {
     const {selectedItems, updateSelectedItems} =
         useContext(SelectedItemsContext);
+    const {restaurantIdAndSeat} = route.params;
+
+    useEffect(() => {
+        console.log(restaurantIdAndSeat);
+    }   , []);
 
     const getTotalAmount = () => {
         return selectedItems
@@ -95,8 +101,10 @@ const CartScreen = () => {
             <Text style={styles.totalAmountText}>
                 Total: ${getTotalAmount()}
             </Text>
-            <TouchableOpacity style={styles.orderButton}>
-                <Text style={styles.orderButtonText}>Order</Text>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('CheckoutScreen', {restaurantIdAndSeat})}
+                style={styles.orderButton}>
+                <Text style={styles.orderButtonText}>Checkout</Text>
             </TouchableOpacity>
         </View>
     );

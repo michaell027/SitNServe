@@ -111,6 +111,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("com.google.android.material:material:0.35.0")
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

@@ -67,3 +67,9 @@ yarn-error.log
 
 # api
 /api/
+
+# android
+/android/app/google-services.json
+
+# config
+/config/

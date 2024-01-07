@@ -15,11 +15,7 @@ import {faCartShopping} from '@fortawesome/free-solid-svg-icons';
 import firestore from '@react-native-firebase/firestore';
 import MenuItemCard from '../components/MenuItemCard';
 import {SelectedItemsContext} from '../providers/SelectedItemsContext';
-
-interface RestaurantIdAndSeat {
-    restaurant_id: string;
-    seat: number;
-}
+import {RestaurantIdAndSeat} from '../models/RestaurantIdAndSeat';
 
 interface Route {
     params: {
@@ -41,10 +37,11 @@ interface Props {
 
 const CartIconWithBadge = () => {
     const {cartCount} = useContext(SelectedItemsContext);
+    const cartIconColor = cartCount > 0 ? 'black' : 'gray';
 
     return (
         <View style={styles.container}>
-            <FontAwesomeIcon icon={faCartShopping} size={30} />
+            <FontAwesomeIcon icon={faCartShopping} size={30} color={cartIconColor} />
             {cartCount > 0 && (
                 <View style={styles.badge}>
                     <Text style={styles.badgeText}>{cartCount}</Text>
@@ -66,12 +63,15 @@ const MenuListScreen: React.FC<Props> = ({navigation, route}) => {
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <Pressable onPress={() => navigation.navigate('CartScreen')}>
+                <Pressable
+                    disabled={count === 0}
+                    onPress={() => navigation.navigate('CartScreen', {restaurantIdAndSeat})}>
                     <CartIconWithBadge />
                 </Pressable>
             ),
         });
     }, [navigation, count]);
+
 
     useEffect(() => {
         const fetchRestaurantData = async () => {
@@ -110,7 +110,7 @@ const MenuListScreen: React.FC<Props> = ({navigation, route}) => {
             }
         };
 
-        fetchRestaurantData().then(r => console.log('Fetching data...'));
+        fetchRestaurantData().then(r => console.log('done'));
     }, [restaurantIdAndSeat]);
 
     useEffect(() => {

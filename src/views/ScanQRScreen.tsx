@@ -2,20 +2,24 @@ import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback, useState} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
+import {RestaurantIdAndSeat} from '../models/RestaurantIdAndSeat';
 
-const ScanQRScreen = ({navigation}) => {
-    const [restaurantIdAndSeat, setRestaurantIdAndSeat] = useState(null);
+const ScanQRScreen = ({navigation}: {navigation: any}) => {
+    const [restaurantIdAndSeat, setRestaurantIdAndSeat] = useState<
+        RestaurantIdAndSeat | null
+    >(null);
 
-    const onSuccess = useCallback(e => {
+    const onSuccess = useCallback((e: any) => {
         const data = JSON.parse(e.data);
         setRestaurantIdAndSeat(data);
         checkData(data);
     }, []);
 
-    const checkData = useCallback(restaurantIdAndSeat => {
+    const checkData = useCallback((restaurantIdAndSeat: RestaurantIdAndSeat) => {
         if (restaurantIdAndSeat) {
-            console.log(restaurantIdAndSeat);
-            navigation.navigate('MenuListScreen', {restaurantIdAndSeat});
+            navigation.navigate('MenuListScreen', {
+                restaurantIdAndSeat,
+            });
         } else if (restaurantIdAndSeat) {
             Alert.alert(
                 'Wrong QR code',
@@ -71,7 +75,7 @@ const ScanQRScreen = ({navigation}) => {
                 <TouchableOpacity
                     style={styles.buttonTouchable}
                     onPress={handleScanIssue}
-                    className="bg-gray-500">
+                    activeOpacity={0.7}>
                     <Text style={styles.buttonText}>
                         I have trouble with scanning
                     </Text>
@@ -101,19 +105,19 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     buttonTouchable: {
-        alignSelf: 'center', // This will center the button horizontally
+        alignSelf: 'center',
         marginTop: 10,
         marginBottom: 10,
         padding: 20,
-        width: '80%', // You can adjust this to set the desired width
+        width: '80%',
         alignItems: 'center',
         borderRadius: 25,
         justifyContent: 'center',
-        backgroundColor: 'gray', // This is just to give the button a background color
+        backgroundColor: 'gray',
     },
 
     topContentContainer: {
-        flex: 0.3, // Assign a fraction based on how much space you want it to occupy
+        flex: 0.3,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,

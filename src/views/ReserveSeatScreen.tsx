@@ -6,7 +6,7 @@ import {
     Platform,
     Pressable,
     ScrollView,
-    Image,
+    Image, Alert,
 } from 'react-native';
 import {firebase} from '@react-native-firebase/database';
 import DateTimePicker, {
@@ -177,64 +177,125 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
             return;
         }
 
-        const newTimes = selectedTimes.reduce(
-            (acc: {[key: string]: ReservationSlot}, time) => {
-                acc[time] = {
-                    occupied: true,
-                    user: userUid,
-                };
-                return acc;
-            },
-            {} as {[key: string]: ReservationSlot},
+        Alert.alert(
+            'Confirm reservation',
+            `Are you sure you want to reserve a seat for ${selectedTimes.join(
+                ', ',
+            )} on ${dateString}?`,
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        const newTimes = selectedTimes.reduce(
+                            (acc: {[key: string]: ReservationSlot}, time) => {
+                                acc[time] = {
+                                    occupied: true,
+                                    user: userUid,
+                                };
+                                return acc;
+                            },
+                            {} as {[key: string]: ReservationSlot},
+                        );
+
+                        const newReserved = {
+                            ...times,
+                            ...newTimes,
+                        };
+
+                        const newSeat = {
+                            ...seatRealTimeData,
+                            reserved: {
+                                ...seatRealTimeData.reserved,
+                                [dateString]: newReserved,
+                            },
+                        };
+
+                        reference
+                            .child(selectedSeatId.toString())
+                            .set(newSeat)
+                            .then(() => {
+                                firestore()
+                                    .collection('users')
+                                    .doc(userUid)
+                                    .collection('reservations')
+                                    .add({
+                                        restaurantId,
+                                        date: dateString,
+                                        times: selectedTimes,
+                                        table: selectedSeatId,
+                                    })
+                                    .then(() => {
+                                        navigation.navigate('ReservationsScreen', {
+                                            userUid: userUid,
+                                        });
+                                    })
+                                    .catch(error => {
+                                        console.log('Error adding reservation to user:', error);
+                                    });
+                            })
+                            .catch(error => {
+                                console.log('Error reserving seat:', error);
+                            });
+                        setSelectedSeatId(null);
+                        setSelectedTimes([]);
+                    },
+                },
+            ],
         );
-
-        const newReserved = {
-            ...times,
-            ...newTimes,
-        };
-
-        const newSeat = {
-            ...seatRealTimeData,
-            reserved: {
-                ...seatRealTimeData.reserved,
-                [dateString]: newReserved,
-            },
-        };
-
-        reference
-            .child(selectedSeatId.toString())
-            .set(newSeat)
-            .then(() => {
-                firestore()
-                    .collection('users')
-                    .doc(userUid)
-                    .collection('reservations')
-                    .add({
-                        restaurantId,
-                        date: dateString,
-                        times: selectedTimes,
-                        table: selectedSeatId,
-                    })
-                    .then(() => {
-                        navigation.navigate('ReservationsScreen', {
-                            userUid: userUid,
-                        });
-                    })
-                    .catch(error => {
-                        console.log('Error adding reservation to user:', error);
-                    });
-            })
-            .catch(error => {
-                console.log('Error reserving seat:', error);
-            });
-        setSelectedSeatId(null);
-        setSelectedTimes([]);
     };
 
-    const renderTimes = (id: number) => {
-        if (!tables || !realTimeData) return;
+
+    const TimeSlots = ({id}: {id: number}): JSX.Element | null => {
+        const [error, setError] = useState('');
+
+        useEffect(() => {
+            const seat = tables?.find(table => table.table === id);
+            if (!seat) {
+                setError('Seat not found.');
+                return;
+            }
+
+            const dateString = date.toISOString().split('T')[0];
+            const tableData = realTimeData?.find(table => table.id === id.toString());
+
+            if (!tableData) {
+                setError('Table not found.');
+                return;
+            }
+
+            const times = tableData.reserved?.[dateString];
+            if (!times) {
+                setError('No times found.');
+                return;
+            }
+
+            console.log('times', times);
+        }, [id, tables, realTimeData, date]);
+
+        if (error) {
+            return <Text style={styles.error}>{error}</Text>;
+        }
+
+        return renderTimes(id);
+
+    }
+
+    useEffect(() => {
+        setError('');
+    } , [selectedSeatId, date]);
+
+    const renderTimes = (id: number): JSX.Element | null => {
+        if (!tables || !realTimeData) {
+            return null;
+        }
 
         const seat = tables.find(table => table.table === id);
+
         if (!seat) {
             setError('Seat not found.');
             return null;
@@ -244,6 +305,7 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
         const tableData = realTimeData.find(
             table => table.id === id.toString(),
         );
+
         if (!tableData) {
             setError('Table not found.');
             return null;
@@ -254,6 +316,7 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
             setError('No times found.');
             return null;
         }
+        console.log('times', times);
 
         const sortedTimes = Object.keys(times).sort((a, b) => {
             const isANextDay = a.startsWith('00:');
@@ -289,6 +352,7 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
                         </Pressable>
                     ))}
                 </View>
+                {error && <Text style={styles.error}>{error}</Text>}
                 <Pressable
                     style={timesStyles.reserveButton}
                     onPress={handleReserve}>
@@ -346,6 +410,7 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
                     <View style={styles.seatsHolder}>
                         {tables.map((seat, index) => (
                             <View key={index} style={styles.seatHolder}>
+                                <>
                                 <View
                                     style={[
                                         styles.seatRow,
@@ -379,8 +444,8 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
                                         </Text>
                                     </Pressable>
                                 </View>
-                                {selectedSeatId === seat.table &&
-                                    renderTimes(seat.table)}
+                                    {selectedSeatId === seat.table && <TimeSlots id={seat.table} />}
+                                </>
                             </View>
                         ))}
                     </View>
@@ -507,6 +572,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 20,
         elevation: 10,
+    },
+    error: {
+        color: 'red',
+        fontSize: 15,
+        fontWeight: 'bold',
+        marginTop: 10,
     },
 });
 

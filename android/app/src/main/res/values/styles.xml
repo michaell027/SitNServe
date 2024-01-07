@@ -6,4 +6,8 @@
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
     </style>
 
+    <style name="Theme.MyApp" parent="Theme.MaterialComponents.DayNight">
+        <!-- ... -->
+    </style>
+
 </resources>
