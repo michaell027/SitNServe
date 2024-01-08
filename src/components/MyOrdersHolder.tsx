@@ -3,7 +3,6 @@ import {View} from 'react-native';
 import MyOrderCard from './MyOrderCard';
 import {styled} from 'nativewind';
 
-const StyledView = styled(View);
 
 const MyOrdersHolder = () => {
     const orders = [
@@ -25,13 +24,13 @@ const MyOrdersHolder = () => {
     ];
 
     return (
-        <StyledView className="p-2">
+        <View style={{flex: 1}}>
             <View>
                 {orders.map((order, index) => {
                     return <MyOrderCard order={order} key={index} />;
                 })}
             </View>
-        </StyledView>
+        </View>
     );
 };
 
