@@ -102,7 +102,7 @@ const CartScreen = ({navigation, route}: {navigation: any; route: any}) => {
                 Total: ${getTotalAmount()}
             </Text>
             <TouchableOpacity
-                onPress={() => navigation.navigate('CheckoutScreen', {restaurantIdAndSeat})}
+                onPress={() => navigation.navigate('CheckoutScreen', {restaurantIdAndSeat: restaurantIdAndSeat})}
                 style={styles.orderButton}>
                 <Text style={styles.orderButtonText}>Checkout</Text>
             </TouchableOpacity>

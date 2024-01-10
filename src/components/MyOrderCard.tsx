@@ -2,42 +2,17 @@ import React, {useRef, useState} from 'react';
 import {Image, Text, View, StyleSheet, Pressable, Animated} from 'react-native';
 import { faInfo, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-
-interface Order {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-}
+import {Order} from "../models/Order";
 
 const MyOrderCard = ({ order }: { order: Order }) => {
     const [showOrderInfo, setShowOrderInfo] = useState(false);
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
-    const orderInfo = [
-        {
-            name: 'Restaurant 1',
-            price: 10.99,
-            amount: 2,
-        },
-        {
-            name: 'Restaurant 2',
-            price: 5.99,
-            amount: 3,
-        },
-        {
-            name: 'Restaurant 3',
-            price: 2.99,
-            amount: 1,
-        },
-    ];
-
-
-    const orderInfoList = orderInfo.map((order, index) => {
+    const orderInfoList = order.items.map((order, index) => {
         return (
-            <View style={styles.itemAndPriceHolder}>
+            <View key={index} style={styles.itemAndPriceHolder}>
                 <Text style={styles.item}>
-                    {`${order.name} x${order.amount}`}
+                    {`${order.name} x${order.quantity}`}
                 </Text>
                 <Text style={styles.price}>
                     {`$${order.price.toFixed(2)}`}
@@ -48,14 +23,12 @@ const MyOrderCard = ({ order }: { order: Order }) => {
 
     const toggleOrderInfo = () => {
         if (showOrderInfo) {
-            // Fade out animation
             Animated.timing(fadeAnim, {
                 toValue: 0,
                 duration: 500,
                 useNativeDriver: true,
             }).start();
         } else {
-            // Fade in animation
             Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 500,
@@ -64,6 +37,30 @@ const MyOrderCard = ({ order }: { order: Order }) => {
         }
         setShowOrderInfo(!showOrderInfo);
     };
+
+
+    function formatDate(firebaseDateString: any) {
+        const seconds = firebaseDateString.seconds;
+        const milliseconds = firebaseDateString.nanoseconds / 1000000;
+
+        const date = new Date(0);
+        date.setUTCSeconds(seconds);
+        date.setUTCMilliseconds(milliseconds);
+
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth() + 1;
+        const year = date.getUTCFullYear();
+        const hour = date.getUTCHours();
+        const minute = date.getUTCMinutes();
+
+        const formattedDay = day < 10 ? `0${day}` : day;
+        const formattedMonth = month < 10 ? `0${month}` : month;
+        const formattedHour = hour < 10 ? `0${hour}` : hour;
+        const formattedMinute = minute < 10 ? `0${minute}` : minute;
+
+        return `${formattedDay}-${formattedMonth}-${year} ${formattedHour}:${formattedMinute}`;
+    }
+
 
 
     return (
@@ -81,9 +78,12 @@ const MyOrderCard = ({ order }: { order: Order }) => {
                         style={styles.image}
                     />
                     <View style={styles.textContainer}>
-                        <Text style={styles.nameText}>{order.name}</Text>
-                        <Text style={styles.descriptionText}>{order.description}</Text>
-                        <Text style={styles.priceText}>{`$${order.price.toFixed(2)}`}</Text>
+                        <Text style={styles.nameText}>{order.restaurantName}</Text>
+                        <Text style={styles.descriptionText}>
+                            {formatDate(order.date)}
+                        </Text>
+
+                        <Text style={styles.priceText}>{`$${order.total.toFixed(2)}`}</Text>
                     </View>
                 </View>
                 <Pressable style={styles.infoIcon} onPress={toggleOrderInfo}>

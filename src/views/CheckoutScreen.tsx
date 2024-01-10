@@ -3,13 +3,15 @@ import {View, Text, FlatList, StyleSheet, Alert, Pressable} from 'react-native';
 import { SelectedItemsContext } from '../providers/SelectedItemsContext';
 import {usePaymentSheet} from "@stripe/stripe-react-native";
 import Config from "../../config/config";
+import firestore from "@react-native-firebase/firestore";
+import {firebase} from "@react-native-firebase/database";
 
 const API_URL = Config.API_URL;
 
 const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
     const [ready, setReady] = useState(false);
     const {initPaymentSheet, presentPaymentSheet, loading} = usePaymentSheet();
-
+    const [userUid, setUserUid] = useState<string|null>(null);
     const { selectedItems, updateSelectedItems } = useContext(SelectedItemsContext);
     const {restaurantIdAndSeat} = route.params;
 
@@ -23,6 +25,26 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
     useEffect(() => {
         initializePaymentSheet().then();
     }, []);
+
+    const fetchUserUid = async () => {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            setUserUid(user.uid);
+        } else {
+            setUserUid(null);
+            navigation.navigate('LoginScreen');
+        }
+    };
+
+    useEffect(() => {
+        fetchUserUid().then();
+    }, []);
+
+    useEffect(() => {
+        console.log(userUid);
+        console.log(restaurantIdAndSeat.restaurant_id);
+        console.log(restaurantIdAndSeat.seat);
+    }  , []);
 
     const initializePaymentSheet = async () => {
         const {
@@ -65,6 +87,10 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
     }
 
     const openPaymentSheet = async () => {
+        if (userUid === null) {
+            Alert.alert('Error', 'You are not logged in!');
+            return;
+        }
         if (selectedItems.length === 0) {
             Alert.alert('Error', 'Your cart is empty!');
             return;
@@ -76,8 +102,24 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
             Alert.alert(`Error code: ${error.code}`, error.message);
         } else {
             Alert.alert('Success', 'Your order is confirmed!');
-            updateSelectedItems([]);
-
+            firestore()
+                .collection('users')
+                .doc(userUid)
+                .collection('orders')
+                .add({
+                    restaurantId: restaurantIdAndSeat.restaurant_id,
+                    seat: restaurantIdAndSeat.seat,
+                    items: selectedItems,
+                    total: calculateTotal(),
+                    date: new Date(),
+                })
+                .then(() => {
+                    navigation.navigate('OrdersScreen');
+                    updateSelectedItems([]);
+                })
+                .catch(error => {
+                    console.log('Error adding reservation to user:', error);
+                });
         }
     };
 

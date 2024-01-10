@@ -35,7 +35,7 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
 
     useEffect(() => {
         const address = user.address;
-        const structuredAddress = `${address.street} ${address.number}, ${address.city}, ${address.state}, ${address.zip}`;
+        const structuredAddress = `${address.street} ${address.number}, ${address.city}, ${address.state}, ${address.ZIPcode}`;
         setStructuredAddress(structuredAddress);
     }, [user]);
 
@@ -110,7 +110,9 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('OrdersScreen')}
+                        onPress={() => navigation.navigate('OrdersScreen', {
+                            userUid: user.uid,
+                        })}
                         style={styles.touchable}>
                         <FontAwesomeIcon icon={faBagShopping} size={20} />
                         <Text style={styles.touchableText}>My orders</Text>
