@@ -6,7 +6,7 @@ import {
     ScrollView,
     Pressable,
     Image,
-    StyleSheet,
+    StyleSheet, Dimensions,
 } from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 import {getCurrentPosition} from '../services/locationService';
@@ -15,6 +15,9 @@ import {
     getCoordinatesFromRestaurants,
 } from '../services/restaurantsService';
 import {Restaurant} from '../models/Restaurant';
+
+const height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
 
 interface MapScreenProps {
     navigation: any;
@@ -100,16 +103,8 @@ function MapScreen({navigation, route}: MapScreenProps) {
             setRestaurants(fetchedRestaurants);
             const fetchedRestaurantCoordinates: RestaurantCoordinates[] =
                 await getCoordinatesFromRestaurants(fetchedRestaurants);
-            console.log(
-                'fetchedRestaurantCoordinates: ',
-                fetchedRestaurantCoordinates,
-            );
             setRestaurantCoordinates(fetchedRestaurantCoordinates);
             fetchNearbyRestaurants(fetchedRestaurantCoordinates);
-            console.log(
-                'fetchedRestaurantCoordinates: ',
-                fetchedRestaurantCoordinates,
-            );
         } catch (error) {
             console.error('Error fetching data: ', error);
         }
@@ -292,8 +287,8 @@ function MapScreen({navigation, route}: MapScreenProps) {
                     {position && (
                         <MapView
                             style={{
-                                width: '90%',
-                                height: 300,
+                                width: width * 0.8,
+                                height: height * 0.45,
                                 marginTop: '-45%',
                             }}
                             initialRegion={{
@@ -348,8 +343,8 @@ function MapScreen({navigation, route}: MapScreenProps) {
                         </MapView>
                     )}
                 </View>
+                {position && (
                 <View
-                    //className="flex space-y-2"
                     style={{
                         marginBottom: 20,
                     }}>
@@ -405,9 +400,6 @@ function MapScreen({navigation, route}: MapScreenProps) {
                                     source={{
                                         uri: restaurant.restaurant.imageUrl,
                                     }}
-                                    // className={
-                                    //     'h-full w-full self-center rounded-xl'
-                                    // }
                                     style={{
                                         width: '100%',
                                         height: '100%',
@@ -417,9 +409,6 @@ function MapScreen({navigation, route}: MapScreenProps) {
                                 />
                             </View>
                             <View
-                                // className={
-                                //     'flex-col w-2/3 sm:w-3/4 justify-between p-4 leading-normal'
-                                // }
                                 style={{
                                     width: '70%',
                                     paddingLeft: 15,
@@ -448,6 +437,7 @@ function MapScreen({navigation, route}: MapScreenProps) {
                         </Pressable>
                     ))}
                 </View>
+                )}
             </View>
         </ScrollView>
     );
@@ -456,21 +446,30 @@ function MapScreen({navigation, route}: MapScreenProps) {
 export default MapScreen;
 
 const styles = StyleSheet.create({
-    container: {width: '100%', paddingHorizontal: 10},
-    mapContainer: {width: '100%', alignItems: 'center', paddingBottom: 20},
+    container: {
+        width: width,
+        paddingHorizontal: 10,
+        height: height * 1.2,
+        alignItems: 'center',
+    },
+    mapContainer: {
+        width: width * 0.90,
+        alignItems: 'center',
+        paddingBottom: 20
+    },
     mapHolder: {
-        width: '100%',
-        height: 300,
-        marginTop: -5,
-        backgroundColor: 'rgba(242, 191, 145, 0.5)',
+        width: width * 0.9,
+        height: height * 0.4,
+        marginTop: -15,
+        backgroundColor: '#93A8AC',
         borderRadius: 20,
         alignItems: 'center',
     },
     mapText: {
-        fontSize: 30,
+        fontSize: 28,
         fontWeight: '800',
         textAlign: 'center',
-        marginTop: 20,
+        marginTop: 25,
         marginBottom: 10,
         color: '#171E26',
     },

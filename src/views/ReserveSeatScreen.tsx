@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
     View,
     Text,
@@ -62,6 +62,7 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
 
     const isTimeInFuture = (timeSlot: string) => {
         const today = new Date();
+
         const selectedDate = date.toISOString().split('T')[0];
         const todayString = today.toISOString().split('T')[0];
 
@@ -69,11 +70,12 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
             return true;
         }
 
-        const [hours, minutes] = timeSlot.split(':').map(Number);
-        const timeSlotDate = new Date(date);
-        timeSlotDate.setHours(hours, minutes, 0, 0);
 
-        return timeSlotDate > today;
+        const hours = today.getHours();
+        const timeSlotHours = parseInt(timeSlot.split('-')[0].split(':')[0]);
+
+
+        return timeSlotHours > hours;
     };
 
 
@@ -250,18 +252,18 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
     };
 
 
-    const TimeSlots = ({id}: {id: number}): JSX.Element | null => {
+    const TimeSlots = ({ id }: { id: number }): JSX.Element | null => {
         const [error, setError] = useState('');
 
-        useEffect(() => {
-            const seat = tables?.find(table => table.table === id);
+        const fetchTimeSlotData = useCallback(() => {
+            const seat = tables?.find((table) => table.table === id);
             if (!seat) {
                 setError('Seat not found.');
                 return;
             }
 
             const dateString = date.toISOString().split('T')[0];
-            const tableData = realTimeData?.find(table => table.id === id.toString());
+            const tableData = realTimeData?.find((table) => table.id === id.toString());
 
             if (!tableData) {
                 setError('Table not found.');
@@ -277,13 +279,16 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
             console.log('times', times);
         }, [id, tables, realTimeData, date]);
 
+        useEffect(() => {
+            fetchTimeSlotData();
+        }, [fetchTimeSlotData]);
+
         if (error) {
             return <Text style={styles.error}>{error}</Text>;
         }
 
         return renderTimes(id);
-
-    }
+    };
 
     useEffect(() => {
         setError('');
@@ -318,23 +323,25 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
         }
         console.log('times', times);
 
-        const sortedTimes = Object.keys(times).sort((a, b) => {
-            const isANextDay = a.startsWith('00:');
-            const isBNextDay = b.startsWith('00:');
-            if (isANextDay && !isBNextDay) return 1;
-            if (!isANextDay && isBNextDay) return -1;
-            return a.localeCompare(b);
+        const sortedTimes: { time: string; isNextDay: boolean }[] = Object.keys(times).map((time) => {
+            const isNextDay = time.startsWith('00:');
+            return { time, isNextDay };
+        }).sort((a, b) => {
+            if (a.isNextDay && !b.isNextDay) return 1;
+            if (!a.isNextDay && b.isNextDay) return -1;
+            return a.time.localeCompare(b.time);
         });
+
 
         return (
             <View style={timesStyles.container}>
                 <View style={timesStyles.timeContainer}>
-                    {sortedTimes.map(time => (
+                    {sortedTimes.map(({time, isNextDay}) => (
                         <Pressable
                             key={time}
                             style={[
                                 timesStyles.timeButton,
-                                (times[time].occupied || !isTimeInFuture(time)) && timesStyles.occupied,
+                                ((times[time].occupied || !isTimeInFuture(time)) && !isNextDay) && timesStyles.occupied,
                                 selectedTimes.includes(time) && timesStyles.selected,
                             ]}
                             onPress={() => {
@@ -348,7 +355,9 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
                             ) : (
                                 <FontAwesomeIcon icon={faCircle} />
                             )}
-                            <Text style={timesStyles.timeText}>{time}</Text>
+                            <Text style={timesStyles.timeText}>
+                                {isNextDay ? `${new Date(date.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]} -> ${time}` : time}
+                            </Text>
                         </Pressable>
                     ))}
                 </View>

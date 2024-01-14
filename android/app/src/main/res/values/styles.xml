@@ -10,4 +10,7 @@
         <!-- ... -->
     </style>
 
+    <color name="white">#FFF</color>
+
+
 </resources>

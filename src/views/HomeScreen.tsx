@@ -34,7 +34,7 @@ const buttonDataAfterLogin = [
     {icon: faUtensils, text: 'Restaurants', navigate: 'Restaurants'},
     {icon: faMap, text: 'Map', navigate: 'MapScreen'},
     {icon: faQrcode, text: 'Scan', navigate: 'ScanQRScreen'},
-    {icon: faGear, text: 'Settings'},
+    {icon: faGear, text: 'Settings', navigate: 'SettingsScreen'},
     {icon: faUser, text: 'My profile', navigate: 'ProfileScreen'},
 ];
 

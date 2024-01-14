@@ -57,7 +57,7 @@ const MenuListScreen: React.FC<Props> = ({navigation, route}) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [count, setCount] = useState<number>(0);
     const [selectedItems, setSelectedItems] = useState<MenuItem[]>([]);
-    const {selectedItems: selectedItemsContext, updateSelectedItems} =
+    const {selectedItems: selectedItemsContext, updateSelectedItems, updateCartCount} =
         useContext(SelectedItemsContext);
 
     useLayoutEffect(() => {
@@ -113,12 +113,16 @@ const MenuListScreen: React.FC<Props> = ({navigation, route}) => {
         fetchRestaurantData().then(r => console.log('done'));
     }, [restaurantIdAndSeat]);
 
-    useEffect(() => {
+    const setCardCount = () => {
         const newCount = selectedItems.reduce(
             (acc, item) => acc + (item.quantity || 0),
             0,
         );
         setCount(newCount);
+    }
+
+    useEffect(() => {
+        updateCartCount(count);
     }, [selectedItems]);
 
     useEffect(() => {

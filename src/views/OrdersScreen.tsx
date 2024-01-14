@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView} from 'react-native';
+import {ActivityIndicator, ScrollView, StyleSheet, View} from 'react-native';
 import MyOrdersHolder from '../components/MyOrdersHolder';
 import firestore from "@react-native-firebase/firestore";
 import {Order} from "../models/Order";
@@ -12,10 +12,12 @@ interface OrdersScreenProps {
 const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
     const {userUid} = route.params;
     const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         fetchOrders().then((orders) => {
             setOrders(orders);
+            setLoading(false);
         } );
     } , []);
 
@@ -56,6 +58,13 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
                 try {
                     const imageUrlAndName = await fetchRestaurantImageUrlAndName(doc.data().restaurantId);
 
+                    const seconds = doc.data().date.seconds;
+                    const milliseconds = doc.data().date.nanoseconds / 1000000;
+
+                    const date = new Date(0);
+                    date.setUTCSeconds(seconds);
+                    date.setUTCMilliseconds(milliseconds);
+
                     if (imageUrlAndName) {
                         const order: Order = {
                             id: doc.id,
@@ -65,10 +74,12 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
                             seat: doc.data().seat,
                             total: doc.data().total,
                             date: doc.data().date,
+                            dateFormatDate: date,
                             items: doc.data().items,
                         };
 
                         orders.push(order);
+
                     } else {
                         console.error('No data found for restaurant ID:', doc.data().restaurantId);
                     }
@@ -77,12 +88,8 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
                 }
             }
 
-            const sortedOrders = orders.sort((a, b) => {
-
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-
-                return dateB.getTime() - dateA.getTime();
+            orders.sort((a, b) => {
+                return b.dateFormatDate.getTime() - a.dateFormatDate.getTime();
             } );
 
             return orders;
@@ -94,6 +101,14 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
 
     };
 
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        )
+    }
+
 
     return (
         <ScrollView>
@@ -103,3 +118,11 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
 };
 
 export default OrdersScreen;
+
+const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+});

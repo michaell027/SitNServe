@@ -1,13 +1,13 @@
 // React & React Native Imports
 import * as React from 'react';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {
     View,
     Text,
     Button,
     DrawerLayoutAndroid,
     StyleSheet,
-    Pressable,
+    Pressable, Platform,
 } from 'react-native';
 
 // Navigation Imports
@@ -24,6 +24,7 @@ import {
     faInfo,
     faPaintBrush,
     faUtensils,
+    faArrowLeft
 } from '@fortawesome/free-solid-svg-icons';
 
 // Screen Imports
@@ -55,6 +56,10 @@ import CheckoutScreen from "./src/views/CheckoutScreen";
 
 // Config Imports
 import Config from "./config/config";
+import SettingsScreen from "./src/views/SettingsScreen";
+import PushNotification, {Importance} from "react-native-push-notification";
+import messaging from "@react-native-firebase/messaging";
+import firebase from "@react-native-firebase/app";
 
 
 const Stack = createNativeStackNavigator();
@@ -150,6 +155,62 @@ function App() {
     const drawerRef = useRef<DrawerLayoutAndroid>(null);
     const [navigationObj, setNavigationObj] = useState(null);
 
+    const createChannel = (channelID) => {
+        PushNotification.createChannel(
+            {
+                channelId: channelID,
+                channelName: "Notification Channel",
+                channelDescription: "Channel for notifications",
+                playSound: true,
+                soundName: "default",
+                importance: Importance.HIGH,
+                vibrate: true,
+            },
+            (created) => console.log(`createChannel returned '${created}'`)
+        );
+    }
+    const showNotification = (channelId, options) => {
+        PushNotification.localNotification({
+            channelId: channelId,
+            subText: options.subText,
+            bigPictureUrl: options.bigPictureUrl,
+            bigLargeIconUrl: options.bigPictureUrl,
+            color: options.color,
+            vibrate: true,
+            vibration: 300,
+            ongoing: false,
+            priority: "high",
+            title: options.title,
+            message: options.message,
+        });
+    }
+
+    const handleBackgroundMessage = async (remoteMsg) => {
+        console.log('Message handled in the background!', remoteMsg);
+    };
+
+    useEffect(() => {
+        messaging()
+            .getToken(firebase.app().options.messagingSenderId)
+            .then((token) => {
+                console.log(token);
+            });
+
+        const unsubscribeOnMessage = messaging().onMessage(async (remoteMsg) => {
+            const channelId = Math.random().toString(36).substring(7);
+            createChannel(channelId);
+            showNotification(channelId, remoteMsg.notification);
+            console.log('A new FCM message arrived!', remoteMsg);
+        });
+
+        messaging().setBackgroundMessageHandler(handleBackgroundMessage);
+
+        return () => {
+            unsubscribeOnMessage();
+        };
+    }, []);
+
+
     const navigationView = ({navigation}) => (
         <View className="flex-1 bg-gray-200 p-0 dark:bg-gray-500">
             <Text className="p-4 py-16 text-center text-lg text-black dark:text-white">
@@ -189,6 +250,7 @@ function App() {
         </View>
     );
 
+    // @ts-ignore
     return (
         <RestaurantProvider>
             <SelectedItemsProvider>
@@ -294,6 +356,20 @@ function App() {
                     <Stack.Screen
                         name="ProfileScreen"
                         component={ProfileScreen}
+                        options={{
+                            headerLeft: () => (
+                                <HeaderButtons>
+
+                                    <Pressable onPress={() => {
+                                        // @ts-ignore
+                                        navigationObj.navigate('Home')}
+                                    }>
+                                        <FontAwesomeIcon icon={faArrowLeft} />
+                                    </Pressable>
+
+                                </HeaderButtons>
+                            ),
+                        }}
                     />
                     <Stack.Screen
                         name="RegisterScreen"
@@ -303,11 +379,28 @@ function App() {
                     <Stack.Screen name="AboutScreen" component={AboutScreen} />
                     <Stack.Screen name="LoginScreen" component={LoginScreen} />
                     <Stack.Screen name="FavoriteRestaurantsScreen" component={FavoriteRestaurantsScreen}/>
-                    <Stack.Screen name="OrdersScreen" component={OrdersScreen}/>
+                    <Stack.Screen
+                        name="OrdersScreen"
+                        options={{
+                            headerLeft: () => (
+                                <HeaderButtons>
+
+                                    <Pressable onPress={() => {
+                                        // @ts-ignore
+                                        navigationObj.navigate('ProfileScreen')}
+                                    }>
+                                        <FontAwesomeIcon icon={faArrowLeft} />
+                                    </Pressable>
+
+                                </HeaderButtons>
+                            ),
+                        }}
+                        component={OrdersScreen}/>
                     <Stack.Screen name="ReservationsScreen" component={ReservationsScreen}/>
                     <Stack.Screen name="CartScreen" component={CartScreen}/>
                     <Stack.Screen name="ScanQRScreen" component={ScanQRScreen}/>
                     <Stack.Screen name="CheckoutScreen" component={CheckoutScreen}/>
+                    <Stack.Screen name="SettingsScreen" component={SettingsScreen}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </DrawerLayoutAndroid>

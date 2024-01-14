@@ -91,7 +91,7 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
                         </View>
                         <View style={styles.secondColumn}>
                             <Text style={styles.dividerTitle}>Orders</Text>
-                            <Text style={styles.dividerText}>12</Text>
+                            <Text style={styles.dividerText}>{user.orders}</Text>
                         </View>
                     </View>
 

@@ -5,8 +5,11 @@ import {usePaymentSheet} from "@stripe/stripe-react-native";
 import Config from "../../config/config";
 import firestore from "@react-native-firebase/firestore";
 import {firebase} from "@react-native-firebase/database";
+import PushNotification, {Importance} from "react-native-push-notification";
+import messaging from "@react-native-firebase/messaging";
 
 const API_URL = Config.API_URL;
+const MESSAGE_API_URL = Config.MESSAGE_API_URL;
 
 const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
     const [ready, setReady] = useState(false);
@@ -114,14 +117,45 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
                     date: new Date(),
                 })
                 .then(() => {
-                    navigation.navigate('OrdersScreen');
+                    navigation.navigate('OrdersScreen', {
+                        userUid: userUid,
+                    });
                     updateSelectedItems([]);
+                    getPushNotification();
                 })
                 .catch(error => {
                     console.log('Error adding reservation to user:', error);
                 });
         }
     };
+
+    const getFCMToken = async () => {
+        try {
+            const token = await messaging().getToken();
+            console.log('FCM Token:', token);
+            return token;
+        } catch (error) {
+            console.error('Error getting FCM token:', error);
+        }
+    };
+
+    const getPushNotification = async () => {
+        const deviceToken = await getFCMToken();
+
+        try {
+            const response = await fetch(MESSAGE_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ deviceToken }),
+            });
+
+        } catch (error) {
+            console.error('Error sending FCM token to server:', error);
+        }
+    };
+
 
 
     const getTotalAmount = () => {
@@ -150,7 +184,14 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
             />
             <View style={styles.footer}>
                 <Text style={styles.total}>Total: ${calculateTotal().toFixed(2)}</Text>
-                <Pressable style={styles.button} onPress={() => {openPaymentSheet()}} >
+                <Pressable
+                    disabled={!ready || loading}
+                    style={({ pressed }) => [
+                        styles.button,
+                        { opacity: pressed || !ready || loading ? 0.5 : 1 },
+                        !ready || loading ? styles.disabledButton : null
+                    ]}
+                    onPress={() => { openPaymentSheet() }}>
                     <Text style={styles.buttonText}>Checkout</Text>
                 </Pressable>
             </View>
@@ -225,6 +266,9 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold'
+    },
+    disabledButton: {
+        backgroundColor: '#ccc'
     }
 });
 

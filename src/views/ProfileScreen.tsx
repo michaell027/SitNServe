@@ -6,6 +6,7 @@ import LoginForm from '../components/LoginForm';
 import ProfileCard from '../components/ProfileCard';
 import {User} from '../models/User';
 import firestore from '@react-native-firebase/firestore';
+import {Address} from "../models/Address";
 
 interface ProfileScreenProps {
     navigation: any;
@@ -17,6 +18,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+
+        async function getNumberOfOrders(uid: string) {
+            const ordersRef = firestore()
+                .collection('users')
+                .doc(uid)
+                .collection('orders');
+            const orders = await ordersRef.get();
+            return orders.docs.length;
+        }
+
         const subscriber = auth().onAuthStateChanged(
             async authenticatedUser => {
                 setLoading(true);
@@ -26,7 +37,24 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
                             .collection('users')
                             .doc(authenticatedUser.uid);
                         const document = await userRef.get();
-                        const user = document.data() as User;
+                        const orders = getNumberOfOrders(authenticatedUser.uid);
+                        const user = {
+                            uid: authenticatedUser.uid,
+                            email: authenticatedUser.email,
+                            address: {
+                                state: document.get('address.state'),
+                                street: document.get('address.street'),
+                                number: document.get('address.number'),
+                                address: document.get('address.address'),
+                                city: document.get('address.city'),
+                                ZIPcode: document.get('address.ZIPcode'),
+                            } as Address,
+                            firstName: document.get('firstName'),
+                            lastName: document.get('lastName'),
+                            phone: document.get('phone'),
+                            creationDate: document.get('creationDate'),
+                            orders: await orders,
+                        } as User;
                         setUser(user);
                     } else {
                         AsyncStorage.removeItem('user_uid').then(() => {

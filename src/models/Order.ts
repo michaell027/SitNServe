@@ -13,5 +13,6 @@ export interface Order {
     seat: string;
     total: number;
     date: Date;
+    dateFormatDate: Date;
     items: OrderItem[];
 }
