@@ -6,7 +6,8 @@ import {
     ScrollView,
     Pressable,
     Image,
-    StyleSheet, Dimensions,
+    StyleSheet,
+    Dimensions,
 } from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 import {getCurrentPosition} from '../services/locationService';
@@ -344,99 +345,99 @@ function MapScreen({navigation, route}: MapScreenProps) {
                     )}
                 </View>
                 {position && (
-                <View
-                    style={{
-                        marginBottom: 20,
-                    }}>
-                    {nearbyRestaurants.length > 0 ? (
-                        <Text
-                            style={{
-                                marginBottom: 10,
-                                fontSize: 30,
-                                fontWeight: '800',
-                                textAlign: 'center',
-                                color: '#171E26',
-                            }}>
-                            Nearby Restaurants:{' '}
-                        </Text>
-                    ) : (
-                        <Text
-                            style={{
-                                marginBottom: 10,
-                                fontSize: 30,
-                                fontWeight: '800',
-                                textAlign: 'center',
-                                color: '#171E26',
-                            }}>
-                            No Nearby Restaurants...
-                        </Text>
-                    )}
-                    {nearbyRestaurants.map((restaurant, index) => (
-                        <Pressable
-                            onPress={() =>
-                                navigation.navigate('Restaurant', {
-                                    restaurantId: restaurant.restaurant.id,
-                                })
-                            }
-                            key={index}
-                            style={{
-                                flexDirection: 'row',
-                                width: '100%',
-                                marginTop: 10,
-                                padding: 10,
-                                borderRadius: 10,
-                                backgroundColor: 'rgba(200, 200, 200, 0.5)',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                            <View
+                    <View
+                        style={{
+                            marginBottom: 20,
+                        }}>
+                        {nearbyRestaurants.length > 0 ? (
+                            <Text
                                 style={{
-                                    width: '30%',
-                                    height: 100,
+                                    marginBottom: 10,
+                                    fontSize: 30,
+                                    fontWeight: '800',
+                                    textAlign: 'center',
+                                    color: '#171E26',
+                                }}>
+                                Nearby Restaurants:{' '}
+                            </Text>
+                        ) : (
+                            <Text
+                                style={{
+                                    marginBottom: 10,
+                                    fontSize: 30,
+                                    fontWeight: '800',
+                                    textAlign: 'center',
+                                    color: '#171E26',
+                                }}>
+                                No Nearby Restaurants...
+                            </Text>
+                        )}
+                        {nearbyRestaurants.map((restaurant, index) => (
+                            <Pressable
+                                onPress={() =>
+                                    navigation.navigate('Restaurant', {
+                                        restaurantId: restaurant.restaurant.id,
+                                    })
+                                }
+                                key={index}
+                                style={{
+                                    flexDirection: 'row',
+                                    width: '100%',
+                                    marginTop: 10,
+                                    padding: 10,
+                                    borderRadius: 10,
+                                    backgroundColor: 'rgba(200, 200, 200, 0.5)',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                 }}>
-                                <Image
-                                    source={{
-                                        uri: restaurant.restaurant.imageUrl,
-                                    }}
+                                <View
                                     style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        borderRadius: 10,
-                                    }}
-                                    resizeMode="cover"
-                                />
-                            </View>
-                            <View
-                                style={{
-                                    width: '70%',
-                                    paddingLeft: 15,
-                                }}>
-                                <Text
-                                    style={{
-                                        fontSize: 24,
-                                        fontWeight: 'bold',
-                                        color: '#171E26',
-                                        marginBottom: 5,
+                                        width: '30%',
+                                        height: 100,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
                                     }}>
-                                    {restaurant.restaurant.name}
-                                </Text>
-                                <Text
+                                    <Image
+                                        source={{
+                                            uri: restaurant.restaurant.imageUrl,
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            borderRadius: 10,
+                                        }}
+                                        resizeMode="cover"
+                                    />
+                                </View>
+                                <View
                                     style={{
-                                        fontSize: 16,
-                                        color: '#171E26',
-                                        marginBottom: 5,
+                                        width: '70%',
+                                        paddingLeft: 15,
                                     }}>
-                                    {truncateDescription(
-                                        restaurant.restaurant.description,
-                                        20,
-                                    )}
-                                </Text>
-                            </View>
-                        </Pressable>
-                    ))}
-                </View>
+                                    <Text
+                                        style={{
+                                            fontSize: 24,
+                                            fontWeight: 'bold',
+                                            color: '#171E26',
+                                            marginBottom: 5,
+                                        }}>
+                                        {restaurant.restaurant.name}
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            fontSize: 16,
+                                            color: '#171E26',
+                                            marginBottom: 5,
+                                        }}>
+                                        {truncateDescription(
+                                            restaurant.restaurant.description,
+                                            20,
+                                        )}
+                                    </Text>
+                                </View>
+                            </Pressable>
+                        ))}
+                    </View>
                 )}
             </View>
         </ScrollView>
@@ -453,9 +454,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     mapContainer: {
-        width: width * 0.90,
+        width: width * 0.9,
         alignItems: 'center',
-        paddingBottom: 20
+        paddingBottom: 20,
     },
     mapHolder: {
         width: width * 0.9,

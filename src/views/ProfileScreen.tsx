@@ -6,7 +6,7 @@ import LoginForm from '../components/LoginForm';
 import ProfileCard from '../components/ProfileCard';
 import {User} from '../models/User';
 import firestore from '@react-native-firebase/firestore';
-import {Address} from "../models/Address";
+import {Address} from '../models/Address';
 
 interface ProfileScreenProps {
     navigation: any;
@@ -18,7 +18,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
         async function getNumberOfOrders(uid: string) {
             const ordersRef = firestore()
                 .collection('users')

@@ -1,10 +1,10 @@
 import React, {useRef, useState} from 'react';
 import {Image, Text, View, StyleSheet, Pressable, Animated} from 'react-native';
-import { faInfo, faReceipt } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {Order} from "../models/Order";
+import {faInfo, faReceipt} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {Order} from '../models/Order';
 
-const MyOrderCard = ({ order }: { order: Order }) => {
+const MyOrderCard = ({order}: {order: Order}) => {
     const [showOrderInfo, setShowOrderInfo] = useState(false);
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -14,9 +14,7 @@ const MyOrderCard = ({ order }: { order: Order }) => {
                 <Text style={styles.item}>
                     {`${order.name} x${order.quantity}`}
                 </Text>
-                <Text style={styles.price}>
-                    {`$${order.price.toFixed(2)}`}
-                </Text>
+                <Text style={styles.price}>{`$${order.price.toFixed(2)}`}</Text>
             </View>
         );
     });
@@ -37,7 +35,6 @@ const MyOrderCard = ({ order }: { order: Order }) => {
         }
         setShowOrderInfo(!showOrderInfo);
     };
-
 
     function formatDate(firebaseDateString: any) {
         const seconds = firebaseDateString.seconds;
@@ -61,47 +58,48 @@ const MyOrderCard = ({ order }: { order: Order }) => {
         return `${formattedDay}-${formattedMonth}-${year} ${formattedHour}:${formattedMinute}`;
     }
 
-
-
     return (
-<View style={styles.holder}>
-        <View style={styles.container}>
-            <View style={styles.iconContainer}>
-                <View style={styles.receiptIcon}>
-                    <FontAwesomeIcon icon={faReceipt} size={15} />
-                </View>
-            </View>
-            <View style={styles.contentContainer}>
-                <View style={styles.imageAndText}>
-                    <Image
-                        source={require('../../assets/images/breakfast2.png')}
-                        style={styles.image}
-                    />
-                    <View style={styles.textContainer}>
-                        <Text style={styles.nameText}>{order.restaurantName}</Text>
-                        <Text style={styles.descriptionText}>
-                            {formatDate(order.date)}
-                        </Text>
-
-                        <Text style={styles.priceText}>{`$${order.total.toFixed(2)}`}</Text>
+        <View style={styles.holder}>
+            <View style={styles.container}>
+                <View style={styles.iconContainer}>
+                    <View style={styles.receiptIcon}>
+                        <FontAwesomeIcon icon={faReceipt} size={15} />
                     </View>
                 </View>
-                <Pressable style={styles.infoIcon} onPress={toggleOrderInfo}>
-                    <FontAwesomeIcon icon={faInfo} />
-                </Pressable>
+                <View style={styles.contentContainer}>
+                    <View style={styles.imageAndText}>
+                        <Image
+                            source={require('../../assets/images/breakfast2.png')}
+                            style={styles.image}
+                        />
+                        <View style={styles.textContainer}>
+                            <Text style={styles.nameText}>
+                                {order.restaurantName}
+                            </Text>
+                            <Text style={styles.descriptionText}>
+                                {formatDate(order.date)}
+                            </Text>
+
+                            <Text
+                                style={
+                                    styles.priceText
+                                }>{`$${order.total.toFixed(2)}`}</Text>
+                        </View>
+                    </View>
+                    <Pressable
+                        style={styles.infoIcon}
+                        onPress={toggleOrderInfo}>
+                        <FontAwesomeIcon icon={faInfo} />
+                    </Pressable>
+                </View>
             </View>
+            {showOrderInfo && (
+                <Animated.View
+                    style={[styles.orderInfoHolder, {opacity: fadeAnim}]}>
+                    {orderInfoList}
+                </Animated.View>
+            )}
         </View>
-    {showOrderInfo && (
-        <Animated.View
-            style={[
-                styles.orderInfoHolder,
-                { opacity: fadeAnim }
-            ]}
-        >
-            {orderInfoList}
-        </Animated.View>
-    )}
-</View>
     );
 };
 

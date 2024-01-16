@@ -14,13 +14,13 @@ export const SelectedItemsContext = React.createContext({
 
 export function SelectedItemsProvider({children}: SelectedItemsProviderProps) {
     const [selectedItems, setSelectedItems] = useState<MenuItem[]>([]);
-    const [cartCount, setCartCount] = useState(0); // state for cart count
+    const [cartCount, setCartCount] = useState(0);
 
     const updateSelectedItems = (newItems: MenuItem[]) => {
         setSelectedItems(newItems);
         updateCartCount(
             newItems.reduce((acc, item) => acc + (item.quantity || 0), 0),
-        ); // Update cart count whenever items are updated
+        );
     };
 
     const updateCartCount = (newCount: number) => {
@@ -31,9 +31,9 @@ export function SelectedItemsProvider({children}: SelectedItemsProviderProps) {
         <SelectedItemsContext.Provider
             value={{
                 selectedItems,
-                cartCount, // provide cart count in context
+                cartCount,
                 updateSelectedItems,
-                updateCartCount, // provide method to update cart count
+                updateCartCount,
             }}>
             {children}
         </SelectedItemsContext.Provider>

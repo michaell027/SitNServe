@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 10,
         width: '90%',
-        gap: 100,
+        gap: 35,
     },
     button: {
         flexDirection: 'row',

@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, ScrollView, StyleSheet, View} from 'react-native';
 import MyOrdersHolder from '../components/MyOrdersHolder';
-import firestore from "@react-native-firebase/firestore";
-import {Order} from "../models/Order";
+import firestore from '@react-native-firebase/firestore';
+import {Order} from '../models/Order';
 
 interface OrdersScreenProps {
     navigation: any;
@@ -15,11 +15,11 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        fetchOrders().then((orders) => {
+        fetchOrders().then(orders => {
             setOrders(orders);
             setLoading(false);
-        } );
-    } , []);
+        });
+    }, []);
 
     const fetchOrders = async () => {
         const fetchRestaurantImageUrlAndName = async (restaurantId: string) => {
@@ -56,7 +56,10 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
 
             for (const doc of snapshot.docs) {
                 try {
-                    const imageUrlAndName = await fetchRestaurantImageUrlAndName(doc.data().restaurantId);
+                    const imageUrlAndName =
+                        await fetchRestaurantImageUrlAndName(
+                            doc.data().restaurantId,
+                        );
 
                     const seconds = doc.data().date.seconds;
                     const milliseconds = doc.data().date.nanoseconds / 1000000;
@@ -79,9 +82,11 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
                         };
 
                         orders.push(order);
-
                     } else {
-                        console.error('No data found for restaurant ID:', doc.data().restaurantId);
+                        console.error(
+                            'No data found for restaurant ID:',
+                            doc.data().restaurantId,
+                        );
                     }
                 } catch (error) {
                     console.error('Error processing order:', error);
@@ -90,15 +95,13 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
 
             orders.sort((a, b) => {
                 return b.dateFormatDate.getTime() - a.dateFormatDate.getTime();
-            } );
+            });
 
             return orders;
-
         } catch (error) {
             console.error('Error fetching orders:', error);
             throw error;
         }
-
     };
 
     if (loading) {
@@ -106,9 +109,8 @@ const OrdersScreen = ({navigation, route}: OrdersScreenProps) => {
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
-        )
+        );
     }
-
 
     return (
         <ScrollView>

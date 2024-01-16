@@ -5,11 +5,13 @@ import {
     ScrollView,
     Image,
     StyleSheet,
-    ActivityIndicator, TouchableOpacity, Alert,
+    ActivityIndicator,
+    TouchableOpacity,
+    Alert,
 } from 'react-native';
 import {Reservation} from '../models/Reservation';
 import firestore from '@react-native-firebase/firestore';
-import {firebase} from "@react-native-firebase/database";
+import {firebase} from '@react-native-firebase/database';
 
 interface ReservationsScreenProps {
     route: any;
@@ -25,9 +27,7 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
     const [upcomingReservations, setUpcomingReservations] = useState<
         Reservation[]
     >([]);
-    const [pastReservations, setPastReservations] = useState<Reservation[]>(
-        [],
-    );
+    const [pastReservations, setPastReservations] = useState<Reservation[]>([]);
     let isMounted = true;
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -97,7 +97,7 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
                             reservation.date > date ||
                             (reservation.date === date &&
                                 reservation.times.some(
-                                    (reservationTime : string) =>
+                                    (reservationTime: string) =>
                                         reservationTime > time,
                                 )),
                     );
@@ -107,7 +107,7 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
                             reservation.date < date ||
                             (reservation.date === date &&
                                 reservation.times.every(
-                                    (reservationTime : string) =>
+                                    (reservationTime: string) =>
                                         reservationTime < time,
                                 )),
                     );
@@ -141,39 +141,62 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
         );
     }
 
-    function handleCancelReservation(reservationId: string, restaurantId: string, tableId: string, times: string[], date: string) {
-        console.log("Cancelling reservation with id", reservationId);
+    function handleCancelReservation(
+        reservationId: string,
+        restaurantId: string,
+        tableId: string,
+        times: string[],
+        date: string,
+    ) {
+        console.log('Cancelling reservation with id', reservationId);
 
         Alert.alert(
-            "Cancel reservation",
-            "Are you sure you want to cancel this reservation?",
+            'Cancel reservation',
+            'Are you sure you want to cancel this reservation?',
             [
                 {
-                    text: "Cancel",
-                    style: "cancel"
+                    text: 'Cancel',
+                    style: 'cancel',
                 },
                 {
-                    text: "Yes",
-                    onPress: () => cancelReservation(reservationId, restaurantId, tableId, times, date)
-                }
-            ]
+                    text: 'Yes',
+                    onPress: () =>
+                        cancelReservation(
+                            reservationId,
+                            restaurantId,
+                            tableId,
+                            times,
+                            date,
+                        ),
+                },
+            ],
         );
     }
 
-    const cancelReservation = async (reservationId: string, restaurantId: string, tableId: string, times: string[], date: string) => {
+    const cancelReservation = async (
+        reservationId: string,
+        restaurantId: string,
+        tableId: string,
+        times: string[],
+        date: string,
+    ) => {
         const firestoreRef = firestore()
             .collection('users')
             .doc(userUid)
             .collection('reservations')
             .doc(reservationId);
 
-        const dbUrl = 'https://sitnserve-fbaed-default-rtdb.europe-west1.firebasedatabase.app/';
+        const dbUrl =
+            'https://sitnserve-fbaed-default-rtdb.europe-west1.firebasedatabase.app/';
         const firebaseRef = firebase
             .app()
             .database(dbUrl)
-            .ref(`/restaurant_id/${restaurantId}/tables/${tableId}/reserved/${date}`);
+            .ref(
+                `/restaurant_id/${restaurantId}/tables/${tableId}/reserved/${date}`,
+            );
 
-        firestoreRef.delete()
+        firestoreRef
+            .delete()
             .then(() => {
                 return firebaseRef.once('value');
             })
@@ -181,25 +204,38 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
                 let reservationData = snapshot.val();
                 if (reservationData) {
                     times.forEach(time => {
-                        if (reservationData[time] && reservationData[time].occupied) {
+                        if (
+                            reservationData[time] &&
+                            reservationData[time].occupied
+                        ) {
                             reservationData[time].occupied = false;
-                            reservationData[time].user = "";
+                            reservationData[time].user = '';
                         }
                     });
                     return firebaseRef.update(reservationData);
                 } else {
-                    throw new Error("No reservation data found for the specified time");
+                    throw new Error(
+                        'No reservation data found for the specified time',
+                    );
                 }
             })
             .then(() => {
-                console.log("Reservation cancelled successfully");
-                setReservations(prevReservations => prevReservations.filter(reservation => reservation.id !== reservationId));
-                setUpcomingReservations(prevUpcoming => prevUpcoming.filter(reservation => reservation.id !== reservationId));
+                console.log('Reservation cancelled successfully');
+                setReservations(prevReservations =>
+                    prevReservations.filter(
+                        reservation => reservation.id !== reservationId,
+                    ),
+                );
+                setUpcomingReservations(prevUpcoming =>
+                    prevUpcoming.filter(
+                        reservation => reservation.id !== reservationId,
+                    ),
+                );
             })
             .catch(error => {
-                console.error("Error during reservation cancellation:", error);
+                console.error('Error during reservation cancellation:', error);
             });
-    }
+    };
 
     return (
         <View style={styles.container}>
@@ -231,9 +267,18 @@ const ReservationsScreen: React.FC<ReservationsScreenProps> = ({
                             </Text>
                             <TouchableOpacity
                                 style={styles.cancelButton}
-                                onPress={() => handleCancelReservation(reservation.id, reservation.restaurantId, reservation.tableId, reservation.times, reservation.date)}
-                            >
-                                <Text style={styles.cancelButtonText}>Cancel Reservation</Text>
+                                onPress={() =>
+                                    handleCancelReservation(
+                                        reservation.id,
+                                        reservation.restaurantId,
+                                        reservation.tableId,
+                                        reservation.times,
+                                        reservation.date,
+                                    )
+                                }>
+                                <Text style={styles.cancelButtonText}>
+                                    Cancel Reservation
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </View>

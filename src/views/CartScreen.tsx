@@ -1,10 +1,17 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Text, View, FlatList, TouchableOpacity, StyleSheet, Alert, Button} from 'react-native';
+import {
+    Text,
+    View,
+    FlatList,
+    TouchableOpacity,
+    StyleSheet,
+    Alert,
+    Button,
+} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
 import {SelectedItemsContext} from '../providers/SelectedItemsContext';
 import {MenuItem} from './MenuListScreen';
-
 
 const CartScreen = ({navigation, route}: {navigation: any; route: any}) => {
     const {selectedItems, updateSelectedItems} =
@@ -13,7 +20,7 @@ const CartScreen = ({navigation, route}: {navigation: any; route: any}) => {
 
     useEffect(() => {
         console.log(restaurantIdAndSeat);
-    }   , []);
+    }, []);
 
     const getTotalAmount = () => {
         return selectedItems
@@ -102,7 +109,11 @@ const CartScreen = ({navigation, route}: {navigation: any; route: any}) => {
                 Total: ${getTotalAmount()}
             </Text>
             <TouchableOpacity
-                onPress={() => navigation.navigate('CheckoutScreen', {restaurantIdAndSeat: restaurantIdAndSeat})}
+                onPress={() =>
+                    navigation.navigate('CheckoutScreen', {
+                        restaurantIdAndSeat: restaurantIdAndSeat,
+                    })
+                }
                 style={styles.orderButton}>
                 <Text style={styles.orderButtonText}>Checkout</Text>
             </TouchableOpacity>

@@ -91,7 +91,9 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
                         </View>
                         <View style={styles.secondColumn}>
                             <Text style={styles.dividerTitle}>Orders</Text>
-                            <Text style={styles.dividerText}>{user.orders}</Text>
+                            <Text style={styles.dividerText}>
+                                {user.orders}
+                            </Text>
                         </View>
                     </View>
 
@@ -101,18 +103,20 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
                             navigation.navigate('FavoriteRestaurantsScreen')
                         }>
                         <FontAwesomeIcon icon={faHeart} size={20} />
-                        <Text style={styles.touchableText}>Favourite</Text>
+                        <Text style={styles.touchableText}>Favorite</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.touchable}>
-                        <FontAwesomeIcon icon={faCreditCard} size={20} />
-                        <Text style={styles.touchableText}>
-                            Payment methods
-                        </Text>
-                    </TouchableOpacity>
+                    {/*<TouchableOpacity style={styles.touchable}>*/}
+                    {/*    <FontAwesomeIcon icon={faCreditCard} size={20} />*/}
+                    {/*    <Text style={styles.touchableText}>*/}
+                    {/*        Payment methods*/}
+                    {/*    </Text>*/}
+                    {/*</TouchableOpacity>*/}
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('OrdersScreen', {
-                            userUid: user.uid,
-                        })}
+                        onPress={() =>
+                            navigation.navigate('OrdersScreen', {
+                                userUid: user.uid,
+                            })
+                        }
                         style={styles.touchable}>
                         <FontAwesomeIcon icon={faBagShopping} size={20} />
                         <Text style={styles.touchableText}>My orders</Text>
@@ -129,12 +133,18 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
                             My reservations
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.touchable}>
-                        <FontAwesomeIcon icon={faStar} size={20} />
-                        <Text style={styles.touchableText}>Reviews</Text>
-                    </TouchableOpacity>
+                    {/*<TouchableOpacity style={styles.touchable}>*/}
+                    {/*    <FontAwesomeIcon icon={faStar} size={20} />*/}
+                    {/*    <Text style={styles.touchableText}>Reviews</Text>*/}
+                    {/*</TouchableOpacity>*/}
                     <View style={styles.bottomSection}>
-                        <TouchableOpacity style={styles.editProfileButton}>
+                        <TouchableOpacity
+                            style={styles.editProfileButton}
+                            onPress={() =>
+                                navigation.navigate('EditProfileScreen', {
+                                    user: user,
+                                })
+                            }>
                             <FontAwesomeIcon
                                 icon={faGears}
                                 color="#fff"

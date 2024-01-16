@@ -3,14 +3,16 @@ import {
     View,
     Text,
     StyleSheet,
-    ScrollView, Pressable, Dimensions,
+    ScrollView,
+    Pressable,
+    Dimensions,
 } from 'react-native';
-import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
-import {faUser} from "@fortawesome/free-regular-svg-icons";
-import {faArrowRight} from "@fortawesome/free-solid-svg-icons";
-import Config from "../../config/config";
-import firebase from "@react-native-firebase/app";
-import messaging from "@react-native-firebase/messaging";
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faUser} from '@fortawesome/free-regular-svg-icons';
+import {faArrowRight} from '@fortawesome/free-solid-svg-icons';
+import Config from '../../config/config';
+import firebase from '@react-native-firebase/app';
+import messaging from '@react-native-firebase/messaging';
 
 const API_URL = Config.MESSAGE_API_URL;
 
@@ -20,17 +22,17 @@ const SettingsScreen = () => {
     return (
         <ScrollView>
             <View style={styles.container}>
-            <Pressable style={styles.option}>
-                <View style={styles.iconHolder}>
-                    <FontAwesomeIcon icon={faUser} />
-                </View>
-                <View style={styles.textHolder}>
-                    <Text style={styles.text}>Account</Text>
-                </View>
-                <View style={styles.arrowHolder}>
-                    <FontAwesomeIcon icon={faArrowRight} size={22} />
-                </View>
-            </Pressable>
+                <Pressable style={styles.option}>
+                    <View style={styles.iconHolder}>
+                        <FontAwesomeIcon icon={faUser} />
+                    </View>
+                    <View style={styles.textHolder}>
+                        <Text style={styles.text}>Account</Text>
+                    </View>
+                    <View style={styles.arrowHolder}>
+                        <FontAwesomeIcon icon={faArrowRight} size={22} />
+                    </View>
+                </Pressable>
             </View>
         </ScrollView>
     );
@@ -41,7 +43,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 20,
         backgroundColor: '#fff',
-        height: height
+        height: height,
     },
     option: {
         flexDirection: 'row',

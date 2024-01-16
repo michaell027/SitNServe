@@ -6,7 +6,8 @@ import {
     Platform,
     Pressable,
     ScrollView,
-    Image, Alert,
+    Image,
+    Alert,
 } from 'react-native';
 import {firebase} from '@react-native-firebase/database';
 import DateTimePicker, {
@@ -70,14 +71,11 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
             return true;
         }
 
-
         const hours = today.getHours();
         const timeSlotHours = parseInt(timeSlot.split('-')[0].split(':')[0]);
 
-
         return timeSlotHours > hours;
     };
-
 
     const fetchRealTimeData = () => {
         reference.on('value', snapshot => {
@@ -232,12 +230,18 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
                                         table: selectedSeatId,
                                     })
                                     .then(() => {
-                                        navigation.navigate('ReservationsScreen', {
-                                            userUid: userUid,
-                                        });
+                                        navigation.navigate(
+                                            'ReservationsScreen',
+                                            {
+                                                userUid: userUid,
+                                            },
+                                        );
                                     })
                                     .catch(error => {
-                                        console.log('Error adding reservation to user:', error);
+                                        console.log(
+                                            'Error adding reservation to user:',
+                                            error,
+                                        );
                                     });
                             })
                             .catch(error => {
@@ -251,19 +255,20 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
         );
     };
 
-
-    const TimeSlots = ({ id }: { id: number }): JSX.Element | null => {
+    const TimeSlots = ({id}: {id: number}): JSX.Element | null => {
         const [error, setError] = useState('');
 
         const fetchTimeSlotData = useCallback(() => {
-            const seat = tables?.find((table) => table.table === id);
+            const seat = tables?.find(table => table.table === id);
             if (!seat) {
                 setError('Seat not found.');
                 return;
             }
 
             const dateString = date.toISOString().split('T')[0];
-            const tableData = realTimeData?.find((table) => table.id === id.toString());
+            const tableData = realTimeData?.find(
+                table => table.id === id.toString(),
+            );
 
             if (!tableData) {
                 setError('Table not found.');
@@ -292,7 +297,7 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
 
     useEffect(() => {
         setError('');
-    } , [selectedSeatId, date]);
+    }, [selectedSeatId, date]);
 
     const renderTimes = (id: number): JSX.Element | null => {
         if (!tables || !realTimeData) {
@@ -323,15 +328,18 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
         }
         console.log('times', times);
 
-        const sortedTimes: { time: string; isNextDay: boolean }[] = Object.keys(times).map((time) => {
-            const isNextDay = time.startsWith('00:');
-            return { time, isNextDay };
-        }).sort((a, b) => {
-            if (a.isNextDay && !b.isNextDay) return 1;
-            if (!a.isNextDay && b.isNextDay) return -1;
-            return a.time.localeCompare(b.time);
-        });
-
+        const sortedTimes: {time: string; isNextDay: boolean}[] = Object.keys(
+            times,
+        )
+            .map(time => {
+                const isNextDay = time.startsWith('00:');
+                return {time, isNextDay};
+            })
+            .sort((a, b) => {
+                if (a.isNextDay && !b.isNextDay) return 1;
+                if (!a.isNextDay && b.isNextDay) return -1;
+                return a.time.localeCompare(b.time);
+            });
 
         return (
             <View style={timesStyles.container}>
@@ -341,22 +349,40 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
                             key={time}
                             style={[
                                 timesStyles.timeButton,
-                                ((times[time].occupied || !isTimeInFuture(time)) && !isNextDay) && timesStyles.occupied,
-                                selectedTimes.includes(time) && timesStyles.selected,
+                                (times[time].occupied ||
+                                    !isTimeInFuture(time)) &&
+                                    !isNextDay &&
+                                    timesStyles.occupied,
+                                selectedTimes.includes(time) &&
+                                    timesStyles.selected,
                             ]}
                             onPress={() => {
-                                if (!times[time].occupied && isTimeInFuture(time)) {
+                                if (
+                                    !times[time].occupied &&
+                                    isTimeInFuture(time)
+                                ) {
                                     handleTimeSelect(time);
                                 }
                             }}
-                            disabled={times[time].occupied || !isTimeInFuture(time)}>
+                            disabled={
+                                times[time].occupied || !isTimeInFuture(time)
+                            }>
                             {selectedTimes.includes(time) ? (
                                 <FontAwesomeIcon icon={faCircleCheck} />
                             ) : (
                                 <FontAwesomeIcon icon={faCircle} />
                             )}
                             <Text style={timesStyles.timeText}>
-                                {isNextDay ? `${new Date(date.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]} -> ${time}` : time}
+                                {isNextDay
+                                    ? `${
+                                          new Date(
+                                              date.getTime() +
+                                                  24 * 60 * 60 * 1000,
+                                          )
+                                              .toISOString()
+                                              .split('T')[0]
+                                      } -> ${time}`
+                                    : time}
                             </Text>
                         </Pressable>
                     ))}
@@ -420,40 +446,45 @@ const ReserveSeatScreen: React.FC<ReserveSeatScreenProps> = ({
                         {tables.map((seat, index) => (
                             <View key={index} style={styles.seatHolder}>
                                 <>
-                                <View
-                                    style={[
-                                        styles.seatRow,
-                                        selectedSeatId === seat.table &&
-                                            styles.seatRowSelected,
-                                    ]}>
-                                    <Image
-                                        source={require('../../assets/images/dining-table.png')}
-                                    />
-                                    <View>
-                                        <Text style={styles.table}>
-                                            Table: {seat.table}
-                                        </Text>
-                                        <Text style={styles.seats}>
-                                            Number of seats: {seat.seats}
-                                        </Text>
-                                    </View>
-                                    <Pressable
-                                        style={styles.button}
-                                        onPress={() => {
-                                            if (selectedSeatId === seat.table) {
-                                                setSelectedSeatId(null);
+                                    <View
+                                        style={[
+                                            styles.seatRow,
+                                            selectedSeatId === seat.table &&
+                                                styles.seatRowSelected,
+                                        ]}>
+                                        <Image
+                                            source={require('../../assets/images/dining-table.png')}
+                                        />
+                                        <View>
+                                            <Text style={styles.table}>
+                                                Table: {seat.table}
+                                            </Text>
+                                            <Text style={styles.seats}>
+                                                Number of seats: {seat.seats}
+                                            </Text>
+                                        </View>
+                                        <Pressable
+                                            style={styles.button}
+                                            onPress={() => {
+                                                if (
+                                                    selectedSeatId ===
+                                                    seat.table
+                                                ) {
+                                                    setSelectedSeatId(null);
+                                                    setSelectedTimes([]);
+                                                    return;
+                                                }
+                                                setSelectedSeatId(seat.table);
                                                 setSelectedTimes([]);
-                                                return;
-                                            }
-                                            setSelectedSeatId(seat.table);
-                                            setSelectedTimes([]);
-                                        }}>
-                                        <Text style={{color: 'white'}}>
-                                            Select time
-                                        </Text>
-                                    </Pressable>
-                                </View>
-                                    {selectedSeatId === seat.table && <TimeSlots id={seat.table} />}
+                                            }}>
+                                            <Text style={{color: 'white'}}>
+                                                Select time
+                                            </Text>
+                                        </Pressable>
+                                    </View>
+                                    {selectedSeatId === seat.table && (
+                                        <TimeSlots id={seat.table} />
+                                    )}
                                 </>
                             </View>
                         ))}

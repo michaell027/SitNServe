@@ -472,5 +472,4 @@ const styles = StyleSheet.create({
         fontSize: 18,
         lineHeight: 25,
     },
-
 });

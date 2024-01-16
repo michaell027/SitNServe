@@ -100,7 +100,9 @@ function ScanScreen({navigation, route}: ScanScreenProps) {
                 restaurantIdAndSeat.restaurant_id === restaurantId
             ) {
                 console.log(restaurantIdAndSeat);
-                navigation.navigate('MenuListScreen', {restaurantIdAndSeat: restaurantIdAndSeat});
+                navigation.navigate('MenuListScreen', {
+                    restaurantIdAndSeat: restaurantIdAndSeat,
+                });
             } else if (
                 restaurantIdAndSeat &&
                 restaurantIdAndSeat.restaurant_id !== restaurantId

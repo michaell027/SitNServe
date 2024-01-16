@@ -15,24 +15,18 @@ import {faCartShopping} from '@fortawesome/free-solid-svg-icons';
 import firestore from '@react-native-firebase/firestore';
 import MenuItemCard from '../components/MenuItemCard';
 import {SelectedItemsContext} from '../providers/SelectedItemsContext';
-import {RestaurantIdAndSeat} from '../models/RestaurantIdAndSeat';
-
-interface Route {
-    params: {
-        restaurantIdAndSeat: RestaurantIdAndSeat;
-    };
-}
 
 export interface MenuItem {
     id: string;
     name: string;
     price: number;
+    image_url: string;
     quantity?: number;
 }
 
 interface Props {
     navigation: any;
-    route: Route;
+    route: any;
 }
 
 const CartIconWithBadge = () => {
@@ -41,7 +35,11 @@ const CartIconWithBadge = () => {
 
     return (
         <View style={styles.container}>
-            <FontAwesomeIcon icon={faCartShopping} size={30} color={cartIconColor} />
+            <FontAwesomeIcon
+                icon={faCartShopping}
+                size={30}
+                color={cartIconColor}
+            />
             {cartCount > 0 && (
                 <View style={styles.badge}>
                     <Text style={styles.badgeText}>{cartCount}</Text>
@@ -51,27 +49,31 @@ const CartIconWithBadge = () => {
     );
 };
 
-const MenuListScreen: React.FC<Props> = ({navigation, route}) => {
+const MenuListScreen = ({navigation, route}: Props) => {
     const {restaurantIdAndSeat} = route.params;
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [count, setCount] = useState<number>(0);
     const [selectedItems, setSelectedItems] = useState<MenuItem[]>([]);
-    const {selectedItems: selectedItemsContext, updateSelectedItems, updateCartCount} =
-        useContext(SelectedItemsContext);
+    const {
+        selectedItems: selectedItemsContext,
+        updateSelectedItems,
+        updateCartCount,
+    } = useContext(SelectedItemsContext);
 
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
                 <Pressable
                     disabled={count === 0}
-                    onPress={() => navigation.navigate('CartScreen', {restaurantIdAndSeat})}>
+                    onPress={() =>
+                        navigation.navigate('CartScreen', {restaurantIdAndSeat})
+                    }>
                     <CartIconWithBadge />
                 </Pressable>
             ),
         });
     }, [navigation, count]);
-
 
     useEffect(() => {
         const fetchRestaurantData = async () => {
@@ -84,10 +86,12 @@ const MenuListScreen: React.FC<Props> = ({navigation, route}) => {
 
                 const menus: MenuItem[] = [];
                 querySnapshot.forEach(doc => {
+                    console.log(doc.id, ' => ', doc.data().image_url);
                     menus.push({
                         id: doc.id,
                         name: doc.data().name,
                         price: doc.data().price,
+                        image_url: doc.data().image_url,
                     });
                 });
 
@@ -119,7 +123,7 @@ const MenuListScreen: React.FC<Props> = ({navigation, route}) => {
             0,
         );
         setCount(newCount);
-    }
+    };
 
     useEffect(() => {
         updateCartCount(count);
@@ -242,8 +246,6 @@ const MenuListScreen: React.FC<Props> = ({navigation, route}) => {
     );
 };
 
-export default MenuListScreen;
-
 const styles = StyleSheet.create({
     container: {
         position: 'relative',
@@ -281,3 +283,5 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
 });
+
+export default MenuListScreen;

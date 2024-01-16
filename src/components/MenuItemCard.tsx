@@ -64,12 +64,20 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
         <View style={styles.card}>
             <View style={styles.imageContainer}>
                 <Image
-                    source={require('./../../assets/images/menu/coca_cola.png')}
+                    source={{uri: item.image_url}}
                     style={styles.image}
                     resizeMode="contain"
                 />
+                {/*<Image*/}
+                {/*    source={require('./../../assets/images/menu/coca_cola.png')}*/}
+                {/*    style={styles.image}*/}
+                {/*    resizeMode="contain"*/}
+                {/*/>*/}
             </View>
-            <Text style={styles.itemName}>{item.name}</Text>
+            <View style={styles.infoHolder}>
+                <Text style={styles.itemName}>{item.name}</Text>
+                <Text style={styles.itemPrice}>{item.price} €</Text>
+            </View>
             <View style={styles.priceContainer}>
                 <View style={styles.topContainer}>
                     <Text style={styles.price}>{totalPrice.toFixed(2)}€</Text>
@@ -121,11 +129,19 @@ const styles = StyleSheet.create({
     },
     image: {
         height: 80,
+        width: 80,
     },
     itemName: {
-        width: '40%',
-        fontSize: 18,
+        fontSize: 17,
         fontWeight: 'bold',
+    },
+    itemPrice: {
+        fontSize: 15,
+    },
+    infoHolder: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        width: '40%',
         paddingLeft: 8,
     },
     priceContainer: {
