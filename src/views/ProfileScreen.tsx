@@ -7,6 +7,7 @@ import ProfileCard from '../components/ProfileCard';
 import {User} from '../models/User';
 import firestore from '@react-native-firebase/firestore';
 import {Address} from '../models/Address';
+import firebase from "@react-native-firebase/app";
 
 interface ProfileScreenProps {
     navigation: any;
@@ -16,6 +17,67 @@ interface ProfileScreenProps {
 const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
+
+    useEffect(() => {
+        const currentUser = firebase.auth().currentUser;
+        const isEmailVerified = () => {
+            console.log(currentUser?.emailVerified);
+            return currentUser?.emailVerified;
+        };
+
+        if (isEmailVerified()) {
+            setIsEmailVerified(true);
+        } else {
+            setIsEmailVerified(false);
+        }
+    } , []);
+
+        useEffect(() => {
+            const getUser = async () => {
+            setLoading(true);
+            const currentUser = firebase.auth().currentUser;
+            try {
+                if (currentUser) {
+                    const isVerified = currentUser.emailVerified;
+                    setIsEmailVerified(isVerified);
+
+                    const userRef = firestore().collection('users').doc(currentUser.uid);
+                    const document = await userRef.get();
+                    const user = {
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        address: {
+                            state: document.get('address.state'),
+                            street: document.get('address.street'),
+                            number: document.get('address.number'),
+                            address: document.get('address.address'),
+                            city: document.get('address.city'),
+                            ZIPcode: document.get('address.ZIPcode'),
+                        } as Address,
+                        firstName: document.get('firstName'),
+                        lastName: document.get('lastName'),
+                        phone: document.get('phone'),
+                        creationDate: document.get('creationDate'),
+                    } as User;
+                    setUser(user);
+                } else {
+                    AsyncStorage.removeItem('user_uid').then(() => {
+                        setUser(null);
+                    });
+                }
+            } catch (error) {
+                AsyncStorage.removeItem('user_uid').then(() => {
+                    setUser(null);
+                });
+                console.error('Failed to handle auth state change:', error);
+            }
+            setLoading(false);
+        }
+        getUser().then();
+    }, []);
+
+
 
     useEffect(() => {
         async function getNumberOfOrders(uid: string) {
@@ -86,7 +148,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
     }
 
     return (
-        <ProfileCard user={user} setUser={setUser} navigation={navigation} />
+        <ProfileCard user={user} setUser={setUser} navigation={navigation} isVerified={isEmailVerified} />
     );
 };
 

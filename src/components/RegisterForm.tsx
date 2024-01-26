@@ -21,19 +21,19 @@ type Props = {
 
 const initialState: User = {
     uid: '',
-    email: 'jane.doe@example.com',
-    password: 'SuperSecretPassword!',
-    repeatPassword: 'SuperSecretPassword!',
+    email: 'miselka12345@gmail.com',
+    password: 'password123',
+    repeatPassword: 'password123',
     address: {
-        street: 'Sokolovska',
+        street: 'Sokolany',
         number: '1',
         city: 'Kosice',
         state: 'Slovakia',
-        zip: '03389',
+        ZIPcode: '04001',
     },
-    firstName: 'Jane',
-    lastName: 'Doe',
-    phone: '+421 123 456 789',
+    firstName: 'Michaela',
+    lastName: 'Majorošová',
+    phone: '+421 949 327 913',
 };
 
 function RegisterForm({navigation}: Props) {
@@ -82,53 +82,55 @@ function RegisterForm({navigation}: Props) {
     };
 
     function register() {
-        auth()
-            .createUserWithEmailAndPassword(user.email, user.password)
-            .then(userCredential => {
-                firestore()
-                    .collection('users')
-                    .doc(userCredential.user.uid)
-                    .set({
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                        email: user.email,
-                        phone: user.phone,
-                        address: user.address,
-                        uid: userCredential.user.uid,
-                        creationDate: formattedCreationDate(
-                            userCredential.user.metadata.creationTime,
-                        ),
-                        emailVerified: userCredential.user.emailVerified,
-                    })
-                    .then(async () => {
-                        await AsyncStorage.setItem(
-                            'user_uid',
-                            userCredential.user.uid,
-                        );
-                        navigation.navigate('Home');
-                    });
+        if (user.password != null) {
+            auth()
+                .createUserWithEmailAndPassword(user.email, user.password)
+                .then(userCredential => {
+                    firestore()
+                        .collection('users')
+                        .doc(userCredential.user.uid)
+                        .set({
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            email: user.email,
+                            phone: user.phone,
+                            address: user.address,
+                            uid: userCredential.user.uid,
+                            creationDate: formattedCreationDate(
+                                userCredential.user.metadata.creationTime,
+                            ),
+                            emailVerified: userCredential.user.emailVerified,
+                        })
+                        .then(async () => {
+                            await AsyncStorage.setItem(
+                                'user_uid',
+                                userCredential.user.uid,
+                            );
+                            navigation.navigate('Home');
+                        });
 
-                userCredential.user
-                    .sendEmailVerification()
-                    .then(() => {
-                        console.log('Verification email sent!');
-                    })
-                    .catch(emailError => {
-                        setError(
-                            'Error sending verification email:' + emailError,
-                        );
-                    });
-            })
-            .catch(error => {
-                if (error.code === 'auth/email-already-in-use') {
-                    setError('That email address is already in use!');
-                }
+                    userCredential.user
+                        .sendEmailVerification()
+                        .then(() => {
+                            console.log('Verification email sent!');
+                        })
+                        .catch(emailError => {
+                            setError(
+                                'Error sending verification email:' + emailError,
+                            );
+                        });
+                })
+                .catch(error => {
+                    if (error.code === 'auth/email-already-in-use') {
+                        setError('That email address is already in use!');
+                    }
 
-                if (error.code === 'auth/invalid-email') {
-                    setError('That email address is invalid!');
-                }
-                setError(error.message);
-            });
+                    if (error.code === 'auth/invalid-email') {
+                        setError('That email address is invalid!');
+                    }
+                    setError(error.message);
+                });
+        }
     }
 
     const formattedCreationDate = (creationDateStr: string | undefined) => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Dimensions,
     Image,
@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {LoggedInHomeProps} from '../models/LoggedInHomeProps';
+import firebase from "@react-native-firebase/app";
 
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;

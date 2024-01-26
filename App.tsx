@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 import {
     DrawerLayoutAndroid,
     StyleSheet,
-    Pressable,
+    Pressable, AppState,
 } from 'react-native';
 
 // Navigation Imports
@@ -111,6 +111,9 @@ function App() {
     };
 
     useEffect(() => {
+        const channelId = Math.random().toString(36).substring(7);
+        createChannel(channelId);
+
         messaging()
             // @ts-ignore
             .getToken(firebase.app().options.messagingSenderId)
@@ -119,9 +122,7 @@ function App() {
             });
 
         const unsubscribeOnMessage = messaging().onMessage(async remoteMsg => {
-            const channelId = Math.random().toString(36).substring(7);
-            createChannel(channelId);
-            showNotification(channelId, remoteMsg.notification);
+            showNotification(channelId, remoteMsg.notification)
             console.log('A new FCM message arrived!', remoteMsg);
         });
 
@@ -143,6 +144,9 @@ function App() {
                             <Stack.Screen
                                 name="Home"
                                 component={HomeScreen}
+                                listeners={({ navigation }) => ({
+                                    state: () => setNavigationObj(navigation),
+                                })}
                                 options={{
                                     title: `Sitn'serve`,
                                     // headerLeft: () => (

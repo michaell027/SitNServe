@@ -334,7 +334,7 @@ function MapScreen({navigation, route}: MapScreenProps) {
                                     )}>
                                     <View>
                                         <Image
-                                            source={require('../../assets/images/30.png')}
+                                            source={{uri: 'https://firebasestorage.googleapis.com/v0/b/sitnserve-fbaed.appspot.com/o/30.png?alt=media&token=86cf1496-aeec-4088-ac27-c5bae1fca7de'}}
                                             style={{width: 40, height: 40}}
                                             resizeMode="contain"
                                         />

@@ -51,6 +51,7 @@ const LoginForm = ({navigation}: LoginFormProps) => {
             .signInWithEmailAndPassword(username, password)
             .then(async userCredential => {
                 await setUserUid(userCredential.user.uid);
+                navigation.navigate('Home');
             })
             .catch(error => {
                 console.log('Error signing in:', error.code);

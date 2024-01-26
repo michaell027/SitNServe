@@ -5,7 +5,7 @@ import {
     Image,
     TouchableOpacity,
     ScrollView,
-    StyleSheet,
+    StyleSheet, Button, Pressable, Alert,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,9 +28,10 @@ interface ProfileCardProps {
     user: User;
     setUser: any;
     navigation: any;
+    isVerified: boolean;
 }
 
-const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
+const ProfileCard = ({user, setUser, navigation, isVerified}: ProfileCardProps) => {
     const [structuredAddress, setStructuredAddress] = useState<string>('');
 
     useEffect(() => {
@@ -45,6 +46,15 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
             .then(async () => {
                 await AsyncStorage.removeItem('user_uid');
                 setUser(null);
+            });
+    }
+
+    function verifyEmail() {
+        auth()
+            .currentUser?.sendEmailVerification()
+            .then(() => {
+                console.log('Email sent');
+                Alert.alert('Email sent', 'Please check your email inbox and verify your email address.');
             });
     }
 
@@ -74,6 +84,12 @@ const ProfileCard = ({user, setUser, navigation}: ProfileCardProps) => {
                     <View style={styles.information}>
                         <FontAwesomeIcon icon={faAt} size={20} />
                         <Text>{user.email}</Text>
+                        {!isVerified && (
+                            <Pressable
+                                onPress={verifyEmail}>
+                                <Text style={{color: 'red', marginLeft: 5}}>Verify email</Text>
+                            </Pressable>
+                        )}
                     </View>
                     <View style={styles.information}>
                         <FontAwesomeIcon icon={faLocationDot} size={20} />

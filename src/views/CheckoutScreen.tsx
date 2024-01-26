@@ -5,7 +5,6 @@ import {usePaymentSheet} from '@stripe/stripe-react-native';
 import Config from '../../config/config';
 import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/database';
-import PushNotification, {Importance} from 'react-native-push-notification';
 import messaging from '@react-native-firebase/messaging';
 
 const API_URL = Config.API_URL;
@@ -19,9 +18,7 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
         useContext(SelectedItemsContext);
     const {restaurantIdAndSeat} = route.params;
 
-    useEffect(() => {
-        console.log(restaurantIdAndSeat);
-    }, []);
+
     const calculateTotal = () => {
         return selectedItems.reduce(
             (total, item) => total + item.price * item.quantity!,
@@ -47,12 +44,6 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
         fetchUserUid().then();
     }, []);
 
-    useEffect(() => {
-        console.log(userUid);
-        console.log(restaurantIdAndSeat.restaurant_id);
-        console.log(restaurantIdAndSeat.seat);
-    }, []);
-
     const initializePaymentSheet = async () => {
         const {paymentIntent, ephemeralKey, customer, publishableKey} =
             await fetchPaymentSheetParams();
@@ -74,6 +65,7 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
 
     const fetchPaymentSheetParams = async () => {
         const totalAmount = getTotalAmount();
+        console.log(totalAmount);
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
@@ -117,12 +109,12 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
                     total: calculateTotal(),
                     date: new Date(),
                 })
-                .then(() => {
+                .then((docRef) => {
                     navigation.navigate('OrdersScreen', {
                         userUid: userUid,
                     });
                     updateSelectedItems([]);
-                    getPushNotification();
+                    getPushNotification(docRef.id);
                 })
                 .catch(error => {
                     console.log('Error adding reservation to user:', error);
@@ -140,7 +132,7 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
         }
     };
 
-    const getPushNotification = async () => {
+    const getPushNotification = async (id: string) => {
         const deviceToken = await getFCMToken();
 
         try {
@@ -149,7 +141,7 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({deviceToken}),
+                body: JSON.stringify({deviceToken, id}),
             });
         } catch (error) {
             console.error('Error sending FCM token to server:', error);
@@ -196,7 +188,7 @@ const CheckoutScreen = ({navigation, route}: {navigation: any; route: any}) => {
                         !ready || loading ? styles.disabledButton : null,
                     ]}
                     onPress={() => {
-                        openPaymentSheet();
+                        openPaymentSheet().then();
                     }}>
                     <Text style={styles.buttonText}>Checkout</Text>
                 </Pressable>
